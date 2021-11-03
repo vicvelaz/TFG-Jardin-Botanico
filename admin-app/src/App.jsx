@@ -1,11 +1,10 @@
 import React from 'react';
-import Prueba from './components/Prueba';
+
 
 function App() {
   return (
     <div className="container">
-      <h1>Hola mundo React</h1>
-      <Prueba />
+      prueba
     </div>
   );
 }

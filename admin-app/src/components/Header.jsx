@@ -2,7 +2,7 @@ import React from 'react'
 
 const Header = () => {
     return (
-        <div>
+        <div className="navbarrjb">
             <nav className="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
                 <div className="container-fluid">
                     <a className="navbar-brand" href="#">RJB App - Admin</a>

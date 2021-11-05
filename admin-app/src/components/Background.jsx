@@ -30,7 +30,6 @@ const Background = () => {
                                     <Link to="/itineraries">
                                         <button className="btn btn-success btn-lg">Itinerarios</button>
                                     </Link>
-                                    
                                 </div>
                             </div>
                         </div>

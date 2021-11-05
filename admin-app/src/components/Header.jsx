@@ -6,7 +6,7 @@ const Header = () => {
         <div className="navbarrjb">
             <nav className="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
                 <div className="container-fluid">
-                    <Link className="navbar-brand" to="/">RJB App - Admin</Link>
+                    <Link className="navbar-brand me-5" to="/">RJB App - Admin</Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
                         <span className="navbar-toggler-icon"></span>
                     </button>

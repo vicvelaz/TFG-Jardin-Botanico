@@ -1,4 +1,5 @@
 import React from 'react'
+import {Link} from 'react-router-dom'
 
 const Background = () => {
     return (
@@ -15,13 +16,21 @@ const Background = () => {
                         <div className="container mt-5">
                             <div className="row justify-content-start">
                                 <div className="col-3">
-                                    <button className="btn btn-success btn-lg">Eventos</button>
+                                    <Link to="/events">
+                                        <button className="btn btn-success btn-lg">Eventos</button>
+                                    </Link>
                                 </div>
                                 <div className="col-4">
-                                    <button className="btn btn-success btn-lg">Plantas y Lugares</button>
+                                    <Link to="/plants">
+                                        <button className="btn btn-success btn-lg">Plantas y Lugares</button>
+                                    </Link>
+                                    
                                 </div>
                                 <div className="col-4">
-                                    <button className="btn btn-success btn-lg">Itinerarios</button>
+                                    <Link to="/itineraries">
+                                        <button className="btn btn-success btn-lg">Itinerarios</button>
+                                    </Link>
+                                    
                                 </div>
                             </div>
                         </div>

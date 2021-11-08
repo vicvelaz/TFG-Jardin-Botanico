@@ -10,18 +10,42 @@ const Events = () => {
                 <div className="d-flex mt-5">
                     <button className="btn btn-success ms-5" data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Nuevo Evento</button>
                     <div class="modal fade text-dark" id="nuevoeventomodal">
-                        <div class="modal-dialog modal-lg">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h4 class="modal-title">Nuevo Evento</h4>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
-                                <div class="modal-body">
-                                    Modal body..
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                                </div>
+                                <form>
+                                    <div class="modal-body">
+                                        <div className="form-floating mt-3">
+                                            <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxlength="50"></input>
+                                            <label for="name">Nombre</label>
+                                        </div>
+                                        <div class="form-floating mt-3">
+                                            <textarea className="form-control" id="description" name="description" placeholder="Descripción" maxlength="200"></textarea>
+                                            <label for="description">Descripción</label>
+                                        </div>
+                                        <div className="d-flex mt-4">
+                                            <div className="">
+                                                <label className="ms-5 me-2" for="startevent">Inicio evento: </label>
+                                                <input type="date" id="startevent" name="startevent"></input>
+                                            </div>
+                                            <div className="ms-auto me-5">
+                                                <label className="me-2" for="endevent">Fin evento: </label>
+                                                <input type="date" id="endevent" name="endevent"></input>
+                                            </div>
+                                        </div>
+                                        <div className="d-flex justify-content-center align-items-center mt-4">
+                                            <label for="formFile" className="me-2" class="form-label">Imagen: </label>
+                                            <input class="form-control w-50" type="file" id="formFile"></input>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input type="submit" class="btn btn-success" value="Añadir"></input>
+                                        <button type="button" className="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

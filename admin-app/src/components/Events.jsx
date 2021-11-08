@@ -37,12 +37,12 @@ const Events = () => {
                                             </div>
                                         </div>
                                         <div className="d-flex justify-content-center align-items-center mt-4">
-                                            <label for="formFile" className="me-2" class="form-label">Imagen: </label>
-                                            <input class="form-control w-50" type="file" id="formFile"></input>
+                                            <label for="formFile" className="form-label">Imagen: </label>
+                                            <input className="form-control w-50 ms-2" type="file" id="formFile"></input>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <input type="submit" class="btn btn-success" value="Añadir"></input>
+                                        <input type="submit" className="btn btn-success" value="Añadir"></input>
                                         <button type="button" className="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
                                     </div>
                                 </form>

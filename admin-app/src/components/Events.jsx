@@ -1,6 +1,31 @@
 import React from 'react'
+import {db,auth,storage} from '../firebase'
+
+import moment from 'moment'
+import 'moment/locale/es'
 
 const Events = () => {
+
+    const [eventos,setEventos] = React.useState([]);
+
+    React.useEffect(()=>{
+        const obtenerEventos = async () => {
+
+            try{
+                const data = await db.collection('events').get();
+                const arrayData = data.docs.map(doc => ({id: doc.id, ...doc.data()}));
+                setEventos(arrayData);
+
+            } catch(error){
+                console.log(error);
+            }
+
+        }
+
+        obtenerEventos();
+
+    },[]);
+
     return (
         <div className="background">
             <div className="d-flex justify-content-center mt-5">
@@ -65,20 +90,17 @@ const Events = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>Semana de la Ciencia</td>
-                                <td>El Real Jardín Botánico (RJB) del Consejo Superior de Investigaciones Científicas (CSIC) se suma una edición más a la gran fiesta de la ciencia y la tecnología que supone la celebración de la denomina...</td>
-                                <td>01/11/21</td>
-                                <td><div className="d-flex align-items-center align-self-center">14/11/21</div></td>
-                                <td><div className="d-flex"><button className="btn btn-success">Editar</button><button className="btn btn-danger ms-3">Eliminar</button></div></td>
-                            </tr>
-                            <tr>
-                                <td>Naturaleza Encencida</td>
-                                <td>Descubre una nueva edición de la exitosa Naturaleza Encendida, EXPLORIUM, una experiencia inmersiva y llena de sorpresas que te hará viajar a las profundidades en un viaje sensorial completamente dife...</td>
-                                <td>02/11/21</td>
-                                <td>16/01/22</td>
-                                <td><div className="d-flex"><button className="btn btn-success">Editar</button><button className="btn btn-danger ms-3">Eliminar</button></div></td>
-                            </tr>
+                            {
+                                eventos.map(e => (
+                                    <tr key={e.id}>
+                                        <td>{e.name}</td>
+                                        <td>{e.description}</td>
+                                        <td>{moment.unix(e.start_date.seconds).format('DD/MM/YY')}</td>
+                                        <td>{moment.unix(e.end_date.seconds).format('DD/MM/YY')}</td>
+                                        <td><div className="d-flex"><button className="btn btn-success">Editar</button><button className="btn btn-danger ms-3">Eliminar</button></div></td>
+                                    </tr>
+                                ))
+                            }
                         </tbody>
                     </table>
                 </div>

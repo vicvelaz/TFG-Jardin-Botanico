@@ -12,6 +12,8 @@ const Events = () => {
     const [startDate, setStartDate] = React.useState("");
     const [endDate, setEndDate] = React.useState("");
     const [image, setImage] = React.useState("");
+    const [edit,setEdit] = React.useState(false);
+    const [id,setID] = React.useState("");
 
     React.useEffect(()=>{
         const obtenerEventos = async () => {
@@ -77,6 +79,57 @@ const Events = () => {
         }
     }
 
+    const loadModalModificarEvento = (id) => {
+        setEdit(true);
+        const eventoInfo = eventos.find(item => item.id === id);
+        document.getElementById("name").value = eventoInfo.name;
+        document.getElementById("description").value = eventoInfo.description;
+        document.getElementById("startevent").value = eventoInfo.startDate;
+        document.getElementById("endevent").value = eventoInfo.endDate;
+        document.getElementById("formFile").value = eventoInfo.image;
+        setID(eventoInfo.id);
+        setName(eventoInfo.name);
+        setDescription(eventoInfo.description);
+        setStartDate(eventoInfo.startDate);
+        setEndDate(eventoInfo.endDate);
+        setImage(eventoInfo.image);
+
+    }
+
+    const modificarEvento = async(e) => {
+        e.preventDefault();
+        if(!name.trim()||!startDate.trim()||!endDate.trim()){
+            console.log("Los campos están vacios");
+            return
+        }
+        try {
+            await db.collection('events').doc(id).update({
+                name: name,
+                description: description,
+                start_date: new Date(startDate),
+                end_date: new Date(endDate),
+                image: image
+            });
+
+            const arrayEditado = eventos.map(item => (
+                item.id === id ? {id:item.id, name:name,description:description,start_date:startDate,end_date:endDate,image:image } : item
+            ));
+
+            setEventos(arrayEditado);
+            setEdit(false);
+            setName('');
+            setDescription('');
+            setStartDate('');
+            setEndDate('');
+            setImage('');
+            
+            document.getElementById("formularioeventos").reset();
+            
+        } catch (error) {
+            console.log(error);
+        } 
+    }
+
     return (
         <div className="background">
             <div className="d-flex justify-content-center mt-5">
@@ -92,7 +145,7 @@ const Events = () => {
                                     <h4 className="modal-title">Nuevo Evento</h4>
                                     <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
-                                <form id="formularioeventos" onSubmit={nuevoEvento}>
+                                <form id="formularioeventos" onSubmit={edit ? modificarEvento : nuevoEvento}>
                                     <div className="modal-body">
                                         <div className="form-floating mt-3">
                                             <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value)}></input>
@@ -148,7 +201,7 @@ const Events = () => {
                                         <td>{e.description}</td>
                                         <td>{moment.unix(e.start_date.seconds).format('DD/MM/YY')}</td>
                                         <td>{moment.unix(e.end_date.seconds).format('DD/MM/YY')}</td>
-                                        <td><div className="d-flex"><button className="btn btn-success">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarEvento(e.id)}>Eliminar</button></div></td>
+                                        <td><div className="d-flex"><button className="btn btn-success" onClick={() => loadModalModificarEvento(e.id)} data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarEvento(e.id)}>Eliminar</button></div></td>
                                     </tr>
                                 ))
                             }

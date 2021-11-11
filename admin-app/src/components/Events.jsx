@@ -64,6 +64,19 @@ const Events = () => {
         }
     }
 
+    const eliminarEvento = async (id) =>
+    {
+        try {
+            
+            await db.collection('events').doc(id).delete();
+            const arrayFiltrado = eventos.filter(item => item.id !== id);
+            setEventos(arrayFiltrado);
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
     return (
         <div className="background">
             <div className="d-flex justify-content-center mt-5">
@@ -135,7 +148,7 @@ const Events = () => {
                                         <td>{e.description}</td>
                                         <td>{moment.unix(e.start_date.seconds).format('DD/MM/YY')}</td>
                                         <td>{moment.unix(e.end_date.seconds).format('DD/MM/YY')}</td>
-                                        <td><div className="d-flex"><button className="btn btn-success">Editar</button><button className="btn btn-danger ms-3">Eliminar</button></div></td>
+                                        <td><div className="d-flex"><button className="btn btn-success">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarEvento(e.id)}>Eliminar</button></div></td>
                                     </tr>
                                 ))
                             }

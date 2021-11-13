@@ -93,7 +93,17 @@ const Events = () => {
         setStartDate(eventoInfo.startDate);
         setEndDate(eventoInfo.endDate);
         setImage(eventoInfo.image);
+    }
 
+    const cancelarEdit = () => {
+        setEdit(false);
+        setName('');
+        setDescription('');
+        setStartDate('');
+        setEndDate('');
+        setImage('');
+            
+        document.getElementById("formularioeventos").reset();
     }
 
     const modificarEvento = async(e) => {
@@ -143,7 +153,7 @@ const Events = () => {
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <h4 className="modal-title">Nuevo Evento</h4>
-                                    <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                                    <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={() => cancelarEdit()}></button>
                                 </div>
                                 <form id="formularioeventos" onSubmit={edit ? modificarEvento : nuevoEvento}>
                                     <div className="modal-body">
@@ -172,7 +182,7 @@ const Events = () => {
                                     </div>
                                     <div className="modal-footer">
                                         <input type="submit" className="btn btn-success" data-bs-dismiss="modal" value="Añadir"></input>
-                                        <button type="button" className="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => cancelarEdit()}>Cancelar</button>
                                     </div>
                                 </form>
                             </div>

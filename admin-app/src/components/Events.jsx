@@ -14,21 +14,23 @@ const Events = () => {
     const [image, setImage] = React.useState("");
     const [edit,setEdit] = React.useState(false);
     const [id,setID] = React.useState("");
+    const [busqueda,setBusqueda] = React.useState(""); 
 
-    React.useEffect(()=>{
-        const obtenerEventos = async () => {
+    const obtenerEventos = async () => {
 
-            try{
-                const data = await db.collection('events').get();
-                const arrayData = data.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                setEventos(arrayData);
+        try{
+            const data = await db.collection('events').get();
+            const arrayData = data.docs.map(doc => ({id: doc.id, ...doc.data()}));
+            setEventos(arrayData);
 
-            } catch(error){
-                console.log(error);
-            }
-
+        } catch(error){
+            console.log(error);
         }
 
+    }
+
+    React.useEffect(()=>{
+    
         obtenerEventos();
 
     },[]);
@@ -85,10 +87,11 @@ const Events = () => {
         document.getElementById("name").value = eventoInfo.name;
         document.getElementById("description").value = eventoInfo.description;
         const fecha_inicio = new Date (eventoInfo.start_date.seconds*1000);
+        console.log(fecha_inicio)
         document.getElementById("startevent").value = `${fecha_inicio.getFullYear()}-${fecha_inicio.getMonth()+1}-${fecha_inicio.getDate()}`;
         const fecha_fin = new Date (eventoInfo.end_date.seconds*1000);
         document.getElementById("endevent").value = `${fecha_fin.getFullYear()}-${fecha_fin.getMonth()+1}-${fecha_fin.getDate()}`;
-        document.getElementById("formFile").value = eventoInfo.image;
+        console.log(fecha_fin)
         setID(eventoInfo.id);
         setName(eventoInfo.name);
         setDescription(eventoInfo.description);
@@ -142,6 +145,15 @@ const Events = () => {
         } 
     }
 
+    const buscarEvento = (e) => {
+        setBusqueda(e.target.value);
+        if(busqueda === ""){
+            obtenerEventos();
+        }else{
+            setEventos(eventos.filter(ev => ev.name.includes(busqueda)));
+        }
+    }
+
     return (
         <div className="background">
             <div className="d-flex justify-content-center mt-5">
@@ -191,7 +203,7 @@ const Events = () => {
                         </div>
                     </div>
                     <div className=" ms-auto me-5">
-                        <input type="text" className="form-control form-control-md text-dark" placeholder="Buscar"></input>
+                        <input type="text" className="form-control form-control-md text-dark" placeholder="Buscar" onChange={e => buscarEvento(e)} onKeyDown={e => buscarEvento(e)}></input>
                     </div>
                 </div>
                 <div className="mt-4 contenedor rounded">

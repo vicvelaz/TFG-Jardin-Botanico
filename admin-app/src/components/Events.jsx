@@ -5,20 +5,23 @@ import moment from 'moment'
 import 'moment/locale/es'
 
 const Events = () => {
-    //estados de control
+    
+    //listado de eventos
     const [eventos,setEventos] = React.useState([]);
-    const [busqueda,setBusqueda] = React.useState(""); 
+
+    //estados de control
     const [edit,setEdit] = React.useState(false);
+    const [editFechaIni,setEditFechaIni] = React.useState(false);
+    const [editFechaFin,setEditFechaFin] = React.useState(false);
 
     //estados para inputs
+    const [busqueda,setBusqueda] = React.useState(""); 
     const [id,setID] = React.useState("");
     const [name, setName] = React.useState("");
     const [description, setDescription] = React.useState("");
-    const [startDate, setStartDate] = React.useState({});
-    const [endDate, setEndDate] = React.useState({});
+    const [startDate, setStartDate] = React.useState("");
+    const [endDate, setEndDate] = React.useState("");
     const [image, setImage] = React.useState("");
-    
-    
     
 
     const obtenerEventos = async () => {
@@ -40,10 +43,16 @@ const Events = () => {
 
     },[]);
 
+    //Funciones asincronas => Consulta a Firebase
+
     const nuevoEvento = async(e) => {
         e.preventDefault();
-        if(!name.trim()||!startDate.trim()||!endDate.trim()){
+        if(name===""||startDate===""||endDate===""){
             console.log("Los campos están vacios")
+            return
+        }
+        if(new Date(startDate) > new Date(endDate)){
+            console.log("La fecha de inicio no puede ser posterior a la de fin")
             return
         }
         try {
@@ -63,6 +72,8 @@ const Events = () => {
             setStartDate('');
             setEndDate('');
             setImage('');
+            setEditFechaIni(false);
+            setEditFechaFin(false);
             setEventos([
                 ...eventos,{...nuevoEvento, id: data.id}
             ])
@@ -86,6 +97,46 @@ const Events = () => {
         }
     }
 
+    const modificarEvento = async(e) => {
+        e.preventDefault();
+        if(name===""||startDate===""||endDate===""){
+            console.log("Los campos están vacios");
+            return
+        }
+        try {
+            console.log(startDate)
+            console.log(endDate)
+            const fecha_ini = editFechaIni ? new Date (startDate) : new Date (startDate.seconds*1000);
+            const fecha_fin = editFechaFin ? new Date (endDate) : new Date (endDate.seconds*1000);
+
+            await db.collection('events').doc(id).update({
+                name: name,
+                description: description,
+                start_date: fecha_ini,
+                end_date: fecha_fin,
+                image: image
+            });
+
+            obtenerEventos();
+         
+            setEdit(false);
+            setName('');
+            setDescription('');
+            setStartDate('');
+            setEndDate('');
+            setImage('');
+            setEditFechaIni(false);
+            setEditFechaFin(false);
+            
+            document.getElementById("formularioeventos").reset();
+            
+        } catch (error) {
+            console.log(error);
+        } 
+    }
+
+    //Funciones auxiliares => Formateo y Frontend
+
     const loadModalModificarEvento = (id) => {
         setEdit(true);
         const eventoInfo = eventos.find(item => item.id === id);
@@ -93,9 +144,9 @@ const Events = () => {
         document.getElementById("name").value = eventoInfo.name;
         document.getElementById("description").value = eventoInfo.description;
         const fecha_inicio = new Date (eventoInfo.start_date.seconds*1000);
-        document.getElementById("startevent").value = `${fecha_inicio.getFullYear()}-${fecha_inicio.getMonth()+1}-${fecha_inicio.getDate()}`;
+        document.getElementById("startevent").value = `${fecha_inicio.getFullYear()}-${('0' + (fecha_inicio.getMonth()+1)).slice(-2)}-${('0' + fecha_inicio.getDate()).slice(-2)}`;
         const fecha_fin = new Date (eventoInfo.end_date.seconds*1000);
-        document.getElementById("endevent").value = `${fecha_fin.getFullYear()}-${fecha_fin.getMonth()+1}-${fecha_fin.getDate()}`;
+        document.getElementById("endevent").value = `${fecha_fin.getFullYear()}-${('0' + (fecha_fin.getMonth()+1)).slice(-2)}-${('0' + fecha_fin.getDate()).slice(-2)}`;
         
         setID(eventoInfo.id);
         setName(eventoInfo.name);
@@ -107,6 +158,8 @@ const Events = () => {
 
     const cancelarEdit = () => {
         setEdit(false);
+        setEditFechaIni(false);
+        setEditFechaFin(false);
         setName('');
         setDescription('');
         setStartDate('');
@@ -116,38 +169,14 @@ const Events = () => {
         document.getElementById("formularioeventos").reset();
     }
 
-    const modificarEvento = async(e) => {
-        e.preventDefault();
-        if(name===""||startDate===""||endDate===""){
-            console.log("Los campos están vacios");
-            return
-        }
-        try {
-            await db.collection('events').doc(id).update({
-                name: name,
-                description: description,
-                start_date: new Date(startDate.seconds*1000),
-                end_date: new Date(endDate.seconds*1000),
-                image: image
-            });
+    const modificarFechaIni= (e) => {
+        setStartDate(e.target.value);
+        setEditFechaIni(true);
+    }
 
-            const arrayEditado = eventos.map(item => (
-                item.id === id ? {id:item.id, name:name,description:description,start_date:startDate,end_date:endDate,image:image } : item
-            ));
-
-            setEventos(arrayEditado);
-            setEdit(false);
-            setName('');
-            setDescription('');
-            setStartDate('');
-            setEndDate('');
-            setImage('');
-            
-            document.getElementById("formularioeventos").reset();
-            
-        } catch (error) {
-            console.log(error);
-        } 
+    const modificarFechaFin = (e) => {
+        setEndDate(e.target.value);
+        setEditFechaFin(true);
     }
 
     const buscarEvento = (e) => {
@@ -187,11 +216,11 @@ const Events = () => {
                                         <div className="d-flex mt-4">
                                             <div className="">
                                                 <label className="ms-5 me-2" htmlFor="startevent">Inicio evento: </label>
-                                                <input type="date" id="startevent" name="startevent" onChange={e => setStartDate(e.target.value)}></input>
+                                                <input type="date" id="startevent" name="startevent" onChange={e => modificarFechaIni(e)}></input>
                                             </div>
                                             <div className="ms-auto me-5">
                                                 <label className="me-2" htmlFor="endevent">Fin evento: </label>
-                                                <input type="date" id="endevent" name="endevent" onChange={e => setEndDate(e.target.value)}></input>
+                                                <input type="date" id="endevent" name="endevent" onChange={e => modificarFechaFin(e)}></input>
                                             </div>
                                         </div>
                                         <div className="d-flex justify-content-center align-items-center mt-4">

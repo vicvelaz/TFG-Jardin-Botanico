@@ -5,16 +5,21 @@ import moment from 'moment'
 import 'moment/locale/es'
 
 const Events = () => {
-
+    //estados de control
     const [eventos,setEventos] = React.useState([]);
+    const [busqueda,setBusqueda] = React.useState(""); 
+    const [edit,setEdit] = React.useState(false);
+
+    //estados para inputs
+    const [id,setID] = React.useState("");
     const [name, setName] = React.useState("");
     const [description, setDescription] = React.useState("");
     const [startDate, setStartDate] = React.useState({});
     const [endDate, setEndDate] = React.useState({});
     const [image, setImage] = React.useState("");
-    const [edit,setEdit] = React.useState(false);
-    const [id,setID] = React.useState("");
-    const [busqueda,setBusqueda] = React.useState(""); 
+    
+    
+    
 
     const obtenerEventos = async () => {
 

@@ -9,8 +9,8 @@ const Events = () => {
     const [eventos,setEventos] = React.useState([]);
     const [name, setName] = React.useState("");
     const [description, setDescription] = React.useState("");
-    const [startDate, setStartDate] = React.useState("");
-    const [endDate, setEndDate] = React.useState("");
+    const [startDate, setStartDate] = React.useState({});
+    const [endDate, setEndDate] = React.useState({});
     const [image, setImage] = React.useState("");
     const [edit,setEdit] = React.useState(false);
     const [id,setID] = React.useState("");
@@ -84,14 +84,14 @@ const Events = () => {
     const loadModalModificarEvento = (id) => {
         setEdit(true);
         const eventoInfo = eventos.find(item => item.id === id);
+
         document.getElementById("name").value = eventoInfo.name;
         document.getElementById("description").value = eventoInfo.description;
         const fecha_inicio = new Date (eventoInfo.start_date.seconds*1000);
-        console.log(fecha_inicio)
         document.getElementById("startevent").value = `${fecha_inicio.getFullYear()}-${fecha_inicio.getMonth()+1}-${fecha_inicio.getDate()}`;
         const fecha_fin = new Date (eventoInfo.end_date.seconds*1000);
         document.getElementById("endevent").value = `${fecha_fin.getFullYear()}-${fecha_fin.getMonth()+1}-${fecha_fin.getDate()}`;
-        console.log(fecha_fin)
+        
         setID(eventoInfo.id);
         setName(eventoInfo.name);
         setDescription(eventoInfo.description);
@@ -113,7 +113,7 @@ const Events = () => {
 
     const modificarEvento = async(e) => {
         e.preventDefault();
-        if(!name.trim()||!startDate.trim()||!endDate.trim()){
+        if(name===""||startDate===""||endDate===""){
             console.log("Los campos están vacios");
             return
         }
@@ -121,8 +121,8 @@ const Events = () => {
             await db.collection('events').doc(id).update({
                 name: name,
                 description: description,
-                start_date: new Date(startDate),
-                end_date: new Date(endDate),
+                start_date: new Date(startDate.seconds*1000),
+                end_date: new Date(endDate.seconds*1000),
                 image: image
             });
 
@@ -169,7 +169,7 @@ const Events = () => {
                                     <h4 className="modal-title">{edit ? 'Editar Evento':'Nuevo Evento'}</h4>
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={() => cancelarEdit()}></button>
                                 </div>
-                                <form id="formularioeventos" onSubmit={edit ? modificarEvento : nuevoEvento}>
+                                <form id="formularioeventos" onSubmit={e => edit ? modificarEvento(e) : nuevoEvento(e)}>
                                     <div className="modal-body">
                                         <div className="form-floating mt-3">
                                             <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value)}></input>

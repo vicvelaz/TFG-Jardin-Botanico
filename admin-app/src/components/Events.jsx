@@ -84,14 +84,16 @@ const Events = () => {
         const eventoInfo = eventos.find(item => item.id === id);
         document.getElementById("name").value = eventoInfo.name;
         document.getElementById("description").value = eventoInfo.description;
-        document.getElementById("startevent").value = eventoInfo.startDate;
-        document.getElementById("endevent").value = eventoInfo.endDate;
+        const fecha_inicio = new Date (eventoInfo.start_date.seconds*1000);
+        document.getElementById("startevent").value = `${fecha_inicio.getFullYear()}-${fecha_inicio.getMonth()+1}-${fecha_inicio.getDate()}`;
+        const fecha_fin = new Date (eventoInfo.end_date.seconds*1000);
+        document.getElementById("endevent").value = `${fecha_fin.getFullYear()}-${fecha_fin.getMonth()+1}-${fecha_fin.getDate()}`;
         document.getElementById("formFile").value = eventoInfo.image;
         setID(eventoInfo.id);
         setName(eventoInfo.name);
         setDescription(eventoInfo.description);
-        setStartDate(eventoInfo.startDate);
-        setEndDate(eventoInfo.endDate);
+        setStartDate(eventoInfo.start_date);
+        setEndDate(eventoInfo.end_date);
         setImage(eventoInfo.image);
     }
 
@@ -152,7 +154,7 @@ const Events = () => {
                         <div className="modal-dialog modal-dialog-centered modal-lg">
                             <div className="modal-content">
                                 <div className="modal-header">
-                                    <h4 className="modal-title">Nuevo Evento</h4>
+                                    <h4 className="modal-title">{edit ? 'Editar Evento':'Nuevo Evento'}</h4>
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={() => cancelarEdit()}></button>
                                 </div>
                                 <form id="formularioeventos" onSubmit={edit ? modificarEvento : nuevoEvento}>
@@ -181,7 +183,7 @@ const Events = () => {
                                         </div>
                                     </div>
                                     <div className="modal-footer">
-                                        <input type="submit" className="btn btn-success" data-bs-dismiss="modal" value="Añadir"></input>
+                                        <input type="submit" className="btn btn-success" data-bs-dismiss="modal" value={edit ? 'Editar':'Añadir'}></input>
                                         <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => cancelarEdit()}>Cancelar</button>
                                     </div>
                                 </form>

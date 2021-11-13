@@ -121,16 +121,26 @@ const Events = () => {
             const fecha_ini = editFechaIni ? new Date (startDate) : new Date (startDate.seconds*1000);
             const fecha_fin = editFechaFin ? new Date (endDate) : new Date (endDate.seconds*1000);
 
+            setLoading(true);
+
             await db.collection('events').doc(id).update({
                 name: name,
                 description: description,
                 start_date: fecha_ini,
                 end_date: fecha_fin,
-                image: image
+                image: ''
             });
 
+            if(image !== undefined){
+                const imagenRef = storage.ref().child("/images/events").child(id);
+                await imagenRef.put(image)
+                const imagenURL = await imagenRef.getDownloadURL()
+                await db.collection('events').doc(id).update({image: imagenURL});
+            }
+
             obtenerEventos();
-         
+
+            setLoading(false);
             setEdit(false);
             setName('');
             setDescription('');

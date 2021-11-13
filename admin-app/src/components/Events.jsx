@@ -3,14 +3,17 @@ import {db,auth,storage} from '../firebase'
 
 import moment from 'moment'
 import 'moment/locale/es'
+import $ from 'jquery'
+import 'bootstrap'
 
 const Events = () => {
-    
+
     //listado de eventos
     const [eventos,setEventos] = React.useState([]);
 
     //estados de control
     const [edit,setEdit] = React.useState(false);
+    const [error,setError] = React.useState(null);
     const [editFechaIni,setEditFechaIni] = React.useState(false);
     const [editFechaFin,setEditFechaFin] = React.useState(false);
 
@@ -37,22 +40,18 @@ const Events = () => {
 
     }
 
-    React.useEffect(()=>{
-    
-        obtenerEventos();
-
-    },[]);
+    React.useEffect(()=>{obtenerEventos()},[]);
 
     //Funciones asincronas => Consulta a Firebase
 
     const nuevoEvento = async(e) => {
         e.preventDefault();
         if(name===""||startDate===""||endDate===""){
-            console.log("Los campos están vacios")
+            setError("Los campos están vacios")
             return
         }
         if(new Date(startDate) > new Date(endDate)){
-            console.log("La fecha de inicio no puede ser posterior a la de fin")
+            setError("La fecha de inicio no puede ser posterior a la de fin")
             return
         }
         try {
@@ -65,7 +64,9 @@ const Events = () => {
                 image: image
             }
 
-            const data = await db.collection('events').add(nuevoEvento);
+            await db.collection('events').add(nuevoEvento);
+
+            obtenerEventos();
 
             setName('');
             setDescription('');
@@ -74,11 +75,13 @@ const Events = () => {
             setImage('');
             setEditFechaIni(false);
             setEditFechaFin(false);
-            setEventos([
-                ...eventos,{...nuevoEvento, id: data.id}
-            ])
-            document.getElementById("formularioeventos").reset();
+            setError(null);
 
+            document.getElementById("formularioeventos").reset();
+            window.$('#nuevoeventomodal').modal('toggle');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+            
         } catch (error) {
             console.log(error);
         }
@@ -100,12 +103,10 @@ const Events = () => {
     const modificarEvento = async(e) => {
         e.preventDefault();
         if(name===""||startDate===""||endDate===""){
-            console.log("Los campos están vacios");
+            setError("Los campos están vacios");
             return
         }
         try {
-            console.log(startDate)
-            console.log(endDate)
             const fecha_ini = editFechaIni ? new Date (startDate) : new Date (startDate.seconds*1000);
             const fecha_fin = editFechaFin ? new Date (endDate) : new Date (endDate.seconds*1000);
 
@@ -127,8 +128,14 @@ const Events = () => {
             setImage('');
             setEditFechaIni(false);
             setEditFechaFin(false);
+            setError(null);
             
             document.getElementById("formularioeventos").reset();
+            window.$('#nuevoeventomodal').modal('toggle');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+            document.getElementById("busc").value = "";
+            setBusqueda("");
             
         } catch (error) {
             console.log(error);
@@ -165,6 +172,7 @@ const Events = () => {
         setStartDate('');
         setEndDate('');
         setImage('');
+        setError(null);
             
         document.getElementById("formularioeventos").reset();
     }
@@ -205,6 +213,11 @@ const Events = () => {
                                 </div>
                                 <form id="formularioeventos" onSubmit={e => edit ? modificarEvento(e) : nuevoEvento(e)}>
                                     <div className="modal-body">
+                                        {error && (
+                                            <div className="alert alert-danger">
+                                                {error}
+                                            </div>
+                                        )}
                                         <div className="form-floating mt-3">
                                             <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value)}></input>
                                             <label htmlFor="name">Nombre</label>
@@ -229,7 +242,7 @@ const Events = () => {
                                         </div>
                                     </div>
                                     <div className="modal-footer">
-                                        <input type="submit" className="btn btn-success" data-bs-dismiss="modal" value={edit ? 'Editar':'Añadir'}></input>
+                                        <input type="submit" className="btn btn-success" value={edit ? 'Editar':'Añadir'}></input>
                                         <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => cancelarEdit()}>Cancelar</button>
                                     </div>
                                 </form>
@@ -237,7 +250,7 @@ const Events = () => {
                         </div>
                     </div>
                     <div className=" ms-auto me-5">
-                        <input type="text" className="form-control form-control-md text-dark" placeholder="Buscar" onChange={e => buscarEvento(e)} onKeyDown={e => buscarEvento(e)}></input>
+                        <input type="text" id="busc" className="form-control form-control-md text-dark" placeholder="Buscar" onChange={e => buscarEvento(e)} onKeyDown={e => buscarEvento(e)}></input>
                     </div>
                 </div>
                 <div className="mt-4 contenedor rounded">

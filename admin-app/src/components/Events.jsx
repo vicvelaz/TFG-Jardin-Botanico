@@ -12,6 +12,7 @@ const Events = () => {
     const [eventos,setEventos] = React.useState([]);
 
     //estados de control
+    const [loading,setLoading] = React.useState(false);
     const [edit,setEdit] = React.useState(false);
     const [error,setError] = React.useState(null);
     const [editFechaIni,setEditFechaIni] = React.useState(false);
@@ -24,7 +25,7 @@ const Events = () => {
     const [description, setDescription] = React.useState("");
     const [startDate, setStartDate] = React.useState("");
     const [endDate, setEndDate] = React.useState("");
-    const [image, setImage] = React.useState("");
+    const [image, setImage] = React.useState(null);
     
 
     const obtenerEventos = async () => {
@@ -61,13 +62,22 @@ const Events = () => {
                 description: description,
                 start_date: new Date(startDate),
                 end_date: new Date(endDate),
-                image: image
+                image: ''
             }
 
-            await db.collection('events').add(nuevoEvento);
+            setLoading(true);
+            const ev = await db.collection('events').add(nuevoEvento);
 
+            if(image !== undefined){
+                const imagenRef = storage.ref().child("/images/events").child(ev.id);
+                await imagenRef.put(image)
+                const imagenURL = await imagenRef.getDownloadURL()
+                await db.collection('events').doc(ev.id).update({image: imagenURL});
+            }
+            
             obtenerEventos();
 
+            setLoading(false);
             setName('');
             setDescription('');
             setStartDate('');
@@ -238,11 +248,17 @@ const Events = () => {
                                         </div>
                                         <div className="d-flex justify-content-center align-items-center mt-4">
                                             <label htmlFor="formFile" className="form-label">Imagen: </label>
-                                            <input className="form-control w-50 ms-2" type="file" accept="image/*" id="formFile" onChange={e => setImage(e.target.value)}></input>
+                                            <input className="form-control w-50 ms-2" type="file" accept="image/*" id="formFile" onChange={e => setImage(e.target.files[0])}></input>
                                         </div>
                                     </div>
                                     <div className="modal-footer">
-                                        <input type="submit" className="btn btn-success" value={edit ? 'Editar':'Añadir'}></input>
+                                        {loading ? (
+                                            <button type="submit" className="btn btn-success" value={edit ? 'Editar':'Añadir'}>
+                                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                Cargando...
+                                            </button>
+                                        ):(<input type="submit" className="btn btn-success" value={edit ? 'Editar':'Añadir'}></input>)}
+
                                         <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => cancelarEdit()}>Cancelar</button>
                                     </div>
                                 </form>

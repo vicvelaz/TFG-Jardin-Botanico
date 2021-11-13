@@ -100,8 +100,9 @@ const Events = () => {
     const eliminarEvento = async (id) =>
     {
         try {
-            
             await db.collection('events').doc(id).delete();
+            const imagenRef = storage.ref().child("/images/events").child(id);
+            await imagenRef.delete()
             const arrayFiltrado = eventos.filter(item => item.id !== id);
             setEventos(arrayFiltrado);
 

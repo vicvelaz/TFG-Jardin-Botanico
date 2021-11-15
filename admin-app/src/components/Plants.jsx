@@ -4,7 +4,28 @@ import {db,auth,storage} from '../firebase'
 const Plants = () => {
      //listado de plantas y lugares
     const [plants,setPlants] = React.useState([]);
-    const [radioTodos, setRadioTodos] = React.useState(false);
+
+    //estados de control
+    const [loading,setLoading] = React.useState(false);
+    const [edit,setEdit] = React.useState(false);
+    const [error,setError] = React.useState(null);
+
+    //estados para inputs
+    const [radioTodos, setRadioTodos] = React.useState(true);
+    const [radioPlantas, setRadioPlantas] = React.useState(false);
+    const [radioLugares, setRadioLugares] = React.useState(false);
+    const [busqueda,setBusqueda] = React.useState(""); 
+    
+    const [id,setID] = React.useState("");
+    const [name, setName] = React.useState("");
+    const [type, setType] = React.useState("");
+    const [scientificName, setScientificName] = React.useState("");
+    const [category, setCategory] = React.useState("");
+    const [terrace, setTerrace] = React.useState("");
+    const [description, setDescription] = React.useState("");
+    const [position, setPosition] = React.useState([]);
+    const [images, setImages] = React.useState([]);
+    const [audio, setAudio] = React.useState(null);
 
     const obtenerPlantas = async () => {
 
@@ -19,7 +40,45 @@ const Plants = () => {
 
     }
 
-    React.useEffect(()=>{obtenerPlantas()},[]);
+    React.useEffect(()=>{
+        obtenerPlantas()
+        document.getElementById("inlineRadio1").checked = true;
+    },[]);
+
+    //Funciones asincronas => Consulta a Firebase
+
+
+    //Funciones auxiliares => Formateo y Frontend
+    const buscarPlanta = (e) => {
+        setBusqueda(e.target.value);
+        if(busqueda === ""){
+            obtenerPlantas();
+        }else{
+            setPlants(plants.filter(ev => ev.name.includes(busqueda)));
+        }
+    }
+
+    const actualizarRadios = (e) => {
+        if(e.target.id==="inlineRadio1"){
+            setRadioTodos(true);
+            setRadioPlantas(false);
+            setRadioLugares(false);
+            obtenerPlantas();
+            
+        }
+        else if(e.target.id==="inlineRadio2"){
+            setRadioTodos(false);
+            setRadioPlantas(true);
+            setRadioLugares(false);
+            setPlants(plants.filter(pl => pl.type==="plant"));
+        }
+        else{
+            setRadioTodos(false);
+            setRadioPlantas(false);
+            setRadioLugares(true);
+            setPlants(plants.filter(pl => pl.type==="place"));
+        }
+    }
 
     return (
         <div className="background">
@@ -30,20 +89,20 @@ const Plants = () => {
                 <button className="btn btn-success ms-auto" data-bs-toggle="modal" data-bs-target="#nuevaplantamodal">Nuevo Elemento</button>
                 <div className="d-flex ms-auto me-auto bg-success rounded p-2">
                     <div className="form-check form-check-inline">
-                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" onChange={e => setRadioTodos(e.target.value)} value="option1" checked></input>
+                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" onChange={e => actualizarRadios(e)} value="todos"></input>
                         <label className ="form-check-label" htmlFor="inlineRadio1">Todo</label>
                     </div>
                     <div className="form-check form-check-inline">
-                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="option2"></input>
+                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" onChange={e => actualizarRadios(e)} value="plantas"></input>
                         <label className ="form-check-label" htmlFor="inlineRadio2">Plantas</label>
                     </div>
                     <div className="form-check form-check-inline">
-                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" value="option3"></input>
+                        <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" onChange={e => actualizarRadios(e)} value="lugares"></input>
                         <label className ="form-check-label" htmlFor="inlineRadio3">Lugares</label>
                     </div>
                 </div>
                 <div className="me-auto me-5">
-                    <input type="text" id="busc" className="form-control form-control-md text-dark" placeholder="Buscar"></input>
+                    <input type="text" id="busc" className="form-control form-control-md text-dark" placeholder="Buscar" onChange={e => buscarPlanta(e)} onKeyDown={e => buscarPlanta(e)}></input>
                 </div>
             </div>
             <div className="container d-flex flex-column">

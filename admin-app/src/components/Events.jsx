@@ -47,6 +47,7 @@ const Events = () => {
 
     const nuevoEvento = async(e) => {
         e.preventDefault();
+        console.log(name);
         if(name===""||startDate===""||endDate===""){
             setError("Los campos están vacios")
             return

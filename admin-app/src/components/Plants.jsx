@@ -2,8 +2,11 @@ import React from 'react'
 import {db,auth,storage} from '../firebase'
 
 const Plants = () => {
-     //listado de plantas y lugares
+    //listado de plantas y lugares
+    const [list, setList] = React.useState([]);
+    const [items,setItems] = React.useState([]);
     const [plants,setPlants] = React.useState([]);
+    const [places,setPlaces] = React.useState([]);
 
     //estados de control
     const [loading,setLoading] = React.useState(false);
@@ -32,7 +35,10 @@ const Plants = () => {
         try{
             const data = await db.collection('plants').get();
             const arrayData = data.docs.map(doc => ({id: doc.id, ...doc.data()}));
-            setPlants(arrayData);
+            setList(arrayData);
+            setItems(arrayData);
+            setPlants(arrayData.filter(pl => pl.type==="plant"));
+            setPlaces(arrayData.filter(pl => pl.type==="place"));
 
         } catch(error){
             console.log(error);
@@ -49,12 +55,12 @@ const Plants = () => {
 
 
     //Funciones auxiliares => Formateo y Frontend
-    const buscarPlanta = (e) => {
+    const buscarItem = (e) => {
         setBusqueda(e.target.value);
         if(busqueda === ""){
-            obtenerPlantas();
+            setList(items);
         }else{
-            setPlants(plants.filter(ev => ev.name.includes(busqueda)));
+            setList(list.filter(ev => ev.name.includes(busqueda)));
         }
     }
 
@@ -63,20 +69,19 @@ const Plants = () => {
             setRadioTodos(true);
             setRadioPlantas(false);
             setRadioLugares(false);
-            obtenerPlantas();
-            
+            setList(items);
         }
         else if(e.target.id==="inlineRadio2"){
             setRadioTodos(false);
             setRadioPlantas(true);
             setRadioLugares(false);
-            setPlants(plants.filter(pl => pl.type==="plant"));
+            setList(plants);
         }
         else{
             setRadioTodos(false);
             setRadioPlantas(false);
             setRadioLugares(true);
-            setPlants(plants.filter(pl => pl.type==="place"));
+            setList(places);
         }
     }
 
@@ -102,7 +107,7 @@ const Plants = () => {
                     </div>
                 </div>
                 <div className="me-auto me-5">
-                    <input type="text" id="busc" className="form-control form-control-md text-dark" placeholder="Buscar" onChange={e => buscarPlanta(e)} onKeyDown={e => buscarPlanta(e)}></input>
+                    <input type="text" id="busc" className="form-control form-control-md text-dark" placeholder="Buscar" onChange={e => buscarItem(e)} onKeyDown={e => buscarItem(e)}></input>
                 </div>
             </div>
             <div className="container d-flex flex-column">
@@ -121,7 +126,7 @@ const Plants = () => {
                         </thead>
                         <tbody>
                             {
-                                plants.map(e => (
+                                list.map(e => (
                                     <tr key={e.id}>
                                         <td>{e.name}</td>
                                         <td>{e.scientific_name}</td>

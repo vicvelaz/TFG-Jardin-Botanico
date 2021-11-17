@@ -1,25 +1,26 @@
 import React from 'react'
-import {db,auth,storage} from '../firebase'
+import { db, auth, storage } from '../firebase'
+import Map from './Map';
 
 const Plants = () => {
     //listado de plantas y lugares
     const [list, setList] = React.useState([]);
-    const [items,setItems] = React.useState([]);
-    const [plants,setPlants] = React.useState([]);
-    const [places,setPlaces] = React.useState([]);
+    const [items, setItems] = React.useState([]);
+    const [plants, setPlants] = React.useState([]);
+    const [places, setPlaces] = React.useState([]);
 
     //estados de control
-    const [loading,setLoading] = React.useState(false);
-    const [edit,setEdit] = React.useState(false);
-    const [error,setError] = React.useState(null);
+    const [loading, setLoading] = React.useState(false);
+    const [edit, setEdit] = React.useState(false);
+    const [error, setError] = React.useState(null);
 
     //estados para inputs
     const [radioTodos, setRadioTodos] = React.useState(true);
     const [radioPlantas, setRadioPlantas] = React.useState(false);
     const [radioLugares, setRadioLugares] = React.useState(false);
-    const [busqueda,setBusqueda] = React.useState(""); 
-    
-    const [id,setID] = React.useState("");
+    const [busqueda, setBusqueda] = React.useState("");
+
+    const [id, setID] = React.useState("");
     const [name, setName] = React.useState("");
     const [type, setType] = React.useState("");
     const [scientificName, setScientificName] = React.useState("");
@@ -32,60 +33,91 @@ const Plants = () => {
 
     const obtenerPlantas = async () => {
 
-        try{
+        try {
             const data = await db.collection('plants').get();
-            const arrayData = data.docs.map(doc => ({id: doc.id, ...doc.data()}));
+            const arrayData = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             setList(arrayData);
             setItems(arrayData);
-            setPlants(arrayData.filter(pl => pl.type==="plant"));
-            setPlaces(arrayData.filter(pl => pl.type==="place"));
+            setPlants(arrayData.filter(pl => pl.type === "plant"));
+            setPlaces(arrayData.filter(pl => pl.type === "place"));
 
-        } catch(error){
+        } catch (error) {
             console.log(error);
         }
 
     }
 
-    React.useEffect(()=>{
+    React.useEffect(() => {
         obtenerPlantas()
         document.getElementById("inlineRadio1").checked = true;
-    },[]);
+    }, []);
 
     //Funciones asincronas => Consulta a Firebase
 
+    const nuevoItem = async (e) => {
+        // {
+        //     location: new db.GeoPoint(latitude, longitude)
+        // }
+    }
+
+    const eliminarItem = async (id) => {
+    }
+
+    const modificarItem = async (e) => {
+    }
 
     //Funciones auxiliares => Formateo y Frontend
+    const loadModalModificarItem = (id) => {
+        setEdit(true);
+        const eventoInfo = list.find(i => i.id === id);
+    }
+
+    const cancelarEdit = () => {
+        setEdit(false);
+        setName('');
+        setDescription('');
+        setImages(null);
+        setError(null);
+
+        document.getElementById("formularioitems").reset();
+    }
+
     const buscarItem = (e) => {
         setBusqueda(e.target.value);
-        if(busqueda === ""){
-            if(radioTodos){ setList(items) }
-            if(radioPlantas){ setList(plants) }
-            if(radioLugares){ setList(places) }
-            
-        }else{
+        if (busqueda === "") {
+            if (radioTodos) { setList(items) }
+            if (radioPlantas) { setList(plants) }
+            if (radioLugares) { setList(places) }
+
+        } else {
             setList(list.filter(ev => ev.name.includes(busqueda)));
         }
     }
 
     const actualizarRadios = (e) => {
-        if(e.target.id==="inlineRadio1"){
+        if (e.target.id === "inlineRadio1") {
             setRadioTodos(true);
             setRadioPlantas(false);
             setRadioLugares(false);
             setList(items);
         }
-        else if(e.target.id==="inlineRadio2"){
+        else if (e.target.id === "inlineRadio2") {
             setRadioTodos(false);
             setRadioPlantas(true);
             setRadioLugares(false);
             setList(plants);
         }
-        else{
+        else {
             setRadioTodos(false);
             setRadioPlantas(false);
             setRadioLugares(true);
             setList(places);
         }
+    }
+
+    const seleccionarPosicion = (e) => {
+        console.log(e.latLng.lat())
+        console.log(e.latLng.lng())
     }
 
     return (
@@ -94,19 +126,86 @@ const Plants = () => {
                 <h1 className="me-5">Plantas y Lugares</h1>
             </div>
             <div className="d-flex mt-5 elems">
-                <button className="btn btn-success ms-auto" data-bs-toggle="modal" data-bs-target="#nuevaplantamodal">Nuevo Elemento</button>
+                <button className="btn btn-success ms-auto" data-bs-toggle="modal" data-bs-target="#nuevoitemmodal">Nuevo Elemento</button>
                 <div className="d-flex ms-auto me-auto bg-success rounded p-2">
                     <div className="form-check form-check-inline">
                         <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" onChange={e => actualizarRadios(e)} value="todos"></input>
-                        <label className ="form-check-label" htmlFor="inlineRadio1">Todo</label>
+                        <label className="form-check-label" htmlFor="inlineRadio1">Todo</label>
                     </div>
                     <div className="form-check form-check-inline">
                         <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" onChange={e => actualizarRadios(e)} value="plantas"></input>
-                        <label className ="form-check-label" htmlFor="inlineRadio2">Plantas</label>
+                        <label className="form-check-label" htmlFor="inlineRadio2">Plantas</label>
                     </div>
                     <div className="form-check form-check-inline">
                         <input className="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3" onChange={e => actualizarRadios(e)} value="lugares"></input>
-                        <label className ="form-check-label" htmlFor="inlineRadio3">Lugares</label>
+                        <label className="form-check-label" htmlFor="inlineRadio3">Lugares</label>
+                    </div>
+                </div>
+                <div className="modal fade text-dark" id="nuevoitemmodal">
+                    <div className="modal-dialog modal-dialog-centered modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h4 className="modal-title">{edit ? 'Editar Elemento' : 'Nuevo Elemento'}</h4>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={() => cancelarEdit()}></button>
+                            </div>
+                            <form id="formularioitems" onSubmit={e => edit ? modificarItem(e) : nuevoItem(e)}>
+                                <div className="modal-body">
+                                    {error && (
+                                        <div className="alert alert-danger">
+                                            {error}
+                                        </div>
+                                    )}
+                                    <select className="form-select form-select-lg mb-3" aria-label=".form-select-lg example" onChange={e => setType(e.target.value)} defaultValue="plant">
+                                        <option value="plant">Planta</option>
+                                        <option value="place">Lugar</option>
+                                    </select>
+                                    <div className="form-floating mt-3">
+                                        <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value)}></input>
+                                        <label htmlFor="name">Nombre</label>
+                                    </div>
+                                    <div className="form-floating mt-3">
+                                        <input type={type === "place" ? "hidden" : "text"} className="form-control" id="scientificname" placeholder="Nombre Científico" name="scientificname" maxLength="50" onChange={e => setScientificName(e.target.value)} disabled={type === "place"}></input>
+                                        <label htmlFor="scientificname" hidden={type === "place"}>Nombre Científico</label>
+                                    </div>
+                                    <div className="form-floating mt-3">
+                                        <input type={type === "place" ? "hidden" : "text"} className="form-control" id="category" placeholder="Categoría" name="category" maxLength="50" onChange={e => setCategory(e.target.value)} disabled={type === "place"}></input>
+                                        <label htmlFor="category" hidden={type === "place"}>Categoría</label>
+                                    </div>
+                                    <select className="form-select mt-3" aria-label="Default select example" onChange={e => setTerrace(e.target.value)} defaultValue="Terraza de los Cuadros">
+                                        <option value="Terraza de los Cuadros">Terraza de los Cuadros</option>
+                                        <option value="Terraza de las Escuelas">Terraza de las Escuelas</option>
+                                        <option value="Terraza del Plano de la Flor">Terraza del Plano de la Flor</option>
+                                        <option value="Terraza de los Bonsáis">Terraza de los Bonsáis</option>
+                                    </select>
+                                    <div className="form-floating mt-3">
+                                        <textarea className="form-control" id="description" name="description" placeholder="Descripción" maxLength="200" onChange={e => setDescription(e.target.value)}></textarea>
+                                        <label htmlFor="description">Descripción</label>
+                                    </div>
+                                    <div className="d-flex justify-content-center align-items-center mt-4">
+                                        <Map onDblClick={e => seleccionarPosicion(e)}></Map>
+                                    </div>
+                                    <div className="d-flex justify-content-center align-items-center mt-4">
+                                        <label htmlFor="formFile" className="form-label">Imágenes: </label>
+                                        <input className="form-control w-50 ms-2" type="file" accept="image/*,video/*" multiple id="formFile" onChange={e => setImages(e.target.files)}></input>
+                                    </div>
+                                    <div className="d-flex justify-content-center align-items-center mt-4">
+                                        <label htmlFor="formFileAudio" className="form-label">Audio: </label>
+                                        <input className="form-control w-50 ms-2" type="file" accept="audio/*" id="formFileAudio" onChange={e => setAudio(e.target.files[0])}></input>
+                                    </div>
+                                </div>
+
+                                <div className="modal-footer">
+                                    {loading ? (
+                                        <button type="submit" className="btn btn-success" value={edit ? 'Editar' : 'Añadir'}>
+                                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            Cargando...
+                                        </button>
+                                    ) : (<input type="submit" className="btn btn-success" value={edit ? 'Editar' : 'Añadir'}></input>)}
+
+                                    <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => cancelarEdit()}>Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 <div className="me-auto me-5">
@@ -136,8 +235,8 @@ const Plants = () => {
                                         {!radioLugares && (<td>{e.category}</td>)}
                                         <td>{e.terrace}</td>
                                         <td>[{e.position._lat},{e.position._long}]</td>
-                                        <td>{e.description.length > 200 ? e.description.substring(0,200)+"..." : e.description}</td>
-                                        <td><div className="d-flex"><button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevaplantamodal">Editar</button><button className="btn btn-danger ms-3">Eliminar</button></div></td>
+                                        <td>{e.description.length > 200 ? e.description.substring(0, 200) + "..." : e.description}</td>
+                                        <td><div className="d-flex"><button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevoitemmodal" onClick={() => loadModalModificarItem(e.id)}>Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarItem(e.id)}>Eliminar</button></div></td>
                                     </tr>
                                 ))
                             }

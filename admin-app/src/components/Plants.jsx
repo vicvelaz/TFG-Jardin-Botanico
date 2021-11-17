@@ -1,6 +1,6 @@
 import React from 'react'
 import { db, auth, storage } from '../firebase'
-import Map from './Map';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
 const Plants = () => {
     //listado de plantas y lugares
@@ -13,12 +13,16 @@ const Plants = () => {
     const [loading, setLoading] = React.useState(false);
     const [edit, setEdit] = React.useState(false);
     const [error, setError] = React.useState(null);
+    const [marcadorVisible,setMarcadorVisible] = React.useState(true);
 
     //estados para inputs
     const [radioTodos, setRadioTodos] = React.useState(true);
     const [radioPlantas, setRadioPlantas] = React.useState(false);
     const [radioLugares, setRadioLugares] = React.useState(false);
     const [busqueda, setBusqueda] = React.useState("");
+    const [lat, setLat] = React.useState();
+    const [long, setLong] = React.useState();
+    const [LatLng, setLatLng] = React.useState();
 
     const [id, setID] = React.useState("");
     const [name, setName] = React.useState("");
@@ -30,6 +34,8 @@ const Plants = () => {
     const [position, setPosition] = React.useState([]);
     const [images, setImages] = React.useState([]);
     const [audio, setAudio] = React.useState(null);
+
+
 
     const obtenerPlantas = async () => {
 
@@ -78,6 +84,11 @@ const Plants = () => {
         setDescription('');
         setImages(null);
         setError(null);
+        setLong(0);
+        setLat(0);
+        const ll = new window.google.maps.LatLng(lat, long)
+        setLatLng(ll)
+        setMarcadorVisible(false)
 
         document.getElementById("formularioitems").reset();
     }
@@ -115,10 +126,25 @@ const Plants = () => {
         }
     }
 
-    const seleccionarPosicion = (e) => {
-        console.log(e.latLng.lat())
-        console.log(e.latLng.lng())
+    const containerStyle = {
+        width: '400px',
+        height: '400px'
+    };
+
+    const center = {
+        lat: 40.41111072322462,
+        lng: -3.691127300262451
+    };
+
+    const obtenerLatLong = (e) => {
+        setLat(e.latLng.lat())
+        setLong(e.latLng.lng())
+        setLatLng(e.latLng)
+        document.getElementById("lat").value = e.latLng.lat();
+        document.getElementById("long").value = e.latLng.lng();
+        setMarcadorVisible(true)
     }
+
 
     return (
         <div className="background">
@@ -142,7 +168,7 @@ const Plants = () => {
                     </div>
                 </div>
                 <div className="modal fade text-dark" id="nuevoitemmodal">
-                    <div className="modal-dialog modal-dialog-centered modal-lg">
+                    <div className="modal-dialog modal-dialog-centered modal-xl">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h4 className="modal-title">{edit ? 'Editar Elemento' : 'Nuevo Elemento'}</h4>
@@ -159,39 +185,69 @@ const Plants = () => {
                                         <option value="plant">Planta</option>
                                         <option value="place">Lugar</option>
                                     </select>
-                                    <div className="form-floating mt-3">
-                                        <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value)}></input>
-                                        <label htmlFor="name">Nombre</label>
+                                    <div className="d-flex flex-row">
+                                        <div className="izq ms-auto me-3">
+                                            <div className="form-floating mt-4">
+                                                <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value)}></input>
+                                                <label htmlFor="name">Nombre</label>
+                                            </div>
+                                            <div className="form-floating mt-3">
+                                                <input type={type === "place" ? "hidden" : "text"} className="form-control" id="scientificname" placeholder="Nombre Científico" name="scientificname" maxLength="50" onChange={e => setScientificName(e.target.value)} disabled={type === "place"}></input>
+                                                <label htmlFor="scientificname" hidden={type === "place"}>Nombre Científico</label>
+                                            </div>
+                                            <div className="form-floating mt-3">
+                                                <input type={type === "place" ? "hidden" : "text"} className="form-control" id="category" placeholder="Categoría" name="category" maxLength="50" onChange={e => setCategory(e.target.value)} disabled={type === "place"}></input>
+                                                <label htmlFor="category" hidden={type === "place"}>Categoría</label>
+                                            </div>
+                                            <select className="form-select mt-3" aria-label="Default select example" onChange={e => setTerrace(e.target.value)} defaultValue="Terraza de los Cuadros">
+                                                <option value="Terraza de los Cuadros">Terraza de los Cuadros</option>
+                                                <option value="Terraza de las Escuelas">Terraza de las Escuelas</option>
+                                                <option value="Terraza del Plano de la Flor">Terraza del Plano de la Flor</option>
+                                                <option value="Terraza de los Bonsáis">Terraza de los Bonsáis</option>
+                                            </select>
+                                            <div className="form-floating mt-3">
+                                                <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="200" onChange={e => setDescription(e.target.value)}></textarea>
+                                                <label htmlFor="description">Descripción</label>
+                                            </div>
+
+                                            <div className="d-flex justify-content-center align-items-center mt-4">
+                                                <label htmlFor="formFile" className="form-label">Imágenes: </label>
+                                                <input className="form-control w-100 ms-2" type="file" accept="image/*,video/*" multiple id="formFile" onChange={e => setImages(e.target.files)}></input>
+                                            </div>
+                                            <div className="d-flex justify-content-center align-items-center mt-4">
+                                                <label htmlFor="formFileAudio" className="form-label">Audio: </label>
+                                                <input className="form-control w-100 ms-2" type="file" accept="audio/*" id="formFileAudio" onChange={e => setAudio(e.target.files[0])}></input>
+                                            </div>
+                                        </div>
+                                        <div className="der ms-3 me-auto">
+                                            <div className="d-flex justify-content-center align-items-center mt-4">
+                                                <LoadScript googleMapsApiKey="AIzaSyBncVh-3ckA9tPjbWstXnSGDRI8ySEnQ08">
+                                                    <GoogleMap
+                                                        mapContainerStyle={containerStyle}
+                                                        center={center}
+                                                        zoom={17}
+                                                        options={{ mapId: "2492686c7e82773c" }}
+                                                        onClick={e => obtenerLatLong(e)}
+                                                    >
+                                                        { /* Child components, such as markers, info windows, etc. */}
+                                                        <Marker position={LatLng} visible={marcadorVisible}></Marker>
+                                                        <></>
+                                                    </GoogleMap>
+                                                </LoadScript>
+                                            </div>
+                                            <div className="d-flex mt-3">
+                                                <div className="form-floating mt-3 ms-auto">
+                                                    <input type="text" className="form-control" id="lat" placeholder="Latitud" name="lat" maxLength="50" onChange={e => setName(e.target.value)}></input>
+                                                    <label htmlFor="lat">Latitud</label>
+                                                </div>
+                                                <div className="form-floating mt-3 ms-1 me-auto">
+                                                    <input type="text" className="form-control" id="long" placeholder="Longitud" name="long" maxLength="50" onChange={e => setName(e.target.value)}></input>
+                                                    <label htmlFor="long">Longitud</label>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="form-floating mt-3">
-                                        <input type={type === "place" ? "hidden" : "text"} className="form-control" id="scientificname" placeholder="Nombre Científico" name="scientificname" maxLength="50" onChange={e => setScientificName(e.target.value)} disabled={type === "place"}></input>
-                                        <label htmlFor="scientificname" hidden={type === "place"}>Nombre Científico</label>
-                                    </div>
-                                    <div className="form-floating mt-3">
-                                        <input type={type === "place" ? "hidden" : "text"} className="form-control" id="category" placeholder="Categoría" name="category" maxLength="50" onChange={e => setCategory(e.target.value)} disabled={type === "place"}></input>
-                                        <label htmlFor="category" hidden={type === "place"}>Categoría</label>
-                                    </div>
-                                    <select className="form-select mt-3" aria-label="Default select example" onChange={e => setTerrace(e.target.value)} defaultValue="Terraza de los Cuadros">
-                                        <option value="Terraza de los Cuadros">Terraza de los Cuadros</option>
-                                        <option value="Terraza de las Escuelas">Terraza de las Escuelas</option>
-                                        <option value="Terraza del Plano de la Flor">Terraza del Plano de la Flor</option>
-                                        <option value="Terraza de los Bonsáis">Terraza de los Bonsáis</option>
-                                    </select>
-                                    <div className="form-floating mt-3">
-                                        <textarea className="form-control" id="description" name="description" placeholder="Descripción" maxLength="200" onChange={e => setDescription(e.target.value)}></textarea>
-                                        <label htmlFor="description">Descripción</label>
-                                    </div>
-                                    <div className="d-flex justify-content-center align-items-center mt-4">
-                                        <Map onDblClick={e => seleccionarPosicion(e)}></Map>
-                                    </div>
-                                    <div className="d-flex justify-content-center align-items-center mt-4">
-                                        <label htmlFor="formFile" className="form-label">Imágenes: </label>
-                                        <input className="form-control w-50 ms-2" type="file" accept="image/*,video/*" multiple id="formFile" onChange={e => setImages(e.target.files)}></input>
-                                    </div>
-                                    <div className="d-flex justify-content-center align-items-center mt-4">
-                                        <label htmlFor="formFileAudio" className="form-label">Audio: </label>
-                                        <input className="form-control w-50 ms-2" type="file" accept="audio/*" id="formFileAudio" onChange={e => setAudio(e.target.files[0])}></input>
-                                    </div>
+
                                 </div>
 
                                 <div className="modal-footer">

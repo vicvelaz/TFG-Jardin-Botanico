@@ -58,7 +58,10 @@ const Plants = () => {
     const buscarItem = (e) => {
         setBusqueda(e.target.value);
         if(busqueda === ""){
-            setList(items);
+            if(radioTodos){ setList(items) }
+            if(radioPlantas){ setList(plants) }
+            if(radioLugares){ setList(places) }
+            
         }else{
             setList(list.filter(ev => ev.name.includes(busqueda)));
         }
@@ -116,8 +119,8 @@ const Plants = () => {
                         <thead className="table-dark">
                             <tr>
                                 <th>Nombre</th>
-                                <th>Nombre Científico</th>
-                                <th>Categoría</th>
+                                {!radioLugares && (<th>Nombre Científico</th>)}
+                                {!radioLugares && (<th>Categoría</th>)}
                                 <th>Terraza</th>
                                 <th>Posición</th>
                                 <th>Descripción</th>
@@ -129,8 +132,8 @@ const Plants = () => {
                                 list.map(e => (
                                     <tr key={e.id}>
                                         <td>{e.name}</td>
-                                        <td>{e.scientific_name}</td>
-                                        <td>{e.category}</td>
+                                        {!radioLugares && (<td>{e.scientific_name}</td>)}
+                                        {!radioLugares && (<td>{e.category}</td>)}
                                         <td>{e.terrace}</td>
                                         <td>[{e.position._lat},{e.position._long}]</td>
                                         <td>{e.description.length > 200 ? e.description.substring(0,200)+"..." : e.description}</td>

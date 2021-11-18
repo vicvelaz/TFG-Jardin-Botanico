@@ -58,9 +58,12 @@ const Itineraries = () => {
     try {
       const data = await db.collection("plants").get();
       const arrayData = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      let infoSelect=[];
       arrayData.forEach((element) => {
-        plantasLugares.push({ value: element.id, label: element.name });
+        console.log(element);
+        infoSelect.push({ value: element.id, label: element.name });
       });
+      setPlantas_Lugares(infoSelect);
       console.log(plantasLugares);
     } catch (error) {
       console.log(error);
@@ -74,7 +77,7 @@ const Itineraries = () => {
   const loadModalModificarItinerario = (id) => {
     setEdit(true);
     const itinerarioInfo = itinerarios.find((item) => item.id === id);
-    console.log(itinerarioInfo.puntos);
+    console.log(itinerarioInfo.paradas);
     console.log(plantasLugares);
     prepararParadas(itinerarioInfo);
     document.getElementById("name").value = itinerarioInfo.name;
@@ -91,19 +94,15 @@ const Itineraries = () => {
 
   const prepararParadas = (itinerarioInfo) => {
     let auxPuntos = [];
-
-    console.log(itinerarioInfo);
-    itinerarioInfo.puntos.forEach((parada) => {
+    itinerarioInfo.paradas.forEach((parada) => {
       let auxParada = plantasLugares.find(
-        (element) => element.value === parada.substr(8)
+        (element) => element.value === parada.id
       );
-      console.log(auxParada);
-      // puntos.push({ value: auxParada.value, label: auxParada.label });
+
       auxPuntos.push({ value: auxParada.value, label: auxParada.label });
       puntos.push(auxParada);
     });
     setPuntos(auxPuntos);
-    console.log(puntos);
   };
 
   const cancelarEdit = () => {
@@ -131,14 +130,14 @@ const Itineraries = () => {
       let paradas = [];
       console.log(puntos);
       puntos.forEach((element) => {
-        paradas.push("/plants/" + element.value);
+        paradas.push( db.doc("/plants/" + element.value));
       });
       console.log(paradas);
 
       await db.collection("itinerary").doc(id).update({
         name: name,
         description: description,
-        puntos: paradas,
+        paradas: paradas,
         image: "",
       });
 
@@ -174,7 +173,6 @@ const Itineraries = () => {
 
   const nuevoItinerario = async (e) => {
     e.preventDefault();
-    console.log(name);
     if (name === "" || description === "") {
       setError("Los campos están vacios");
       return;
@@ -183,14 +181,14 @@ const Itineraries = () => {
       let paradas = [];
       console.log(puntos);
       puntos.forEach((element) => {
-        paradas.push("/plants/" + element.value);
+        paradas.push(db.doc("/plants/" + element.value));
       });
       console.log(paradas);
 
       const nuevoItinerario = {
         name: name,
         description: description,
-        puntos: paradas,
+        paradas: paradas,
         image: "",
       };
 

@@ -1,6 +1,8 @@
 import React from 'react'
-import { db, auth, storage } from '../firebase'
+import { db, auth, storage, firebase } from '../firebase'
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import $ from 'jquery'
+import 'bootstrap'
 
 const Plants = () => {
     //listado de plantas y lugares
@@ -13,7 +15,7 @@ const Plants = () => {
     const [loading, setLoading] = React.useState(false);
     const [edit, setEdit] = React.useState(false);
     const [error, setError] = React.useState(null);
-    const [marcadorVisible,setMarcadorVisible] = React.useState(true);
+    const [marcadorVisible, setMarcadorVisible] = React.useState(true);
 
     //estados para inputs
     const [radioTodos, setRadioTodos] = React.useState(true);
@@ -61,12 +63,104 @@ const Plants = () => {
     //Funciones asincronas => Consulta a Firebase
 
     const nuevoItem = async (e) => {
-        // {
-        //     location: new db.GeoPoint(latitude, longitude)
-        // }
+        e.preventDefault();
+
+        if (name === "" || description === "") {
+            setError("El campo nombre o el campo descripción están vacíos")
+            return
+        }
+
+        try {
+
+            const nuevoItem = type === "plant" ?
+                {
+                    name: name,
+                    description: description,
+                    category: category,
+                    scientific_name: scientificName,
+                    type: "plant",
+                    terrace: terrace,
+                    position: new firebase.firestore.GeoPoint(lat, long),
+                    media: '',
+                    audio: ''
+                } : {
+                    name: name,
+                    description: description,
+                    type: "place",
+                    terrace: terrace,
+                    position: new firebase.firestore.GeoPoint(lat, long),
+                    media: '',
+                    audio: ''
+                };
+
+            setLoading(true);
+            const it = await db.collection('plants').add(nuevoItem);
+            const arr = Array.from(images);
+            if (arr.length !== 0) {
+                
+                console.log(arr);
+                arr.map(async (i, index) => {
+                    const imagenRef = storage.ref().child(`/images/plants/${it.id}`).child(`${index}-${Date.now()}`);
+                    await imagenRef.put(i);
+                    const imagenURL = await imagenRef.getDownloadURL();
+                    await db.collection('plants').doc(it.id).update({media: firebase.firestore.FieldValue.arrayUnion(imagenURL)});
+                })
+            }
+
+            if (audio !== null) {
+                const audioRef = storage.ref().child("/audio/plants").child(it.id);
+                await audioRef.put(audio);
+                const audioURL = await audioRef.getDownloadURL();
+                await db.collection('plants').doc(it.id).update({ audio: audioURL });
+            }
+
+            obtenerPlantas();
+
+            setLoading(false);
+            setName('');
+            setID('');
+            setType('');
+            setCategory('');
+            setScientificName('');
+            setPosition([]);
+            setDescription('');
+            setImages('');
+            setAudio('');
+            setLong(0);
+            setLat(0);
+            const ll = new window.google.maps.LatLng(lat, long)
+            setLatLng(ll)
+            setMarcadorVisible(false)
+
+            setError(null);
+
+            document.getElementById("formularioitems").reset();
+            window.$('#nuevoitemmodal').modal('toggle');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     const eliminarItem = async (id) => {
+        try {
+            await db.collection('plants').doc(id).delete();
+            const imagenRef = storage.ref().child(`/images/plants/${id}`);
+            imagenRef.listAll().then((listResults) => {
+                const promises = listResults.items.map((item) => {
+                  return item.delete();
+                });
+                Promise.all(promises);
+              });
+            const audioRef = storage.ref().child("/audio/plants").child(id);
+            await audioRef.delete();
+            obtenerPlantas();
+
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     const modificarItem = async (e) => {
@@ -253,7 +347,7 @@ const Plants = () => {
                                 <div className="modal-footer">
                                     {loading ? (
                                         <button type="submit" className="btn btn-success" value={edit ? 'Editar' : 'Añadir'}>
-                                            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                             Cargando...
                                         </button>
                                     ) : (<input type="submit" className="btn btn-success" value={edit ? 'Editar' : 'Añadir'}></input>)}

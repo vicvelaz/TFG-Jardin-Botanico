@@ -128,8 +128,6 @@ const Plants = () => {
             setAudio('');
             setLong(0);
             setLat(0);
-            const ll = new window.google.maps.LatLng(lat, long)
-            setLatLng(ll)
             setMarcadorVisible(false)
 
             setError(null);
@@ -164,12 +162,85 @@ const Plants = () => {
     }
 
     const modificarItem = async (e) => {
+        e.preventDefault();
+
+        if (name === "" || description === "") {
+            setError("El campo nombre o el campo descripción están vacíos")
+            return
+        }
+        try {
+            // const fecha_ini = editFechaIni ? new Date (startDate) : new Date (startDate.seconds*1000);
+            // const fecha_fin = editFechaFin ? new Date (endDate) : new Date (endDate.seconds*1000);
+
+            // setLoading(true);
+
+            // await db.collection('events').doc(id).update({
+            //     name: name,
+            //     description: description,
+            //     start_date: fecha_ini,
+            //     end_date: fecha_fin,
+            //     image: ''
+            // });
+
+            // if(image !== undefined){
+            //     const imagenRef = storage.ref().child("/images/events").child(id);
+            //     await imagenRef.put(image)
+            //     const imagenURL = await imagenRef.getDownloadURL()
+            //     await db.collection('events').doc(id).update({image: imagenURL});
+            // }
+
+            // obtenerEventos();
+
+            // setLoading(false);
+            // setEdit(false);
+            // setName('');
+            // setDescription('');
+            // setStartDate('');
+            // setEndDate('');
+            // setImage('');
+            // setEditFechaIni(false);
+            // setEditFechaFin(false);
+            // setError(null);
+            
+            // document.getElementById("formularioeventos").reset();
+            // window.$('#nuevoeventomodal').modal('toggle');
+            // $('body').removeClass('modal-open');
+            // $('.modal-backdrop').remove();
+            // document.getElementById("busc").value = "";
+            // setBusqueda("");
+            
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     //Funciones auxiliares => Formateo y Frontend
     const loadModalModificarItem = (id) => {
         setEdit(true);
-        const eventoInfo = list.find(i => i.id === id);
+        const itemInfo = items.find(i => i.id === id);
+
+        if(itemInfo.type==="plant"){
+            document.getElementById("scientificname").value = itemInfo.scientific_name;
+            document.getElementById("category").value = itemInfo.category;
+            setScientificName(itemInfo.scientific_name);
+            setCategory(itemInfo.category);
+        }
+        
+        document.getElementById("tipo").value = itemInfo.type;
+        document.getElementById("name").value = itemInfo.name;
+        document.getElementById("terrace").defaultValue = itemInfo.terrace;
+        document.getElementById("description").value = itemInfo.description;
+
+        document.getElementById("lat").value = itemInfo.position._lat;
+        document.getElementById("long").value = itemInfo.position._long;
+        setLatLng(new window.google.maps.LatLng(itemInfo.position._lat, itemInfo.position._long));
+        setMarcadorVisible(true);
+
+        setType(itemInfo.type);
+        setID(itemInfo.id);
+        setName(itemInfo.name);
+        setDescription(itemInfo.description);
+        setTerrace(itemInfo.terrace);
     }
 
     const cancelarEdit = () => {
@@ -178,10 +249,7 @@ const Plants = () => {
         setDescription('');
         setImages(null);
         setError(null);
-        setLong(0);
-        setLat(0);
-        const ll = new window.google.maps.LatLng(lat, long)
-        setLatLng(ll)
+        setType("plant");
         setMarcadorVisible(false)
 
         document.getElementById("formularioitems").reset();
@@ -275,7 +343,7 @@ const Plants = () => {
                                             {error}
                                         </div>
                                     )}
-                                    <select className="form-select form-select-lg mb-3" aria-label=".form-select-lg example" onChange={e => setType(e.target.value)} defaultValue="plant">
+                                    <select id="tipo" className="form-select form-select-lg mb-3" aria-label=".form-select-lg example" onChange={e => setType(e.target.value)} defaultValue="plant">
                                         <option value="plant">Planta</option>
                                         <option value="place">Lugar</option>
                                     </select>
@@ -293,7 +361,7 @@ const Plants = () => {
                                                 <input type={type === "place" ? "hidden" : "text"} className="form-control" id="category" placeholder="Categoría" name="category" maxLength="50" onChange={e => setCategory(e.target.value)} disabled={type === "place"}></input>
                                                 <label htmlFor="category" hidden={type === "place"}>Categoría</label>
                                             </div>
-                                            <select className="form-select mt-3" aria-label="Default select example" onChange={e => setTerrace(e.target.value)} defaultValue="Terraza de los Cuadros">
+                                            <select id="terrace" className="form-select mt-3" aria-label="Default select example" onChange={e => setTerrace(e.target.value)} defaultValue="Terraza de los Cuadros">
                                                 <option value="Terraza de los Cuadros">Terraza de los Cuadros</option>
                                                 <option value="Terraza de las Escuelas">Terraza de las Escuelas</option>
                                                 <option value="Terraza del Plano de la Flor">Terraza del Plano de la Flor</option>

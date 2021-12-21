@@ -1,5 +1,5 @@
 import React from 'react'
-import { db, auth, storage, firebase } from '../firebase'
+import { db, auth, storage, firebase } from '../firebase/firebase-config'
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import $ from 'jquery'
 import 'bootstrap'

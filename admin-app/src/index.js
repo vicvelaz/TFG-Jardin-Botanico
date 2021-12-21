@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import './styles/styles.scss';
+import {BotanicApp} from './BotanicApp';
 
 
-ReactDOM.render(<React.StrictMode><App /></React.StrictMode>, document.getElementById('root'));
 
+ReactDOM.render( <BotanicApp/>, document.getElementById('root')); 

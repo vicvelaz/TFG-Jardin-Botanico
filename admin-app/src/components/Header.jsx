@@ -1,7 +1,17 @@
-import React from 'react'
-import {Link, NavLink} from 'react-router-dom'
+import React from 'react';
+import { Link, NavLink } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+
+import { startLogout } from '../actions/auth';
 
 const Header = () => {
+
+    const dispatch = useDispatch();
+
+    const hanleLogout = () => {
+        dispatch( startLogout() )
+    }
+
     return (
         <div className="navbarrjb">
             <nav className="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
@@ -23,6 +33,12 @@ const Header = () => {
                             </li>
                         </ul>
                     </div>
+                    <button
+                        className="btn btn-logout"
+                        onClick={hanleLogout}
+                    >
+                        Logout
+                    </button>
                 </div>
             </nav>
         </div>

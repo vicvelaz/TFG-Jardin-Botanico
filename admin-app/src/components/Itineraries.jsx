@@ -1,9 +1,9 @@
-import React, { Component } from "react";
-import { db, auth, storage } from "../firebase";
+import React from "react";
+import { db, storage } from "../firebase/firebase-config";
 import $ from "jquery";
 import "bootstrap";
 import "moment/locale/es";
-import moment from "moment";
+import SelectItineraries from "./SelectItineraries";
 
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
@@ -58,7 +58,7 @@ const Itineraries = () => {
     try {
       const data = await db.collection("plants").get();
       const arrayData = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      let infoSelect=[];
+      let infoSelect = [];
       arrayData.forEach((element) => {
         console.log(element);
         infoSelect.push({ value: element.id, label: element.name });
@@ -130,7 +130,7 @@ const Itineraries = () => {
       let paradas = [];
       console.log(puntos);
       puntos.forEach((element) => {
-        paradas.push( db.doc("/plants/" + element.value));
+        paradas.push(db.doc("/plants/" + element.value));
       });
       console.log(paradas);
 
@@ -304,16 +304,21 @@ const Itineraries = () => {
                       ></textarea>
                       <label htmlFor="description">Descripción</label>
                     </div>
-
-                    <Select
+                    <SelectItineraries 
+                      paradas={puntos}
+                    ></SelectItineraries>
+                    {/* <Select
                       id="puntos"
                       name="puntos"
                       className="mt-3"
                       defaultValue={puntos}
+                      isOptionSelected= {true}
                       isMulti={true}
                       options={plantasLugares}
+                      loadOptions={true}
+                      cache={false}
                       onChange={(e) => setPuntos(e) }
-                    />
+                    /> */}
                   </div>
                   <div className="d-flex justify-content-center align-items-center mt-4">
                     <label htmlFor="formFile" className="form-label">

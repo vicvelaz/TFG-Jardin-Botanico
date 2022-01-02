@@ -148,17 +148,19 @@ const Plants = () => {
             await db.collection('plants').doc(id).delete();
             const imagenRef = storage.ref().child(`/images/plants/${id}`);
             imagenRef.listAll().then((listResults) => {
-                const promises = listResults.items.map((item) => {
-                  return item.delete();
-                });
-                Promise.all(promises);
-              });
+                if(listResults.items.length !== 0){
+                    const promises = listResults.items.map((item) => {
+                        return item.delete();
+                      });
+                      Promise.all(promises);
+                }
+            });
             const audioRef = storage.ref().child("/audio/plants").child(id);
             await audioRef.delete();
             obtenerPlantas();
 
         } catch (error) {
-            setError(error);
+            console.log(error);
         }
     }
 

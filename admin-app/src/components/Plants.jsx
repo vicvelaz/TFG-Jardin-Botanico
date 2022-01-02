@@ -50,7 +50,7 @@ const Plants = () => {
             setPlaces(arrayData.filter(pl => pl.type === "place"));
 
         } catch (error) {
-            setError(error);
+            console.log(error);
         }
 
     }
@@ -137,10 +137,9 @@ const Plants = () => {
             window.$('#nuevoitemmodal').modal('toggle');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
-            $(document.body).css("overflow","visible");
 
         } catch (error) {
-            setError(error);
+            console.log(error);
         }
     }
 
@@ -198,7 +197,7 @@ const Plants = () => {
 
             const it = await db.collection('plants').doc(id).update(nuevoItem);
 
-            if(images !== null){
+            if(images !== null && images!== ""){
                 const arr = Array.from(images);
                 if (arr.length !== 0) {
                     arr.map(async (i, index) => {
@@ -210,7 +209,7 @@ const Plants = () => {
                 }
             }
         
-            if (audio !== null) {
+            if (audio !== null && audio!=="") {
                 const audioRef = storage.ref().child("/audio/plants").child(it.id);
                 await audioRef.put(audio);
                 const audioURL = await audioRef.getDownloadURL();
@@ -241,7 +240,7 @@ const Plants = () => {
             $('.modal-backdrop').remove();
             
         } catch (error) {
-            setError(error);
+            console.log(error);
         }
     }
 

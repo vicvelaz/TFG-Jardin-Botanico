@@ -28,7 +28,7 @@ const Plants = () => {
 
     const [id, setID] = React.useState("");
     const [name, setName] = React.useState("");
-    const [type, setType] = React.useState("");
+    const [type, setType] = React.useState("plant");
     const [scientificName, setScientificName] = React.useState("");
     const [category, setCategory] = React.useState("");
     const [terrace, setTerrace] = React.useState("");
@@ -95,19 +95,22 @@ const Plants = () => {
 
             setLoading(true);
             const it = await db.collection('plants').add(nuevoItem);
-            const arr = Array.from(images);
-            console.log(arr.length)
-            if (arr.length !== 0) {
-                
-                console.log(arr);
-                arr.map(async (i, index) => {
-                    const imagenRef = storage.ref().child(`/images/plants/${it.id}`).child(`${index}-${Date.now()}`);
-                    await imagenRef.put(i);
-                    const imagenURL = await imagenRef.getDownloadURL();
-                    await db.collection('plants').doc(it.id).update({media: firebase.firestore.FieldValue.arrayUnion(imagenURL)});
-                })
-            }
 
+            if(images !== null){
+                const arr = Array.from(images);
+                console.log(arr.length)
+                if (arr.length !== 0) {
+                    
+                    console.log(arr);
+                    arr.map(async (i, index) => {
+                        const imagenRef = storage.ref().child(`/images/plants/${it.id}`).child(`${index}-${Date.now()}`);
+                        await imagenRef.put(i);
+                        const imagenURL = await imagenRef.getDownloadURL();
+                        await db.collection('plants').doc(it.id).update({media: firebase.firestore.FieldValue.arrayUnion(imagenURL)});
+                    })
+                }
+            }
+        
             if (audio !== null) {
                 const audioRef = storage.ref().child("/audio/plants").child(it.id);
                 await audioRef.put(audio);

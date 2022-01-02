@@ -1,5 +1,5 @@
 import React from 'react'
-import { db, auth, storage, firebase } from '../firebase/firebase-config'
+import { db, storage, firebase } from '../firebase/firebase-config'
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import $ from 'jquery'
 import 'bootstrap'
@@ -96,6 +96,7 @@ const Plants = () => {
             setLoading(true);
             const it = await db.collection('plants').add(nuevoItem);
             const arr = Array.from(images);
+            console.log(arr.length)
             if (arr.length !== 0) {
                 
                 console.log(arr);

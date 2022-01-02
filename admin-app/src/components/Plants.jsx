@@ -50,7 +50,7 @@ const Plants = () => {
             setPlaces(arrayData.filter(pl => pl.type === "place"));
 
         } catch (error) {
-            console.log(error);
+            setError(error);
         }
 
     }
@@ -98,10 +98,7 @@ const Plants = () => {
 
             if(images !== null){
                 const arr = Array.from(images);
-                console.log(arr.length)
                 if (arr.length !== 0) {
-                    
-                    console.log(arr);
                     arr.map(async (i, index) => {
                         const imagenRef = storage.ref().child(`/images/plants/${it.id}`).child(`${index}-${Date.now()}`);
                         await imagenRef.put(i);
@@ -142,7 +139,7 @@ const Plants = () => {
             $('.modal-backdrop').remove();
 
         } catch (error) {
-            console.log(error);
+            setError(error);
         }
     }
 
@@ -161,7 +158,7 @@ const Plants = () => {
             obtenerPlantas();
 
         } catch (error) {
-            console.log(error);
+            setError(error);
         }
     }
 
@@ -173,48 +170,75 @@ const Plants = () => {
             return
         }
         try {
-            // const fecha_ini = editFechaIni ? new Date (startDate) : new Date (startDate.seconds*1000);
-            // const fecha_fin = editFechaFin ? new Date (endDate) : new Date (endDate.seconds*1000);
+            const nuevoItem = type === "plant" ?
+                {
+                    name: name,
+                    description: description,
+                    category: category,
+                    scientific_name: scientificName,
+                    type: "plant",
+                    terrace: terrace,
+                    position: new firebase.firestore.GeoPoint(lat, long),
+                    media: '',
+                    audio: ''
+                } : {
+                    name: name,
+                    description: description,
+                    type: "place",
+                    terrace: terrace,
+                    position: new firebase.firestore.GeoPoint(lat, long),
+                    media: '',
+                    audio: ''
+                };
 
-            // setLoading(true);
+            setLoading(true);
 
-            // await db.collection('events').doc(id).update({
-            //     name: name,
-            //     description: description,
-            //     start_date: fecha_ini,
-            //     end_date: fecha_fin,
-            //     image: ''
-            // });
+            const it = await db.collection('plants').doc(id).update(nuevoItem);
 
-            // if(image !== undefined){
-            //     const imagenRef = storage.ref().child("/images/events").child(id);
-            //     await imagenRef.put(image)
-            //     const imagenURL = await imagenRef.getDownloadURL()
-            //     await db.collection('events').doc(id).update({image: imagenURL});
-            // }
+            if(images !== null){
+                const arr = Array.from(images);
+                if (arr.length !== 0) {
+                    arr.map(async (i, index) => {
+                        const imagenRef = storage.ref().child(`/images/plants/${it.id}`).child(`${index}-${Date.now()}`);
+                        await imagenRef.put(i);
+                        const imagenURL = await imagenRef.getDownloadURL();
+                        await db.collection('plants').doc(it.id).update({media: firebase.firestore.FieldValue.arrayUnion(imagenURL)});
+                    })
+                }
+            }
+        
+            if (audio !== null) {
+                const audioRef = storage.ref().child("/audio/plants").child(it.id);
+                await audioRef.put(audio);
+                const audioURL = await audioRef.getDownloadURL();
+                await db.collection('plants').doc(it.id).update({ audio: audioURL });
+            }
 
-            // obtenerEventos();
+            obtenerPlantas();
 
-            // setLoading(false);
-            // setEdit(false);
-            // setName('');
-            // setDescription('');
-            // setStartDate('');
-            // setEndDate('');
-            // setImage('');
-            // setEditFechaIni(false);
-            // setEditFechaFin(false);
-            // setError(null);
-            
-            // document.getElementById("formularioeventos").reset();
-            // window.$('#nuevoeventomodal').modal('toggle');
-            // $('body').removeClass('modal-open');
-            // $('.modal-backdrop').remove();
-            // document.getElementById("busc").value = "";
-            // setBusqueda("");
+            setLoading(false);
+            setName('');
+            setID('');
+            setType('');
+            setCategory('');
+            setScientificName('');
+            setPosition([]);
+            setDescription('');
+            setImages('');
+            setAudio('');
+            setLong(0);
+            setLat(0);
+            setMarcadorVisible(false)
+            setBusqueda("");
+            setError(null);
+
+            document.getElementById("formularioitems").reset();
+            window.$('#nuevoitemmodal').modal('toggle');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
             
         } catch (error) {
-            console.log(error);
+            setError(error);
         }
     }
 

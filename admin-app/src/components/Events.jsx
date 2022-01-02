@@ -1,5 +1,5 @@
 import React from 'react'
-import {db,auth,storage} from '../firebase/firebase-config'
+import {db,storage} from '../firebase/firebase-config'
 
 import moment from 'moment'
 import 'moment/locale/es'

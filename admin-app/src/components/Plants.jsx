@@ -31,7 +31,7 @@ const Plants = () => {
     const [type, setType] = React.useState("plant");
     const [scientificName, setScientificName] = React.useState("");
     const [category, setCategory] = React.useState("");
-    const [terrace, setTerrace] = React.useState("");
+    const [terrace, setTerrace] = React.useState("Terraza de los Cuadros");
     const [description, setDescription] = React.useState("");
     const [position, setPosition] = React.useState([]);
     const [images, setImages] = React.useState([]);
@@ -137,6 +137,7 @@ const Plants = () => {
             window.$('#nuevoitemmodal').modal('toggle');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
+            $(document.body).css("overflow","visible");
 
         } catch (error) {
             setError(error);
@@ -160,7 +161,7 @@ const Plants = () => {
             obtenerPlantas();
 
         } catch (error) {
-            console.log(error);
+            obtenerPlantas();
         }
     }
 

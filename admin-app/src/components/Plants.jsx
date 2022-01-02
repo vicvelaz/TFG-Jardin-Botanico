@@ -264,6 +264,8 @@ const Plants = () => {
         document.getElementById("lat").value = itemInfo.position._lat;
         document.getElementById("long").value = itemInfo.position._long;
         setLatLng(new window.google.maps.LatLng(itemInfo.position._lat, itemInfo.position._long));
+        setLat(itemInfo.position._lat);
+        setLong(itemInfo.position._long);
         setMarcadorVisible(true);
 
         setType(itemInfo.type);

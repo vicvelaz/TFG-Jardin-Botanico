@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "865397111946",
+    "project_id": "realjardinbotanicoapp",
+    "storage_bucket": "realjardinbotanicoapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:865397111946:android:ef664bb23652d860090173",
+        "android_client_info": {
+          "package_name": "com.tfg.mobileApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "865397111946-fv78ujkqo8adqjupsv53jrkolhmqlf3s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgVQacLS7mTc0s1TLpx2PCUGVzZMiLILA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "865397111946-fv78ujkqo8adqjupsv53jrkolhmqlf3s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

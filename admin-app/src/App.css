@@ -38,6 +38,18 @@ table{
   background-color: #198754!important;
   border-color:#198754!important;
 }
+
 .page-link{
   color: black;
+}
+
+.deshabilitado{
+  background-color: rgb(235,235,228)!important;
+  color: black!important;
+}
+
+.clickable:hover{
+  cursor: pointer;
+  color: black!important;
+  background-color: #9CCA90;
 }

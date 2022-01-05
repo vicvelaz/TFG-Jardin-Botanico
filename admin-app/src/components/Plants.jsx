@@ -354,7 +354,7 @@ const Plants = () => {
         setList(items.slice(itt,it));
         setPagActual(pag);
     }
-    
+
     const containerStyle = {
         width: '400px',
         height: '400px'
@@ -531,16 +531,16 @@ const Plants = () => {
                 <nav className="mt-3" aria-label="Page navigation example">
                     <ul className="pagination justify-content-center">
                         <li className={pagActual === 1 ? "page-item disabled" : "page-item"} onClick={() => paginaAnterior()}>
-                            <a className="page-link">Anterior</a>
+                            <a className={pagActual === 1 ? "page-link deshabilitado" : "page-link clickable"}>Anterior</a>
                         </li>
                         {paginas.map((e) =>
                             <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}> 
-                                <a className="page-link">{e}</a> 
+                                <a className="page-link clickable">{e}</a> 
                             </li>
                         )}
                         
                         <li className={pagActual === numPaginas ? "page-item disabled" : "page-item"} onClick={() => siguientePagina()}>
-                            <a className="page-link">Siguiente</a>
+                            <a className={pagActual === numPaginas ? "page-link deshabilitado" : "page-link clickable"}>Siguiente</a>
                         </li>
                     </ul>
                 </nav>

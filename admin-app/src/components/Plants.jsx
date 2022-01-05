@@ -16,6 +16,10 @@ const Plants = () => {
     const [edit, setEdit] = React.useState(false);
     const [error, setError] = React.useState(null);
     const [marcadorVisible, setMarcadorVisible] = React.useState(true);
+    const [numPaginas, setNumPaginas] = React.useState(2);
+    const [pagActual, setPagActual] = React.useState(1);
+    const [itemActual, setItemActual] = React.useState(0);
+    const [paginas, setPaginas] = React.useState([]);
 
     //estados para inputs
     const [radioTodos, setRadioTodos] = React.useState(true);
@@ -44,10 +48,14 @@ const Plants = () => {
         try {
             const data = await db.collection('plants').get();
             const arrayData = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setList(arrayData);
             setItems(arrayData);
             setPlants(arrayData.filter(pl => pl.type === "plant"));
             setPlaces(arrayData.filter(pl => pl.type === "place"));
+            setNumPaginas(arrayData.length % 5 === 0 ? (arrayData.length / 5) : (Math.trunc(arrayData.length / 5)) + 1);
+            setList(arrayData.slice(0, 5));
+            setItemActual(itemActual + 5);
+            let pag = Array.from({length: numPaginas}, (_, index) => index + 1);
+            setPaginas(pag);
 
         } catch (error) {
             console.log(error);
@@ -96,18 +104,18 @@ const Plants = () => {
             setLoading(true);
             const it = await db.collection('plants').add(nuevoItem);
 
-            if(images !== null){
+            if (images !== null) {
                 const arr = Array.from(images);
                 if (arr.length !== 0) {
                     arr.map(async (i, index) => {
                         const imagenRef = storage.ref().child(`/images/plants/${it.id}`).child(`${index}-${Date.now()}`);
                         await imagenRef.put(i);
                         const imagenURL = await imagenRef.getDownloadURL();
-                        await db.collection('plants').doc(it.id).update({media: firebase.firestore.FieldValue.arrayUnion(imagenURL)});
+                        await db.collection('plants').doc(it.id).update({ media: firebase.firestore.FieldValue.arrayUnion(imagenURL) });
                     })
                 }
             }
-        
+
             if (audio !== null) {
                 const audioRef = storage.ref().child("/audio/plants").child(it.id);
                 await audioRef.put(audio);
@@ -148,11 +156,11 @@ const Plants = () => {
             await db.collection('plants').doc(id).delete();
             const imagenRef = storage.ref().child(`/images/plants/${id}`);
             imagenRef.listAll().then((listResults) => {
-                if(listResults.items.length !== 0){
+                if (listResults.items.length !== 0) {
                     const promises = listResults.items.map((item) => {
                         return item.delete();
-                      });
-                      Promise.all(promises);
+                    });
+                    Promise.all(promises);
                 }
             });
             const audioRef = storage.ref().child("/audio/plants").child(id);
@@ -197,19 +205,19 @@ const Plants = () => {
 
             const it = await db.collection('plants').doc(id).update(nuevoItem);
 
-            if(images !== null && images!== ""){
+            if (images !== null && images !== "") {
                 const arr = Array.from(images);
                 if (arr.length !== 0) {
                     arr.map(async (i, index) => {
                         const imagenRef = storage.ref().child(`/images/plants/${it.id}`).child(`${index}-${Date.now()}`);
                         await imagenRef.put(i);
                         const imagenURL = await imagenRef.getDownloadURL();
-                        await db.collection('plants').doc(it.id).update({media: firebase.firestore.FieldValue.arrayUnion(imagenURL)});
+                        await db.collection('plants').doc(it.id).update({ media: firebase.firestore.FieldValue.arrayUnion(imagenURL) });
                     })
                 }
             }
-        
-            if (audio !== null && audio!=="") {
+
+            if (audio !== null && audio !== "") {
                 const audioRef = storage.ref().child("/audio/plants").child(it.id);
                 await audioRef.put(audio);
                 const audioURL = await audioRef.getDownloadURL();
@@ -238,7 +246,7 @@ const Plants = () => {
             window.$('#nuevoitemmodal').modal('toggle');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
-            
+
         } catch (error) {
             console.log(error);
         }
@@ -249,13 +257,13 @@ const Plants = () => {
         setEdit(true);
         const itemInfo = items.find(i => i.id === id);
 
-        if(itemInfo.type==="plant"){
+        if (itemInfo.type === "plant") {
             document.getElementById("scientificname").value = itemInfo.scientific_name;
             document.getElementById("category").value = itemInfo.category;
             setScientificName(itemInfo.scientific_name);
             setCategory(itemInfo.category);
         }
-        
+
         document.getElementById("tipo").value = itemInfo.type;
         document.getElementById("name").value = itemInfo.name;
         document.getElementById("terrace").defaultValue = itemInfo.terrace;
@@ -320,6 +328,33 @@ const Plants = () => {
         }
     }
 
+    const siguientePagina = () => {
+        if(pagActual !== numPaginas){
+            let ia = itemActual + 5;
+            setItemActual(ia);
+            setList(items.slice(itemActual, ia));
+            setPagActual(pagActual + 1);
+        }
+    }
+
+    const paginaAnterior = () => {
+        if(pagActual !== 1){
+            let ia = itemActual - 5;
+            const itt = ia - 5;
+            setItemActual(ia);
+            setList(items.slice(itt, ia));
+            setPagActual(pagActual - 1);
+        } 
+    }
+
+    const irAPagina = (pag) => {
+        const it = pag * 5;
+        const itt = it - 5;
+        setItemActual(it);
+        setList(items.slice(itt,it));
+        setPagActual(pag);
+    }
+    
     const containerStyle = {
         width: '400px',
         height: '400px'
@@ -493,6 +528,22 @@ const Plants = () => {
                         </tbody>
                     </table>
                 </div>
+                <nav className="mt-3" aria-label="Page navigation example">
+                    <ul className="pagination justify-content-center">
+                        <li className={pagActual === 1 ? "page-item disabled" : "page-item"} onClick={() => paginaAnterior()}>
+                            <a className="page-link">Anterior</a>
+                        </li>
+                        {paginas.map((e) =>
+                            <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}> 
+                                <a className="page-link">{e}</a> 
+                            </li>
+                        )}
+                        
+                        <li className={pagActual === numPaginas ? "page-item disabled" : "page-item"} onClick={() => siguientePagina()}>
+                            <a className="page-link">Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     )

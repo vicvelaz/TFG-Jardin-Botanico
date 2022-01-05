@@ -1,0 +1,12 @@
+{
+  "name": "mobileApp",
+  "displayName": "mobileApp",
+  "expo": {
+    "android": {
+      "googleServicesFile": "./google-services.json"
+    },
+    "plugins": [
+      "@react-native-firebase/app"
+    ]
+  }
+}

@@ -1,42 +1,42 @@
-import React, { Component } from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import React from 'react'
+import { Dimensions, Image, StyleSheet, Text, TouchableOpacity } from 'react-native'
 
+const windowWidth = Dimensions.get('window').width;
 
 interface Props {
     name: any;
-    img?: string;
+    img: string;
     navigation: any;
 }
 
 
-export const Item =({name,navigation}: Props) =>{
+export const Item =({name,img,navigation}: Props) =>{
+    console.log(img);
         return (
             <TouchableOpacity 
             style={styles.container} 
             onPress={() => navigation.navigate('Planta')}
             >
-                <Image style={styles.img} source={require('../img/rosa.jpg')}/>
+                <Image 
+                style={styles.img} 
+                source={ require('../img/rosa.jpg')}
+                />
                 <Text style={styles.title}>{name}</Text>
-            
             </TouchableOpacity>
         )
-
 }
 
 const styles = StyleSheet.create({
-   
     container: {
-        padding: 20,
-        width: '50%',
-        aspectRatio: 1,
+        marginTop:20,
+        width: (windowWidth / 2)-10,
+        height: (windowWidth / 2)-30,
         flexDirection:'column',
         justifyContent:'space-around',
-
     },
     img: {
-        backgroundColor: '#419E08',
-        width:120,
-        height:120,
+        width:125,
+        height:125,
         borderWidth:2,
         borderColor:'white',
         borderRadius:10,
@@ -47,5 +47,7 @@ const styles = StyleSheet.create({
         color:'white',
         fontWeight:'bold',
         textAlign:'center',
+        height:50,
+        textAlignVertical:'center',
     },
 });

@@ -49,13 +49,13 @@ export const MainMenu = ({ navigation }: Props) => {
                     <View style={styles.rowButtons}>
                         <TouchableOpacity
                             style={styles.smallButton}
-                            onPress={() => navigation.navigate('PlantsList')}
+                            onPress={() => navigation.navigate('List',{title:'Lista de plantas',type:'plants'})}
                         >
                             <Text style={styles.buttonText}>Plantas</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.smallButton}
-                            onPress={() => navigation.navigate('PuntosInteresList')}
+                            onPress={() => navigation.navigate('List',{title:'Lista de puntos de interés',type:'place'})}
                         >
                             <Text style={styles.buttonText}>Puntos de interés</Text>
                         </TouchableOpacity>
@@ -64,7 +64,7 @@ export const MainMenu = ({ navigation }: Props) => {
 
                     <TouchableOpacity
                         style={styles.button}
-                        onPress={() => navigation.navigate('ItinerariosList')}
+                        onPress={() => navigation.navigate('List',{title:'Lista de itinerarios',type:'itinerary'})}
                     >
                         <Text style={styles.buttonText}>Itinerarios</Text>
                     </TouchableOpacity>

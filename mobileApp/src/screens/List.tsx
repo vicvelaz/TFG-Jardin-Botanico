@@ -45,40 +45,40 @@ export const List = ({ route, navigation }: Props) => {
                 },
                 {
                     id: '3ac68afc-c605-48d3-a4f8-fbd9s1aa97f63',
-                    name: 'Rosa',
+                    name: 'Abeto',
                     img: '../img/rosa.jpg',
                 },
                 {
                     id: '58694a0f-3da1-471f-bd96-14g5571e29d72',
-                    name: 'Rosa',
+                    name: 'Cactus',
                     img: '../img/rosa.jpg',
                 }, {
                     id: 'bd7acbea-c1b1-46c2-aefd5-3ad53abb28ba',
-                    name: 'Rosa',
+                    name: 'Helecho',
                     img: '../img/rosa.jpg',
                 },
                 {
                     id: '3ac68afc-c605-48d3s-a4f8-fbd91aa97f63',
-                    name: 'Rosa',
+                    name: 'Bromelia',
                     img: '../img/rosa.jpg',
                 },
                 {
                     id: '58694a0f-3da1-47w1f-bd96-145571e29d72',
-                    name: 'Rosa',
+                    name: 'Ficus',
                     img: '../img/rosa.jpg',
                 }, {
                     id: 'bd7acbea-c1b1-46c2r-aed5-3ad53abb28ba',
-                    name: 'Rosa',
+                    name: 'Manzano',
                     img: '../img/rosa.jpg',
                 },
                 {
                     id: '3ac68afc-c605-48dw3-a4f8-fbd91aa97f63',
-                    name: 'Rosa',
+                    name: 'Romero',
                     img: '../img/rosa.jpg',
                 },
                 {
                     id: '58694a0f-3da1-471rf-bd96-145571e29d72',
-                    name: 'Rosa',
+                    name: 'Trébol',
                     img: '../img/rosa.jpg',
                 },]
                 break;

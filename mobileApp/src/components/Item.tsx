@@ -11,11 +11,10 @@ interface Props {
 
 
 export const Item =({name,img,navigation}: Props) =>{
-    console.log(img);
         return (
             <TouchableOpacity 
             style={styles.container} 
-            onPress={() => navigation.navigate('Planta')}
+            onPress={() => navigation.navigate('ItemDetails',{title:name})}
             >
                 <Image 
                 style={styles.img} 

@@ -29,64 +29,67 @@ export const MainMenu = ({ navigation }: Props) => {
     const data = [foto, foto1, foto2];
 
     return (
-        <View style={styles.container}>
-            <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.image}>
+        <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.backgroundImage}>
+            <View style={styles.container}>
                 <Text style={styles.mainTitle}>Real Jardín Botánico App</Text>
                 <View style={styles.events}>
                     <Text style={styles.eventsTitle}>EVENTOS</Text>
-                        <Carousel
-                            data={data}
-                            renderItem={({ item, index }: any) => data[index]}
-                            sliderWidth={windowWidth - 44}
-                            itemWidth={windowWidth - 44}
-                            sliderHeight={200}
-                            lockScrollWhileSnapping
-                            autoplay
-                            autoplayInterval={3000}
-                        />
+                    <Carousel
+                        data={data}
+                        renderItem={({ item, index }: any) => data[index]}
+                        sliderWidth={windowWidth - 44}
+                        itemWidth={windowWidth - 44}
+                        sliderHeight={200}
+                        lockScrollWhileSnapping
+                        autoplay
+                        autoplayInterval={3000}
+                    />
                 </View>
-                <View style={styles.rowButtons}>
+                <View>
+                    <View style={styles.rowButtons}>
+                        <TouchableOpacity
+                            style={styles.smallButton}
+                            onPress={() => navigation.navigate('PlantsList')}
+                        >
+                            <Text style={styles.buttonText}>Plantas</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.smallButton}
+                            onPress={() => navigation.navigate('PuntosInteresList')}
+                        >
+                            <Text style={styles.buttonText}>Puntos de interés</Text>
+                        </TouchableOpacity>
+
+                    </View>
+
                     <TouchableOpacity
-                        style={styles.smallButton}
-                        onPress={() => navigation.navigate('PlantsList')}
+                        style={styles.button}
+                        onPress={() => navigation.navigate('ItinerariosList')}
                     >
-                        <Text style={styles.buttonText}>Plantas</Text>
+                        <Text style={styles.buttonText}>Itinerarios</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={styles.smallButton}
-                        onPress={() => navigation.navigate('PuntosInteresList')}
+                        style={styles.button}
+                        onPress={() => navigation.navigate('MapScreen')}
                     >
-                        <Text style={styles.buttonText}>Puntos de interés</Text>
+                        <Text style={styles.buttonText}>Mapa</Text>
                     </TouchableOpacity>
-
                 </View>
+            </View>
+        </ImageBackground>
 
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('ItinerariosList')}
-                >
-                    <Text style={styles.buttonText}>Itinerarios</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => navigation.navigate('MapScreen')}
-                >
-                    <Text style={styles.buttonText}>Mapa</Text>
-                </TouchableOpacity>
-            </ImageBackground>
-        </View>
     )
 }
 
 const styles = StyleSheet.create({
+    
+    backgroundImage: {
+        flex: 1,
+    },
     container: {
         flex: 1,
         flexDirection: 'column',
-
-    },
-    image: {
-        flex: 1,
-        justifyContent: "center"
+        justifyContent:'space-evenly'
     },
     mainTitle: {
         textAlign: 'center',
@@ -99,14 +102,14 @@ const styles = StyleSheet.create({
         height: 122,
         alignSelf: 'stretch',
         marginHorizontal: 20,
-        marginVertical: 50,
+        // marginVertical: 50,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
         flexDirection: 'column',
         justifyContent: 'space-around',
         alignItems: 'center',
-        borderColor:'white',
-        borderWidth:2,
+        borderColor: 'white',
+        borderWidth: 2,
     },
     eventsTitle: {
         textAlign: 'center',
@@ -129,17 +132,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingVertical: 10,
         borderRadius: 10,
-        borderColor:'white',
-        borderWidth:2,
-        width:'48%'
+        borderColor: 'white',
+        borderWidth: 2,
+        width: '48%'
     },
     button: {
         backgroundColor: '#419E08',
         justifyContent: 'center',
         paddingVertical: 10,
         borderRadius: 10,
-        borderColor:'white',
-        borderWidth:2,
+        borderColor: 'white',
+        borderWidth: 2,
         marginTop: 20,
         marginHorizontal: 20
     },
@@ -149,8 +152,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
         marginHorizontal: 20,
-        width:'100%',
-        textAlign:'center'
+        width: '100%',
+        textAlign: 'center'
     }
 });
 

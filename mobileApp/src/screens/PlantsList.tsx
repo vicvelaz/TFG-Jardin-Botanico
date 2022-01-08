@@ -2,43 +2,44 @@ import { StackScreenProps } from '@react-navigation/stack';
 import React from 'react'
 import { FlatList, Image, ImageBackground, SafeAreaView, StatusBar, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from 'react-native';
+import { Item } from '../components/Item';
 
 interface Props extends StackScreenProps<any, any> { };
 
 const DATA = [
     {
         id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-        title: 'Rosa',
+        name: 'Rosa',
     },
     {
         id: '3ac68afc-c605-48d3-a4f8-fbd9s1aa97f63',
-        title: 'Rosa',
+        name: 'Rosa',
     },
     {
         id: '58694a0f-3da1-471f-bd96-14g5571e29d72',
-        title: 'Rosa',
+        name: 'Rosa',
     }, {
         id: 'bd7acbea-c1b1-46c2-aefd5-3ad53abb28ba',
-        title: 'Rosa',
+        name: 'Rosa',
     },
     {
         id: '3ac68afc-c605-48d3s-a4f8-fbd91aa97f63',
-        title: 'Rosa',
+        name: 'Rosa',
     },
     {
         id: '58694a0f-3da1-47w1f-bd96-145571e29d72',
-        title: 'Rosa',
+        name: 'Rosa',
     }, {
         id: 'bd7acbea-c1b1-46c2r-aed5-3ad53abb28ba',
-        title: 'Rosa',
+        name: 'Rosa',
     },
     {
         id: '3ac68afc-c605-48dw3-a4f8-fbd91aa97f63',
-        title: 'Rosa',
+        name: 'Rosa',
     },
     {
         id: '58694a0f-3da1-471rf-bd96-145571e29d72',
-        title: 'Rosa',
+        name: 'Rosa',
     },
 ];
 
@@ -49,22 +50,22 @@ const DATA = [
 
 export const PlantsList = ({ navigation }: Props) => {
 
-    const Item = ({ title }:any) => (
-        <TouchableOpacity 
-        style={styles.item} 
-        onPress={() => navigation.navigate('Planta')}>
+    // const Item = ({ title }:any) => (
+    //     <TouchableOpacity 
+    //     style={styles.item} 
+    //     onPress={() => navigation.navigate('Planta')}>
        
-            <Image style={styles.foto} source={require('../img/rosa.jpg')}/>
-            <Text style={styles.title}>{title}</Text>
+    //         <Image style={styles.foto} source={require('../img/rosa.jpg')}/>
+    //         <Text style={styles.title}>{title}</Text>
         
-        </TouchableOpacity>
-    );
+    //     </TouchableOpacity>
+    // );
 
-    const renderItem=( {item} :any) =>{
-        return (
-            <Item title={item.title} img={item.img} />
-        );
-    }
+    // const renderItem=( {item} :any) =>{
+    //     return (
+    //         <Item title={item.title} img={item.img} />
+    //     );
+    // }
 
     return (
         <SafeAreaView style={styles.container}>
@@ -72,8 +73,10 @@ export const PlantsList = ({ navigation }: Props) => {
             <FlatList
             style={styles.list}
                 data={DATA}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
+                renderItem={ ({ item }: any) => (
+                    <Item  name={item.name} navigation={navigation} />
+                )}
+                keyExtractor={ (item) => item.id.toString() }
                 numColumns={2}
             />
             </ImageBackground>

@@ -29,14 +29,14 @@ export const ItemDetails = ({ route, navigation }: Props) => {
         data: {},
     });
 
-    const [image, setImage] = useState<any[]>([]);
+    const [image, setImage] = useState<JSX.Element[]>([]);
 
     const getDetails = async () => {
         try {
             const data = await db.collection('plants').doc(route.params?.id).get();
-            console.log(data.data());
+            // console.log(data.data());
             const info: any = data.data();
-            const arrayImagenes: any[] = [];
+            const arrayImagenes: JSX.Element[] = [];
             info.media.forEach((element: any) => {
                 arrayImagenes.push(
                     <View >

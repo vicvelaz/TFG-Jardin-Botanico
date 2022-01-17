@@ -1,8 +1,11 @@
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { FlatList, ImageBackground, SafeAreaView, StyleSheet, Text } from 'react-native';
+import { firebase, db } from '../firebase/firebase-config';
+
 
 import { Item } from '../components/Item';
+import { queryEqual } from 'firebase/firestore';
 
 
 
@@ -12,156 +15,122 @@ import { Item } from '../components/Item';
 
 interface Props extends StackScreenProps<any, 'List'> { };
 
-interface Data{
-    id:string;
-    name:string;
-    img:string;
+interface Data {
+    id: string;
+    name: string;
+    img: string;
 }
 
-interface PropState{
-    isLoading:boolean;
-    items:Data[];
-    
+interface PropState {
+    isLoading: boolean;
+    items: Data[];
+
 }
 
 export const List = ({ route, navigation }: Props) => {
-    
+
     const [state, setstate] = useState<PropState>({
-        isLoading:true,
-        items:[],
+        isLoading: true,
+        items: [],
     })
 
 
-    let data:Data[]=[];
+    let data: Data[] = [];
 
-    const getItems=async () => {
+
+    const obtenerPlantas = async () => {
+        try {
+            const data = await db.collection('plants').where('type', '==', 'plant').get();
+            const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const arrayPlanta: Data[] = [];
+            arrayData.forEach((element: any) => {
+                arrayPlanta.push({ id: element.id, name: element.name, img: element.media[0] });
+            });
+            setstate({
+                isLoading: false,
+                items: arrayPlanta,
+            })
+        } catch (error) {
+            console.log('error');
+        }
+    }
+
+    const obtenerLugares = async () => {
+        try {
+            const data = await db.collection('plants').where('type', '==', 'place').get();
+            const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const arrayLugar: Data[] = [];
+            arrayData.forEach((element: any) => {
+                    arrayLugar.push({ id: element.id, name: element.name, img: element.media[0] });
+            });
+            setstate({
+                isLoading: false,
+                items: arrayLugar,
+            })
+        } catch (error) {
+            console.log('error');
+        }
+    }
+
+    const obtenerItinerarios = async () => {
+        try {
+            const data = await db.collection('itinerary').get();
+            const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const arrayItinerario: Data[] = [];
+            arrayData.forEach((element: any) => {
+                arrayItinerario.push({ id: element.id, name: element.name, img: element.media[0] });
+            });
+            setstate({
+                isLoading: false,
+                items: arrayItinerario,
+            })
+        } catch (error) {
+            console.log('error');
+        }
+    }
+
+    const getItems = async () => {
         switch (route.params?.type) {
             case 'plants':
-                
-                 data = [{
-                    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-                    name: 'Rosa',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '3ac68afc-c605-48d3-a4f8-fbd9s1aa97f63',
-                    name: 'Abeto',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '58694a0f-3da1-471f-bd96-14g5571e29d72',
-                    name: 'Cactus',
-                    img: '../img/rosa.jpg',
-                }, {
-                    id: 'bd7acbea-c1b1-46c2-aefd5-3ad53abb28ba',
-                    name: 'Helecho',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '3ac68afc-c605-48d3s-a4f8-fbd91aa97f63',
-                    name: 'Bromelia',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '58694a0f-3da1-47w1f-bd96-145571e29d72',
-                    name: 'Ficus',
-                    img: '../img/rosa.jpg',
-                }, {
-                    id: 'bd7acbea-c1b1-46c2r-aed5-3ad53abb28ba',
-                    name: 'Manzano',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '3ac68afc-c605-48dw3-a4f8-fbd91aa97f63',
-                    name: 'Romero',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '58694a0f-3da1-471rf-bd96-145571e29d72',
-                    name: 'Trébol',
-                    img: '../img/rosa.jpg',
-                },]
+                obtenerPlantas();
+
                 break;
             case 'place':
-                 data = [{
-                    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-                    name: 'Terraza del plano de la flor',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '3ac68afc-c605-48d3-a4f8-fbd9s1aa97f63',
-                    name: 'Terraza de las escuelas',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '58694a0f-3da1-471f-bd96-14g5571e29d72',
-                    name: 'Almez',
-                    img: '../img/rosa.jpg',
-                }, {
-                    id: 'bd7acbea-c1b1-46c2-aefd5-3ad53abb28ba',
-                    name: 'terraza de los cuadros',
-                    img: '../img/rosa.jpg',
-                }]
+                obtenerLugares();
+               
                 break;
             case 'itinerary':
-                data = [{
-                    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-                    name: 'Arboles singulares',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '3ac68afc-c605-48d3-a4f8-fbd9s1aa97f63',
-                    name: 'Arboles del Quijote',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '58694a0f-3da1-471f-bd96-14g5571e29d72',
-                    name: 'Paseo de las rosas',
-                    img: '../img/rosa.jpg',
-                }, {
-                    id: 'bd7acbea-c1b1-46c2-aefd5-3ad53abb28ba',
-                    name: 'Flores comestibles',
-                    img: '../img/rosa.jpg',
-                },
-                {
-                    id: '3ac68afc-c605-48d3s-a4f8-fbd91aa97f63',
-                    name: 'Plantas de Peppa Pig',
-                    img: '../img/rosa.jpg',
-                }]
+                obtenerItinerarios();
+    
                 break;
             default:
                 break;
         }
-        
-        setstate({
-            isLoading:false,
-            items: data,
-        })
     }
 
 
     useEffect(() => {
         navigation.setOptions({ title: route.params?.title })
         getItems();
-    }, [])
+    }, [route.params?.title])
 
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.container}>
                 {
                     state.isLoading
-                    ?<Text style={{ color:'white',fontSize:50,textAlign:'center'}}>Cargando....</Text>
-                    : <FlatList
-                    style={styles.list}
-                    data={state.items}
-                    renderItem={({ item }) => (
-                        <Item name={item.name} img={item.img} navigation={navigation} />
-                    )}
-                    keyExtractor={({id}:Data) =>  id.toString()}
-                    numColumns={2}
-                />
+                        ? <Text style={{ color: 'white', fontSize: 50, textAlign: 'center' }}>Cargando....</Text>
+                        : <FlatList
+                            style={styles.list}
+                            data={state.items}
+                            renderItem={({ item }) => (
+                                <Item name={item.name} img={item.img} id={item.id} navigation={navigation} />
+                            )}
+                            keyExtractor={({ id }: Data) => id.toString()}
+                            numColumns={2}
+                        />
                 }
-               
+
             </ImageBackground>
         </SafeAreaView>
     );

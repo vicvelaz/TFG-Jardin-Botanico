@@ -1,18 +1,52 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { Text, View, StyleSheet, Button, TouchableOpacity, ImageBackground, Image, Dimensions } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack';
 import Carousel from 'react-native-snap-carousel';
 import { ScrollView } from 'react-native-gesture-handler';
+import { db } from '../firebase/firebase-config';
 
 interface Props extends StackScreenProps<any, 'ItemDetails'> { };
 
 const windowWidth = Dimensions.get('window').width;
+interface Data{
+    audio?:any,
+    category?:string,
+    description?:string,
+    name?:string,
 
-export const ItemDetails = ({ route,navigation }: Props) => {
-    
+}
+
+interface PropState{
+    isLoading: boolean,
+    data: Data,
+}
+
+export const ItemDetails = ({ route, navigation }: Props) => {
+
+    const [state, setstate] = useState<PropState>({
+        isLoading: true,
+        data:{},
+    });
+
+    const getDetails = async () => {
+        try {
+            const data = await db.collection('plants').doc(route.params?.id).get();
+            console.log(data.data());
+            // const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const info:any = data.data();
+            setstate({
+                isLoading: false,
+                data: info,
+            })
+        } catch (error) {
+            console.log('error');
+        }
+    }
+
     useEffect(() => {
         navigation.setOptions({ title: route.params?.title })
+        getDetails();
     }, [])
 
     const foto = (
@@ -23,11 +57,14 @@ export const ItemDetails = ({ route,navigation }: Props) => {
 
     const data = [foto, foto, foto];
 
-    
+
 
     return (
-            <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.container}>
-                <View style={styles.carousel}>
+        <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.container}>
+            {state.isLoading
+                ? <Text style={{ color: 'white', fontSize: 50, textAlign: 'center' }}>Cargando....</Text>
+                : <View>
+                    <View style={styles.carousel}>
                         <Carousel
                             data={data}
                             renderItem={({ item, index }: any) => data[index]}
@@ -37,35 +74,36 @@ export const ItemDetails = ({ route,navigation }: Props) => {
                             enableMomentum
                             lockScrollWhileSnapping
                         />
-                </View>
-                <View style={styles.scroll}>
-                <ScrollView >
-                    <Text style={styles.description}>El género Rosa está compuesto por un conocido grupo de arbustos generalmente espinosos y floridos representantes principales de la familia de las rosáceas. Se denomina rosa a la flor de los miembros de este género y rosal a la planta. El número de especies ronda las cien, la mayoría originarias de Asia y un reducido número nativas de Europa, Norteamérica y África noroccidental. Tanto especies como cultivares e híbridos se cultivan como ornamentales por la belleza y fragancia de su flor; pero también para la extracción de aceite esencial, utilizado en perfumería y cosmética, usos medicinales (fitoterapia) y gastronómicos.</Text>
-                </ScrollView>
-                </View>
-                <View style={styles.rowButtons}>
-                    <TouchableOpacity
-                        style={styles.smallButton}
-                    // onPress={() => navigation.navigate('PlantsList')}
-                    >
-                        <Text style={styles.buttonText}>Escuchar audio</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.smallButton}
-                    // onPress={() => navigation.navigate('PuntosInteresList')}
-                    >
-                        <Text style={styles.buttonText}>Mostrar ubicación</Text>
-                    </TouchableOpacity>
+                    </View>
+                    <View style={styles.scroll}>
+                        <ScrollView >
+                            <Text style={styles.description}>{state.data.description}</Text>
+                        </ScrollView>
+                    </View>
+                    <View style={styles.rowButtons}>
+                        <TouchableOpacity
+                            style={styles.smallButton}
+                        // onPress={() => navigation.navigate('PlantsList')}
+                        >
+                            <Text style={styles.buttonText}>Escuchar audio</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.smallButton}
+                        // onPress={() => navigation.navigate('PuntosInteresList')}
+                        >
+                            <Text style={styles.buttonText}>Mostrar ubicación</Text>
+                        </TouchableOpacity>
 
-                </View>
+                    </View>
 
-                <TouchableOpacity
-                    style={styles.button}
-                // onPress={() => navigation.navigate('ItinerariosList')}
-                >
-                    <Text style={styles.buttonText}>Iniciar ruta</Text>
-                </TouchableOpacity>
-            </ImageBackground>
+                    <TouchableOpacity
+                        style={styles.button}
+                    // onPress={() => navigation.navigate('ItinerariosList')}
+                    >
+                        <Text style={styles.buttonText}>Iniciar ruta</Text>
+                    </TouchableOpacity>
+                </View>}
+        </ImageBackground>
     )
 }
 
@@ -83,13 +121,13 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderWidth: 2,
     },
-    imageCarousel:{
-        height:'100%', 
-        width:'100%',
+    imageCarousel: {
+        height: '100%',
+        width: '100%',
         borderRadius: 10,
     },
     scroll: {
-        height:160,
+        height: 160,
         alignItems: 'center',
         borderColor: 'white',
         borderWidth: 2,
@@ -102,7 +140,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 20,
         color: 'white',
-        marginVertical:5,
+        marginVertical: 5,
     },
     rowButtons: {
         flexDirection: "row",

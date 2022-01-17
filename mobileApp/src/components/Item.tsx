@@ -6,19 +6,20 @@ const windowWidth = Dimensions.get('window').width;
 interface Props {
     name: any;
     img: string;
+    id: string;
     navigation: any;
 }
 
 
-export const Item =({name,img,navigation}: Props) =>{
+export const Item =({name,img,id,navigation}: Props) =>{
         return (
             <TouchableOpacity 
             style={styles.container} 
-            onPress={() => navigation.navigate('ItemDetails',{title:name})}
+            onPress={() => navigation.navigate('ItemDetails',{title:name,id:id})}
             >
                 <Image 
                 style={styles.img} 
-                source={ require('../img/rosa.jpg')}
+                source={{uri:img}}
                 />
                 <Text style={styles.title}>{name}</Text>
             </TouchableOpacity>

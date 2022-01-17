@@ -5,7 +5,6 @@ import { firebase, db } from '../firebase/firebase-config';
 
 
 import { Item } from '../components/Item';
-import { queryEqual } from 'firebase/firestore';
 
 
 

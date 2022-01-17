@@ -9,15 +9,15 @@ import { db } from '../firebase/firebase-config';
 interface Props extends StackScreenProps<any, 'ItemDetails'> { };
 
 const windowWidth = Dimensions.get('window').width;
-interface Data{
-    audio?:any,
-    category?:string,
-    description?:string,
-    name?:string,
+interface Data {
+    audio?: any,
+    category?: string,
+    description?: string,
+    name?: string,
 
 }
 
-interface PropState{
+interface PropState {
     isLoading: boolean,
     data: Data,
 }
@@ -26,15 +26,25 @@ export const ItemDetails = ({ route, navigation }: Props) => {
 
     const [state, setstate] = useState<PropState>({
         isLoading: true,
-        data:{},
+        data: {},
     });
+
+    const [image, setImage] = useState<any[]>([]);
 
     const getDetails = async () => {
         try {
             const data = await db.collection('plants').doc(route.params?.id).get();
             console.log(data.data());
-            // const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const info:any = data.data();
+            const info: any = data.data();
+            const arrayImagenes: any[] = [];
+            info.media.forEach((element: any) => {
+                arrayImagenes.push(
+                    <View >
+                        <Image style={styles.imageCarousel} source={{ uri: element }} />
+                    </View>
+                )
+            });
+            setImage(arrayImagenes);
             setstate({
                 isLoading: false,
                 data: info,
@@ -49,13 +59,7 @@ export const ItemDetails = ({ route, navigation }: Props) => {
         getDetails();
     }, [])
 
-    const foto = (
-        <View >
-            <Image style={styles.imageCarousel} source={require('../img/rosa.jpg')} />
-        </View>
-    )
-
-    const data = [foto, foto, foto];
+   
 
 
 
@@ -66,8 +70,8 @@ export const ItemDetails = ({ route, navigation }: Props) => {
                 : <View>
                     <View style={styles.carousel}>
                         <Carousel
-                            data={data}
-                            renderItem={({ item, index }: any) => data[index]}
+                            data={image}
+                            renderItem={({ item, index }: any) => image[index]}
                             sliderWidth={windowWidth - 44}
                             itemWidth={windowWidth - 44}
                             sliderHeight={200}

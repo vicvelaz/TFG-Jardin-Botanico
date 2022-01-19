@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import { Text, View, StyleSheet, Button, TouchableOpacity, ImageBackground, Image, Dimensions } from 'react-native'
+import { Text, View, StyleSheet, Button, TouchableOpacity, ImageBackground, Image, Dimensions, Modal } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack';
 import Carousel from 'react-native-snap-carousel';
 import { ScrollView } from 'react-native-gesture-handler';
 import { db } from '../firebase/firebase-config';
+import Sound from 'react-native-sound';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Props extends StackScreenProps<any, 'ItemDetails'> { };
 
@@ -30,6 +32,9 @@ export const ItemDetails = ({ route, navigation }: Props) => {
     });
 
     const [image, setImage] = useState<JSX.Element[]>([]);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [control_Online, setControl_Online] = useState<Sound>();
+
 
     const getDetails = async () => {
         try {
@@ -49,18 +54,48 @@ export const ItemDetails = ({ route, navigation }: Props) => {
                 isLoading: false,
                 data: info,
             })
+
+            Sound.setCategory('Playback', true);
+            setControl_Online(new Sound(info.audio, '', (error) => {
+                if (error) { console.log('fallo al cargar el audio', error) }
+            }));
         } catch (error) {
-            console.log('error');
+            console.log(error);
         }
     }
 
     useEffect(() => {
         navigation.setOptions({ title: route.params?.title })
         getDetails();
+
     }, [])
 
-   
 
+    const playSound_onLine = () => {
+
+
+        if (isPlaying) {
+            control_Online?.stop(() => {
+                // control_Online.release();
+            });
+            setIsPlaying(false);
+        } else {
+
+            setIsPlaying(true);
+            control_Online?.play(() => {
+                control_Online?.release();
+            });
+        }
+
+
+
+    }
+
+    const pausePlayAudio = () => {
+        // control_Online.
+        // ? audio.play()
+        // :audio.pause();
+    }
 
 
     return (
@@ -85,12 +120,24 @@ export const ItemDetails = ({ route, navigation }: Props) => {
                         </ScrollView>
                     </View>
                     <View style={styles.rowButtons}>
-                        <TouchableOpacity
-                            style={styles.smallButton}
-                        // onPress={() => navigation.navigate('PlantsList')}
-                        >
-                            <Text style={styles.buttonText}>Escuchar audio</Text>
-                        </TouchableOpacity>
+                        {state.data.audio != ''
+                            ? <TouchableOpacity
+                                style={styles.smallButton}
+                                onPress={playSound_onLine}
+                            >
+                                <Text style={[styles.buttonText, isPlaying ? { color: 'black' } : { color: 'white' }]}>Play/Pause audio</Text>
+                            </TouchableOpacity>
+
+                            : <TouchableOpacity
+                                disabled={true}
+                                activeOpacity={0}
+                                style={{ ...styles.smallButton, opacity: 0 }}
+                            // onPress={() => navigation.navigate('PlantsList')}
+                            >
+
+                            </TouchableOpacity>
+                        }
+
                         <TouchableOpacity
                             style={styles.smallButton}
                         // onPress={() => navigation.navigate('PuntosInteresList')}

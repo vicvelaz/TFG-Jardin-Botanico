@@ -23,13 +23,14 @@ interface Data {
 interface PropState {
     isLoading: boolean;
     items: Data[];
-
+    type:string;
 }
 
 export const List = ({ route, navigation }: Props) => {
 
     const [state, setstate] = useState<PropState>({
         isLoading: true,
+        type:'',
         items: [],
     })
 
@@ -48,9 +49,10 @@ export const List = ({ route, navigation }: Props) => {
             setstate({
                 isLoading: false,
                 items: arrayPlanta,
+                type:'plants',
             })
         } catch (error) {
-            console.log('error');
+            console.log('error1');
         }
     }
 
@@ -65,9 +67,10 @@ export const List = ({ route, navigation }: Props) => {
             setstate({
                 isLoading: false,
                 items: arrayLugar,
+                type:'plants',
             })
         } catch (error) {
-            console.log('error');
+            console.log('error2');
         }
     }
 
@@ -82,9 +85,10 @@ export const List = ({ route, navigation }: Props) => {
             setstate({
                 isLoading: false,
                 items: arrayItinerario,
+                type:'itinerary'
             })
         } catch (error) {
-            console.log('error');
+            console.log('error3',error);
         }
     }
 
@@ -123,7 +127,7 @@ export const List = ({ route, navigation }: Props) => {
                             style={styles.list}
                             data={state.items}
                             renderItem={({ item }) => (
-                                <Item name={item.name} img={item.img} id={item.id} navigation={navigation} />
+                                <Item name={item.name} img={item.img} id={item.id} type={state.type} navigation={navigation} />
                             )}
                             keyExtractor={({ id }: Data) => id.toString()}
                             numColumns={2}

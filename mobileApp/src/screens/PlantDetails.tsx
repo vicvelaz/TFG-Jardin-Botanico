@@ -6,9 +6,8 @@ import Carousel from 'react-native-snap-carousel';
 import { ScrollView } from 'react-native-gesture-handler';
 import { db } from '../firebase/firebase-config';
 import Sound from 'react-native-sound';
-import { useFocusEffect } from '@react-navigation/native';
 
-interface Props extends StackScreenProps<any, 'ItemDetails'> { };
+interface Props extends StackScreenProps<any, 'PlantDetails'> { };
 
 const windowWidth = Dimensions.get('window').width;
 interface Data {
@@ -24,7 +23,7 @@ interface PropState {
     data: Data,
 }
 
-export const ItemDetails = ({ route, navigation }: Props) => {
+export const PlantDetails = ({ route, navigation }: Props) => {
 
     const [state, setstate] = useState<PropState>({
         isLoading: true,
@@ -55,10 +54,13 @@ export const ItemDetails = ({ route, navigation }: Props) => {
                 data: info,
             })
 
-            Sound.setCategory('Playback', true);
-            setControl_Online(new Sound(info.audio, '', (error) => {
-                if (error) { console.log('fallo al cargar el audio', error) }
-            }));
+
+            if (info.audio != undefined && info.audio != '') {
+                Sound.setCategory('Playback', true);
+                setControl_Online(new Sound(info.audio, '', (error) => {
+                    if (error) { console.log('fallo al cargar el audio', error) }
+                }));
+            }
         } catch (error) {
             console.log(error);
         }

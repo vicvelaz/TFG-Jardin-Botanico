@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react'
-
-import { Text, View, StyleSheet, Button, TouchableOpacity, ImageBackground, Image, Dimensions, Modal } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react';
+import {ToastAndroid} from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, ImageBackground, Image, Dimensions, Modal } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack';
 import Carousel from 'react-native-snap-carousel';
 import { ScrollView } from 'react-native-gesture-handler';
 import { db } from '../firebase/firebase-config';
-import Sound from 'react-native-sound';
+import { AudioButton } from '../components/AudioButton';
 
 interface Props extends StackScreenProps<any, 'PlantDetails'> { };
 
@@ -20,6 +20,7 @@ interface Data {
 
 interface PropState {
     isLoading: boolean,
+    isAudioPlaying: boolean,
     data: Data,
 }
 
@@ -27,12 +28,11 @@ export const PlantDetails = ({ route, navigation }: Props) => {
 
     const [state, setstate] = useState<PropState>({
         isLoading: true,
+        isAudioPlaying:false,
         data: {},
     });
 
     const [image, setImage] = useState<JSX.Element[]>([]);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [control_Online, setControl_Online] = useState<Sound>();
 
 
     const getDetails = async () => {
@@ -51,53 +51,25 @@ export const PlantDetails = ({ route, navigation }: Props) => {
             setImage(arrayImagenes);
             setstate({
                 isLoading: false,
+                isAudioPlaying:false,
                 data: info,
             })
 
 
-            if (info.audio != undefined && info.audio != '') {
-                Sound.setCategory('Playback', true);
-                setControl_Online(new Sound(info.audio, '', (error) => {
-                    if (error) { console.log('fallo al cargar el audio', error) }
-                }));
-            }
+          
         } catch (error) {
             console.log(error);
         }
     }
 
     useEffect(() => {
-        navigation.setOptions({ title: route.params?.title })
-        getDetails();
-
+        navigation.setOptions({ title: route.params?.title });
+        getDetails();    
     }, [])
 
 
-    const playSound_onLine = () => {
-
-
-        if (isPlaying) {
-            control_Online?.stop(() => {
-                // control_Online.release();
-            });
-            setIsPlaying(false);
-        } else {
-
-            setIsPlaying(true);
-            control_Online?.play(() => {
-                control_Online?.release();
-            });
-        }
-
-
-
-    }
-
-    const pausePlayAudio = () => {
-        // control_Online.
-        // ? audio.play()
-        // :audio.pause();
-    }
+  
+  
 
 
     return (
@@ -122,24 +94,28 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                         </ScrollView>
                     </View>
                     <View style={styles.rowButtons}>
-                        {state.data.audio != ''
+                        {/* {state.data.audio != '' 
                             ? <TouchableOpacity
                                 style={styles.smallButton}
                                 onPress={playSound_onLine}
                             >
-                                <Text style={[styles.buttonText, isPlaying ? { color: 'black' } : { color: 'white' }]}>Play/Pause audio</Text>
+                                <Text style={[styles.buttonText, state.isAudioPlaying ? { color: 'black' } : { color: 'white' }]}>Play/Pause audio</Text>
                             </TouchableOpacity>
 
                             : <TouchableOpacity
-                                disabled={true}
-                                activeOpacity={0}
-                                style={{ ...styles.smallButton, opacity: 0 }}
-                            // onPress={() => navigation.navigate('PlantsList')}
+                                // disabled={true}
+                                // activeOpacity={0}
+                                style={{ ...styles.smallButton, backgroundColor: 'grey' }}
+                            onPress={() => ToastAndroid.show("Audio no disponible", ToastAndroid.SHORT)}
                             >
+                                <Text style={styles.buttonText}>Play/Pause audio</Text>
 
                             </TouchableOpacity>
-                        }
-
+                        } */}
+                        <AudioButton 
+                        audioURL={state.data.audio} 
+                        navigation={navigation}
+                        />
                         <TouchableOpacity
                             style={styles.smallButton}
                         // onPress={() => navigation.navigate('PuntosInteresList')}

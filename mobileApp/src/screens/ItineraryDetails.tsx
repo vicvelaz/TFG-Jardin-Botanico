@@ -87,12 +87,6 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
 
     }
 
-    const pausePlayAudio = () => {
-        // control_Online.
-        // ? audio.play()
-        // :audio.pause();
-    }
-
 
     return (
         <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.container}>
@@ -116,24 +110,7 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                         </ScrollView>
                     </View>
                     <View style={styles.rowButtons}>
-                        {/* {state.data.audio != '' 
-                            ? <TouchableOpacity
-                                style={styles.smallButton}
-                                onPress={playSound_onLine}
-                            >
-                                <Text style={[styles.buttonText, isPlaying ? { color: 'black' } : { color: 'white' }]}>Play/Pause audio</Text>
-                            </TouchableOpacity>
-
-                            : <TouchableOpacity
-                                disabled={true}
-                                activeOpacity={0}
-                                style={{ ...styles.smallButton, opacity: 0 }}
-                            // onPress={() => navigation.navigate('PlantsList')}
-                            >
-
-                            </TouchableOpacity>
-                        } */}
-
+                        
                         <TouchableOpacity
                             style={styles.smallButton}
                         // onPress={() => navigation.navigate('PuntosInteresList')}

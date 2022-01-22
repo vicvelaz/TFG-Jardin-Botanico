@@ -16,7 +16,7 @@ const Plants = () => {
     const [edit, setEdit] = React.useState(false);
     const [error, setError] = React.useState(null);
     const [marcadorVisible, setMarcadorVisible] = React.useState(true);
-    const [numPaginas, setNumPaginas] = React.useState(2);
+    const [numPaginas, setNumPaginas] = React.useState(4);
     const [pagActual, setPagActual] = React.useState(1);
     const [itemActual, setItemActual] = React.useState(0);
     const [paginas, setPaginas] = React.useState([]);
@@ -319,7 +319,7 @@ const Plants = () => {
 
     const actualizarRadios = (e) => {
         let npag = 0;
-        
+
         if (e.target.id === "inlineRadio1") {
             setRadioTodos(true);
             setRadioPlantas(false);

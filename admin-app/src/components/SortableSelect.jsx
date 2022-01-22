@@ -1,4 +1,3 @@
-import { Button } from 'bootstrap';
 import React, { Fragment } from 'react';
 
 import Select, { components } from 'react-select';
@@ -48,6 +47,11 @@ const MultiSelectSort = (props) => {
     setSelected([]);
   }
 
+  const editarPuntos = (e, puntos) => {
+    e.preventDefault();
+    setSelected(puntos);
+  }
+
   return (
     <Fragment>
     <SortableSelect
@@ -69,6 +73,7 @@ const MultiSelectSort = (props) => {
       closeMenuOnSelect={false}
     />
     <button id="resetsortableselect" onClick={(e) => onReset(e)}>clear</button>
+    <button id="editsortableselect" onClick={(e) => editarPuntos(e, props.editarPuntos)}>edit</button>
     </Fragment>
     
   );

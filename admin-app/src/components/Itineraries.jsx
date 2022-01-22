@@ -82,7 +82,7 @@ const Itineraries = () => {
   const loadModalModificarItinerario = (id) => {
     setEdit(true);
     const itinerarioInfo = itinerarios.find((item) => item.id === id);
-    console.log(itinerarioInfo.paradas);
+    console.log(itinerarioInfo);
     console.log(plantasLugares);
     prepararParadas(itinerarioInfo);
     document.getElementById("name").value = itinerarioInfo.name;
@@ -91,7 +91,7 @@ const Itineraries = () => {
     setName(itinerarioInfo.name);
     setDescription(itinerarioInfo.description);
     // setPuntos(itinerarioInfo.paradas);
-
+    document.getElementById("editsortableselect").click()
     //puntos.push({value:itinerarioInfo.paradas.id,label:itinerarioInfo.paradas.id});
     setImage(itinerarioInfo.image);
     console.log(puntos);
@@ -316,6 +316,7 @@ const Itineraries = () => {
                       paradas={plantasLugares}
                       id="puntos"
                       name="puntos"
+                      editarPuntos={puntos}
                       actualizarPuntos={(p) => actualizarPuntos(p)}
                     ></SortableSelect>
                     </div>

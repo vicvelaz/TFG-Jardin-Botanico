@@ -59,3 +59,9 @@ table{
   border: none !important;
   font-size:0;
 }
+
+#editsortableselect{
+  background: transparent;
+  border: none !important;
+  font-size:0;
+}

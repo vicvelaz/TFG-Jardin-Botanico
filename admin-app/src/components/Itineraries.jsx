@@ -166,6 +166,7 @@ const Itineraries = () => {
       setError(null);
 
       document.getElementById("formularioitinerarios").reset();
+      document.getElementById("resetsortableselect").click();
       window.$("#nuevoitinerariomodal").modal("toggle");
       $("body").removeClass("modal-open");
       $(".modal-backdrop").remove();
@@ -220,6 +221,7 @@ const Itineraries = () => {
       setError(null);
 
       document.getElementById("formularioitinerarios").reset();
+      document.getElementById("resetsortableselect").click();
       window.$("#nuevoitinerariomodal").modal("toggle");
       $("body").removeClass("modal-open");
       $(".modal-backdrop").remove();

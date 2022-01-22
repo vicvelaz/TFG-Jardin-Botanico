@@ -45,7 +45,6 @@ const Itineraries = () => {
       const data = await db.collection("itinerary").get();
       const arrayData = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setItinerarios(arrayData);
-      console.log(itinerarios);
     } catch (error) {
       console.log(error);
     }
@@ -61,11 +60,9 @@ const Itineraries = () => {
       const arrayData = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       let infoSelect = [];
       arrayData.forEach((element) => {
-        console.log(element);
         infoSelect.push({ value: element.id, label: element.name });
       });
       setPlantas_Lugares(infoSelect);
-      console.log(plantasLugares);
     } catch (error) {
       console.log(error);
     }
@@ -82,8 +79,6 @@ const Itineraries = () => {
   const loadModalModificarItinerario = (id) => {
     setEdit(true);
     const itinerarioInfo = itinerarios.find((item) => item.id === id);
-    console.log(itinerarioInfo);
-    console.log(plantasLugares);
     prepararParadas(itinerarioInfo);
     document.getElementById("name").value = itinerarioInfo.name;
     document.getElementById("description").value = itinerarioInfo.description;
@@ -94,11 +89,10 @@ const Itineraries = () => {
     document.getElementById("editsortableselect").click()
     //puntos.push({value:itinerarioInfo.paradas.id,label:itinerarioInfo.paradas.id});
     setImage(itinerarioInfo.image);
-    console.log(puntos);
   };
 
   const prepararParadas = (itinerarioInfo) => {
-    console.log(puntos);
+
     let auxPuntos = [];
     itinerarioInfo.paradas.forEach((parada) => {
       let auxParada = plantasLugares.find(
@@ -106,8 +100,6 @@ const Itineraries = () => {
       );
 
       auxPuntos.push({ value: auxParada.value, label: auxParada.label });
-      console.log(puntos);
-      console.log(auxParada);
       puntos.push(auxParada);
     });
     
@@ -121,7 +113,6 @@ const Itineraries = () => {
     setPuntos([]);
     setImage("");
     setError(null);
-    console.log(puntos);
     document.getElementById("resetsortableselect").click();
     document.getElementById("formularioitinerarios").reset();
     
@@ -137,11 +128,9 @@ const Itineraries = () => {
       setLoading(true);
 
       let paradas = [];
-      console.log(puntos);
       puntos.forEach((element) => {
         paradas.push(db.doc("/plants/" + element.value));
       });
-      console.log(paradas);
 
       await db.collection("itinerary").doc(id).update({
         name: name,
@@ -163,9 +152,7 @@ const Itineraries = () => {
       setEdit(false);
       setName("");
       setDescription("");
-      console.log(puntos);
       setPuntos([]);
-      console.log(puntos);
       setImage("");
       setError(null);
 
@@ -189,11 +176,9 @@ const Itineraries = () => {
     }
     try {
       let paradas = [];
-      console.log(puntos);
       puntos.forEach((element) => {
         paradas.push(db.doc("/plants/" + element.value));
       });
-      console.log(paradas);
 
       const nuevoItinerario = {
         name: name,
@@ -248,7 +233,7 @@ const Itineraries = () => {
 
   const buscarItinerario = (e) => {
     setBusqueda(e.target.value);
-    console.log(e.target.value);
+
     if (busqueda === "") {
       obtenerItinerarios();
     } else {

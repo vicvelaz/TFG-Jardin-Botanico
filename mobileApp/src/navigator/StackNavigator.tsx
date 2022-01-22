@@ -4,13 +4,15 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { MainMenu } from '../screens/MainMenu';
 import { List } from '../screens/List';
 import { MapScreen } from '../screens/MapScreen';
-import { ItemDetails } from '../screens/ItemDetails';
+import { PlantDetails } from '../screens/PlantDetails';
+import { ItineraryDetails } from '../screens/ItineraryDetails';
 
 export type RootStackParams = {
   MainMenu: undefined;
   List: String;
   MapScreen:undefined;
-  ItemDetails: String;
+  PlantDetails: String;
+  ItineraryDetails: String;
 }
 
 
@@ -22,7 +24,8 @@ export const StackNavigator = () => {
       <Stack.Screen name="MainMenu" component={MainMenu} options={{headerShown:false}}/>
       <Stack.Screen name="List" component={List} />
       <Stack.Screen name="MapScreen" component={MapScreen} options={{ title:"Mapa" }}/>
-      <Stack.Screen name="ItemDetails" component={ItemDetails}/>
+      <Stack.Screen name="PlantDetails" component={PlantDetails}/>
+      <Stack.Screen name="ItineraryDetails" component={ItineraryDetails}/>
     </Stack.Navigator>
   );
 }

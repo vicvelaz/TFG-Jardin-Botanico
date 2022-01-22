@@ -6,9 +6,8 @@ import Carousel from 'react-native-snap-carousel';
 import { ScrollView } from 'react-native-gesture-handler';
 import { db } from '../firebase/firebase-config';
 import Sound from 'react-native-sound';
-import { useFocusEffect } from '@react-navigation/native';
 
-interface Props extends StackScreenProps<any, 'ItemDetails'> { };
+interface Props extends StackScreenProps<any, 'ItineraryDetails'> { };
 
 const windowWidth = Dimensions.get('window').width;
 interface Data {
@@ -24,7 +23,7 @@ interface PropState {
     data: Data,
 }
 
-export const ItemDetails = ({ route, navigation }: Props) => {
+export const ItineraryDetails = ({ route, navigation }: Props) => {
 
     const [state, setstate] = useState<PropState>({
         isLoading: true,
@@ -38,7 +37,7 @@ export const ItemDetails = ({ route, navigation }: Props) => {
 
     const getDetails = async () => {
         try {
-            const data = await db.collection('plants').doc(route.params?.id).get();
+            const data = await db.collection('itinerary').doc(route.params?.id).get();
             // console.log(data.data());
             const info: any = data.data();
             const arrayImagenes: JSX.Element[] = [];
@@ -55,10 +54,7 @@ export const ItemDetails = ({ route, navigation }: Props) => {
                 data: info,
             })
 
-            Sound.setCategory('Playback', true);
-            setControl_Online(new Sound(info.audio, '', (error) => {
-                if (error) { console.log('fallo al cargar el audio', error) }
-            }));
+            
         } catch (error) {
             console.log(error);
         }
@@ -91,12 +87,6 @@ export const ItemDetails = ({ route, navigation }: Props) => {
 
     }
 
-    const pausePlayAudio = () => {
-        // control_Online.
-        // ? audio.play()
-        // :audio.pause();
-    }
-
 
     return (
         <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.container}>
@@ -120,24 +110,7 @@ export const ItemDetails = ({ route, navigation }: Props) => {
                         </ScrollView>
                     </View>
                     <View style={styles.rowButtons}>
-                        {state.data.audio != ''
-                            ? <TouchableOpacity
-                                style={styles.smallButton}
-                                onPress={playSound_onLine}
-                            >
-                                <Text style={[styles.buttonText, isPlaying ? { color: 'black' } : { color: 'white' }]}>Play/Pause audio</Text>
-                            </TouchableOpacity>
-
-                            : <TouchableOpacity
-                                disabled={true}
-                                activeOpacity={0}
-                                style={{ ...styles.smallButton, opacity: 0 }}
-                            // onPress={() => navigation.navigate('PlantsList')}
-                            >
-
-                            </TouchableOpacity>
-                        }
-
+                        
                         <TouchableOpacity
                             style={styles.smallButton}
                         // onPress={() => navigation.navigate('PuntosInteresList')}

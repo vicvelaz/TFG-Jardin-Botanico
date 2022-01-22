@@ -53,3 +53,9 @@ table{
   color: black!important;
   background-color: #9CCA90;
 }
+
+#resetsortableselect{
+  background: transparent;
+  border: none !important;
+  font-size:0;
+}

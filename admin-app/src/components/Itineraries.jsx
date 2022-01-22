@@ -4,6 +4,7 @@ import $ from "jquery";
 import "bootstrap";
 import "moment/locale/es";
 import SelectItineraries from "./SelectItineraries";
+import SortableSelect from "./SortableSelect";
 
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
@@ -74,6 +75,10 @@ const Itineraries = () => {
     obtenerPlantasLugares();
   }, []);
 
+  const actualizarPuntos = (p) => {
+    setPuntos(p);
+  }
+
   const loadModalModificarItinerario = (id) => {
     setEdit(true);
     const itinerarioInfo = itinerarios.find((item) => item.id === id);
@@ -112,10 +117,10 @@ const Itineraries = () => {
     setPuntos([]);
     setImage("");
     setError(null);
-
     console.log(puntos);
-
+    document.getElementById("resetsortableselect").click();
     document.getElementById("formularioitinerarios").reset();
+    
   };
 
   const modificarItinerario = async (e) => {
@@ -304,9 +309,17 @@ const Itineraries = () => {
                       ></textarea>
                       <label htmlFor="description">Descripción</label>
                     </div>
-                    <SelectItineraries 
+                    <div className="mt-3">
+                    <SortableSelect
+                      paradas={plantasLugares}
+                      id="puntos"
+                      name="puntos"
+                      actualizarPuntos={(p) => actualizarPuntos(p)}
+                    ></SortableSelect>
+                    </div>
+                    {/* <SelectItineraries 
                       paradas={puntos}
-                    ></SelectItineraries>
+                    ></SelectItineraries> */}
                     {/* <Select
                       id="puntos"
                       name="puntos"
@@ -320,7 +333,7 @@ const Itineraries = () => {
                       onChange={(e) => setPuntos(e) }
                     /> */}
                   </div>
-                  <div className="d-flex justify-content-center align-items-center mt-4">
+                  <div className="d-flex justify-content-center align-items-center mt-4 mb-4">
                     <label htmlFor="formFile" className="form-label">
                       Imagen:{" "}
                     </label>

@@ -23,7 +23,7 @@ React.useEffect(() => {
 
 
     return (
-        <div className="iti">SelectItineraries!!!!!!!!!!
+        <div className="iti">
         {paradas.map((e)=>(
             <div>{e.label}</div>
         ))

@@ -10,6 +10,7 @@ const Events = () => {
 
     //listado de eventos
     const [eventos,setEventos] = React.useState([]);
+    const [items, setList] = React.useState([]);
 
     //estados de control
     const [loading,setLoading] = React.useState(false);
@@ -17,6 +18,10 @@ const Events = () => {
     const [error,setError] = React.useState(null);
     const [editFechaIni,setEditFechaIni] = React.useState(false);
     const [editFechaFin,setEditFechaFin] = React.useState(false);
+    const [numPaginas, setNumPaginas] = React.useState(1);
+    const [pagActual, setPagActual] = React.useState(1);
+    const [itemActual, setItemActual] = React.useState(0);
+    const [paginas, setPaginas] = React.useState([]);
 
     //estados para inputs
     const [busqueda,setBusqueda] = React.useState(""); 
@@ -33,7 +38,12 @@ const Events = () => {
         try{
             const data = await db.collection('events').get();
             const arrayData = data.docs.map(doc => ({id: doc.id, ...doc.data()}));
-            setEventos(arrayData);
+            setList(arrayData);
+            setNumPaginas(arrayData.length % 5 === 0 ? (arrayData.length / 5) : (Math.trunc(arrayData.length / 5)) + 1);
+            setEventos(arrayData.slice(0, 5));
+            setItemActual(itemActual + 5);
+            let pag = Array.from({length: numPaginas}, (_, index) => index + 1);
+            setPaginas(pag);
 
         } catch(error){
             console.log(error);
@@ -104,8 +114,7 @@ const Events = () => {
             await db.collection('events').doc(id).delete();
             const imagenRef = storage.ref().child("/images/events").child(id);
             await imagenRef.delete()
-            const arrayFiltrado = eventos.filter(item => item.id !== id);
-            setEventos(arrayFiltrado);
+            obtenerEventos();
 
         } catch (error) {
             console.log(error);
@@ -218,6 +227,33 @@ const Events = () => {
         }
     }
 
+    const siguientePagina = () => {
+        if(pagActual !== numPaginas){
+            let ia = itemActual + 5;
+            setItemActual(ia);
+            setEventos(items.slice(itemActual, ia));
+            setPagActual(pagActual + 1);
+        }
+    }
+
+    const paginaAnterior = () => {
+        if(pagActual !== 1){
+            let ia = itemActual - 5;
+            const itt = ia - 5;
+            setItemActual(ia);
+            setEventos(items.slice(itt, ia));
+            setPagActual(pagActual - 1);
+        } 
+    }
+
+    const irAPagina = (pag) => {
+        const it = pag * 5;
+        const itt = it - 5;
+        setItemActual(it);
+        setEventos(items.slice(itt,it));
+        setPagActual(pag);
+    }
+
     return (
         <div className="background">
             <div className="d-flex justify-content-center mt-5">
@@ -307,6 +343,22 @@ const Events = () => {
                         </tbody>
                     </table>
                 </div>
+                <nav className="mt-3" aria-label="Page navigation example">
+                    <ul className="pagination justify-content-center">
+                        <li className={pagActual === 1 ? "page-item disabled" : "page-item"} onClick={() => paginaAnterior()}>
+                            <a className={pagActual === 1 ? "page-link deshabilitado" : "page-link clickable"}>Anterior</a>
+                        </li>
+                        {paginas.map((e) =>
+                            <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}> 
+                                <a className="page-link clickable">{e}</a> 
+                            </li>
+                        )}
+                        
+                        <li className={pagActual === numPaginas ? "page-item disabled" : "page-item"} onClick={() => siguientePagina()}>
+                            <a className={pagActual === numPaginas ? "page-link deshabilitado" : "page-link clickable"}>Siguiente</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     )

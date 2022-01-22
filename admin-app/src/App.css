@@ -10,7 +10,7 @@ body {
     margin-top: 56px;
     overflow: hidden;
     width: 100%;
-    height: 110vh;
+    height: 120vh;
     background: url("https://firebasestorage.googleapis.com/v0/b/realjardinbotanicoapp.appspot.com/o/background-dark.jpg?alt=media&token=b43496b1-59e5-442d-9891-534415ee857b") top center no-repeat;
     background-size: cover;
     background-attachment: fixed;
@@ -44,7 +44,7 @@ table{
 }
 
 .deshabilitado{
-  background-color: rgb(235,235,228)!important;
+  background-color: rgb(172, 172, 168)!important;
   color: black!important;
 }
 

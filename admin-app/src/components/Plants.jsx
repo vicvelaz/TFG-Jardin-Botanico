@@ -298,41 +298,63 @@ const Plants = () => {
     const buscarItem = (e) => {
         setBusqueda(e.target.value);
         if (busqueda === "") {
-            if (radioTodos) { setList(items) }
-            if (radioPlantas) { setList(plants) }
-            if (radioLugares) { setList(places) }
-
+            let npag = 0;
+            if (radioTodos) { setList(items.slice(0,5)); npag = items.length % 5 === 0 ? (items.length / 5) : (Math.trunc(items.length / 5)) + 1 }
+            if (radioPlantas) { setList(plants.slice(0,5)); npag= plants.length % 5 === 0 ? (plants.length / 5) : (Math.trunc(plants.length / 5)) + 1 }
+            if (radioLugares) { setList(places.slice(0,5)); npag= places.length % 5 === 0 ? (places.length / 5) : (Math.trunc(places.length / 5)) + 1}
+            setNumPaginas(npag);
+            setItemActual(5);
+            let pag = Array.from({length: npag}, (_, index) => index + 1);
+            setPaginas(pag);
         } else {
-            setList(list.filter(ev => ev.name.includes(busqueda)));
+            const filterlist = list.filter(ev => ev.name.toLowerCase().includes(busqueda.toLowerCase())).slice(0, 5);
+            const numpag = filterlist.length % 5 === 0 ? (filterlist.length / 5) : (Math.trunc(filterlist.length / 5)) + 1;
+            setList(filterlist);
+            setNumPaginas(numpag);
+            setItemActual(5);
+            let pag = Array.from({length: numpag}, (_, index) => index + 1);
+            setPaginas(pag);
         }
     }
 
     const actualizarRadios = (e) => {
+        let npag = 0;
+        
         if (e.target.id === "inlineRadio1") {
             setRadioTodos(true);
             setRadioPlantas(false);
             setRadioLugares(false);
-            setList(items);
+            setList(items.slice(0,5));
+            npag = items.length % 5 === 0 ? (items.length / 5) : (Math.trunc(items.length / 5)) + 1 ;
         }
         else if (e.target.id === "inlineRadio2") {
             setRadioTodos(false);
             setRadioPlantas(true);
             setRadioLugares(false);
-            setList(plants);
+            setList(plants.slice(0,5));
+            npag= plants.length % 5 === 0 ? (plants.length / 5) : (Math.trunc(plants.length / 5)) + 1 ;
         }
         else {
             setRadioTodos(false);
             setRadioPlantas(false);
             setRadioLugares(true);
-            setList(places);
+            setList(places.slice(0,5));
+            npag= places.length % 5 === 0 ? (places.length / 5) : (Math.trunc(places.length / 5)) + 1 ;
         }
+
+        setNumPaginas(npag);
+        setItemActual(5);
+        let pag = Array.from({length: npag}, (_, index) => index + 1);
+        setPaginas(pag);
     }
 
     const siguientePagina = () => {
         if(pagActual !== numPaginas){
             let ia = itemActual + 5;
             setItemActual(ia);
-            setList(items.slice(itemActual, ia));
+            if (radioTodos) { setList(items.slice(itemActual, ia))}
+            if (radioPlantas) { setList(plants.slice(itemActual, ia))}
+            if (radioLugares) { setList(places.slice(itemActual, ia))}
             setPagActual(pagActual + 1);
         }
     }
@@ -342,7 +364,9 @@ const Plants = () => {
             let ia = itemActual - 5;
             const itt = ia - 5;
             setItemActual(ia);
-            setList(items.slice(itt, ia));
+            if (radioTodos) { setList(items.slice(itt, ia))}
+            if (radioPlantas) { setList(plants.slice(itt, ia))}
+            if (radioLugares) { setList(places.slice(itt, ia))}
             setPagActual(pagActual - 1);
         } 
     }
@@ -351,7 +375,9 @@ const Plants = () => {
         const it = pag * 5;
         const itt = it - 5;
         setItemActual(it);
-        setList(items.slice(itt,it));
+        if (radioTodos) { setList(items.slice(itt,it))}
+        if (radioPlantas) { setList(plants.slice(itt,it))}
+        if (radioLugares) { setList(places.slice(itt,it))}
         setPagActual(pag);
     }
 

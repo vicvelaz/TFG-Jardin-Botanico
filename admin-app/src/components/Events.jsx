@@ -223,7 +223,7 @@ const Events = () => {
         if(busqueda === ""){
             obtenerEventos();
         }else{
-            setEventos(eventos.filter(ev => ev.name.includes(busqueda)));
+            setEventos(items.filter(ev => ev.name.includes(busqueda)));
         }
     }
 

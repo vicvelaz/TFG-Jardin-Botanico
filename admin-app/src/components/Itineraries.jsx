@@ -98,6 +98,7 @@ const Itineraries = () => {
   };
 
   const prepararParadas = (itinerarioInfo) => {
+    console.log(puntos);
     let auxPuntos = [];
     itinerarioInfo.paradas.forEach((parada) => {
       let auxParada = plantasLugares.find(
@@ -105,8 +106,11 @@ const Itineraries = () => {
       );
 
       auxPuntos.push({ value: auxParada.value, label: auxParada.label });
+      console.log(puntos);
+      console.log(auxParada);
       puntos.push(auxParada);
     });
+    
     setPuntos(auxPuntos);
   };
 
@@ -160,7 +164,7 @@ const Itineraries = () => {
       setName("");
       setDescription("");
       console.log(puntos);
-      setPuntos("");
+      setPuntos([]);
       console.log(puntos);
       setImage("");
       setError(null);

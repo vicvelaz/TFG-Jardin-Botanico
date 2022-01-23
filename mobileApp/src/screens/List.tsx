@@ -40,7 +40,7 @@ export const List = ({ route, navigation }: Props) => {
 
     const obtenerPlantas = async () => {
         try {
-            const data = await db.collection('plants').where('type', '==', 'plant').get();
+            const data = await db.collection('plants').where('type', '==', 'plant').orderBy('name').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const arrayPlanta: Data[] = [];
             arrayData.forEach((element: any) => {
@@ -52,13 +52,13 @@ export const List = ({ route, navigation }: Props) => {
                 type:'plants',
             })
         } catch (error) {
-            console.log('error1');
+            console.log('error',error);
         }
     }
 
     const obtenerLugares = async () => {
         try {
-            const data = await db.collection('plants').where('type', '==', 'place').get();
+            const data = await db.collection('plants').where('type', '==', 'place').orderBy('name').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const arrayLugar: Data[] = [];
             arrayData.forEach((element: any) => {
@@ -70,13 +70,13 @@ export const List = ({ route, navigation }: Props) => {
                 type:'plants',
             })
         } catch (error) {
-            console.log('error2');
+            console.log('error2',error);
         }
     }
 
     const obtenerItinerarios = async () => {
         try {
-            const data = await db.collection('itinerary').get();
+            const data = await db.collection('itinerary').orderBy('name','desc').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const arrayItinerario: Data[] = [];
             arrayData.forEach((element: any) => {

@@ -17,6 +17,7 @@ export const AudioButton = ({ audioURL,navigation }: Props) => {
 
     useEffect(() => {
         if (audioURL != '') {
+            console.log('audioURL',audioURL);
             Sound.setCategory('Playback', true);
             setControl_Online(new Sound(audioURL, '', (error) => {
                 if (error) { console.log('fallo al cargar el audio', error) }

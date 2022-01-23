@@ -15,7 +15,6 @@ interface Data {
     category?: string,
     description?: string,
     name?: string,
-
 }
 
 interface PropState {
@@ -94,24 +93,6 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                         </ScrollView>
                     </View>
                     <View style={styles.rowButtons}>
-                        {/* {state.data.audio != '' 
-                            ? <TouchableOpacity
-                                style={styles.smallButton}
-                                onPress={playSound_onLine}
-                            >
-                                <Text style={[styles.buttonText, state.isAudioPlaying ? { color: 'black' } : { color: 'white' }]}>Play/Pause audio</Text>
-                            </TouchableOpacity>
-
-                            : <TouchableOpacity
-                                // disabled={true}
-                                // activeOpacity={0}
-                                style={{ ...styles.smallButton, backgroundColor: 'grey' }}
-                            onPress={() => ToastAndroid.show("Audio no disponible", ToastAndroid.SHORT)}
-                            >
-                                <Text style={styles.buttonText}>Play/Pause audio</Text>
-
-                            </TouchableOpacity>
-                        } */}
                         <AudioButton 
                         audioURL={state.data.audio} 
                         navigation={navigation}
@@ -142,9 +123,10 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     carousel: {
-        height: 200,
+        height: 250,
         marginHorizontal: 20,
-        marginVertical: 50,
+        marginTop: 20,
+        marginBottom: 20,
         borderRadius: 10,
         alignItems: 'center',
         borderColor: 'white',

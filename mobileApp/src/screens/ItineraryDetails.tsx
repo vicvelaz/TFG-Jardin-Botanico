@@ -1,27 +1,28 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { Text, View, StyleSheet, Button, TouchableOpacity, ImageBackground, Image, Dimensions, Modal } from 'react-native'
+import { Text, View, StyleSheet, Button, TouchableOpacity, ImageBackground, Image, Dimensions, Modal, FlatList } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack';
 import Carousel from 'react-native-snap-carousel';
 import { ScrollView } from 'react-native-gesture-handler';
 import { db } from '../firebase/firebase-config';
-import Sound from 'react-native-sound';
 
 interface Props extends StackScreenProps<any, 'ItineraryDetails'> { };
 
 const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
 interface Data {
-    audio?: any,
     category?: string,
     description?: string,
     name?: string,
-
+    media?: any
 }
 
 interface PropState {
     isLoading: boolean,
     data: Data,
 }
+
 
 export const ItineraryDetails = ({ route, navigation }: Props) => {
 
@@ -30,18 +31,118 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
         data: {},
     });
 
-    const [image, setImage] = useState<JSX.Element[]>([]);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [control_Online, setControl_Online] = useState<Sound>();
 
+    const [image, setImage] = useState<JSX.Element[]>([]);
+    const [paradas, setParadas] = useState<any[]>([]);
 
     const getDetails = async () => {
         try {
-            const data = await db.collection('itinerary').doc(route.params?.id).get();
-            // console.log(data.data());
-            const info: any = data.data();
+            await db.collection('itinerary').doc(route.params?.id).get()
+                .then(async (res: any) => {
+                    const info: any = res.data();
+                    const arrayParadas: any[] = [];
+
+                    await info.paradas.reduce(async (promise: any, parada: any) => {
+                        await promise;
+                        const d = await db.collection('plants').doc(parada?._delegate?._key?.path?.segments.slice(-1)[0]).get();
+                        const i = d?.data();
+                        arrayParadas.push(i);
+                        // console.log(i?.media[0]);
+                        // arrayImagenesURL.push(i?.media[0]);
+                    }, Promise.resolve())
+
+                    console.log(arrayParadas);
+                    setParadas(arrayParadas);
+
+                    const arrayImagenesURL: any[] = [];
+                    arrayImagenesURL.push(info.media[0]);
+                    arrayParadas.forEach((p: any) => {
+                        arrayImagenesURL.push(...p.media);
+                    });
+
+                    const arrayImagenes: JSX.Element[] = [];
+                    console.log('arrayImagenesURL', arrayImagenesURL);
+                    arrayImagenesURL.forEach((element: any) => {
+                        arrayImagenes.push(
+                            <View >
+                                <Image style={styles.imageCarousel} source={{ uri: element }} />
+                            </View>
+                        )
+                    });
+                    setImage(arrayImagenes);
+                    setstate({
+                        isLoading: false,
+                        data: info,
+                    })
+
+                    // console.log(image);
+
+                });
+
+
+
+
+
+        } catch (error) {
+            console.log('error getDetails', error);
+        }
+    }
+
+    const getParadas = async (info: any) => {
+        const arrayParadas: any[] = [];
+        const arrayImagenesURL: any[] = [];
+
+        // console.log(info.image)
+        arrayImagenesURL.push(info.image);
+
+        // info.paradas.forEach(async (parada: any) => {
+        //     const d = await db.collection('plants').doc(parada._delegate._key.path.segments.slice(-1)[0]).get();
+        //     const i = d?.data();
+        //     arrayParadas.push(i);
+        //     // console.log(i?.media[0]);
+        //     arrayImagenesURL.push(i?.media[0]);
+        //     console.log(arrayImagenesURL);
+        // })
+
+
+        for await (const parada of paradas) {
+            const d = await db.collection('plants').doc(parada?._delegate?._key?.path?.segments.slice(-1)[0]).get();
+            const i = d?.data();
+            arrayParadas.push(i);
+            // console.log(i?.media[0]);
+            arrayImagenesURL.push(i?.media[0]);
+        }
+        console.log(arrayImagenesURL);
+
+        const arrayImagenes: JSX.Element[] = [];
+        arrayImagenesURL.forEach((element: any) => {
+            arrayImagenes.push(
+                <View >
+                    <Image style={styles.imageCarousel} source={{ uri: element }} />
+                </View>
+            )
+        });
+        console.log(1);
+
+        setParadas(arrayParadas);
+        // console.log(image);
+        // console.log(arrayImagenes);
+        setImage(arrayImagenes);
+        console.log(image);
+        return arrayParadas;
+    }
+
+    const prepareImg = async () => {
+
+        try {
+            const arrayImagenesURL: any[] = [];
+            arrayImagenesURL.push(...state.data.media);
+            paradas.forEach((p: any) => {
+                arrayImagenesURL.push(...p.media);
+            });
+
             const arrayImagenes: JSX.Element[] = [];
-            info.media.forEach((element: any) => {
+            arrayImagenesURL.forEach((element: any) => {
                 arrayImagenes.push(
                     <View >
                         <Image style={styles.imageCarousel} source={{ uri: element }} />
@@ -51,41 +152,32 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
             setImage(arrayImagenes);
             setstate({
                 isLoading: false,
-                data: info,
+                data: state.data,
             })
-
-            
+            console.log(2);
         } catch (error) {
-            console.log(error);
+            console.log('si es este', error);
         }
     }
 
     useEffect(() => {
         navigation.setOptions({ title: route.params?.title })
-        getDetails();
+        getDetails()
+        // prepareImg();
 
     }, [])
 
 
-    const playSound_onLine = () => {
 
+    const Item = ({ title }: any) => (
+        <View >
+            <Text style={styles.paradas}>{title}</Text>
+        </View>
+    );
 
-        if (isPlaying) {
-            control_Online?.stop(() => {
-                // control_Online.release();
-            });
-            setIsPlaying(false);
-        } else {
-
-            setIsPlaying(true);
-            control_Online?.play(() => {
-                control_Online?.release();
-            });
-        }
-
-
-
-    }
+    const renderItem = ({ item }: any) => (
+        <Item title={item.name} />
+    );
 
 
     return (
@@ -104,29 +196,33 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                             lockScrollWhileSnapping
                         />
                     </View>
-                    <View style={styles.scroll}>
-                        <ScrollView >
-                            <Text style={styles.description}>{state.data.description}</Text>
-                        </ScrollView>
-                    </View>
-                    <View style={styles.rowButtons}>
-                        
+                    <View style={styles.bloque}>
+                        <View style={styles.rowButtons}>
+
+                            <View style={styles.scroll}>
+                                <ScrollView >
+                                    <Text style={styles.description}>{state.data.description}</Text>
+                                </ScrollView>
+                            </View>
+
+                            <FlatList
+                                style={styles.lista}
+                                data={paradas}
+                                renderItem={renderItem}
+                                keyExtractor={item => item.id}
+                            />
+
+                        </View>
+
                         <TouchableOpacity
                             style={styles.smallButton}
                         // onPress={() => navigation.navigate('PuntosInteresList')}
                         >
-                            <Text style={styles.buttonText}>Mostrar ubicación</Text>
+                            <Text style={styles.buttonText}>Iniciar itinerario</Text>
                         </TouchableOpacity>
-
                     </View>
-
-                    <TouchableOpacity
-                        style={styles.button}
-                    // onPress={() => navigation.navigate('ItinerariosList')}
-                    >
-                        <Text style={styles.buttonText}>Iniciar ruta</Text>
-                    </TouchableOpacity>
-                </View>}
+                </View>
+            }
         </ImageBackground>
     )
 }
@@ -137,9 +233,10 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     carousel: {
-        height: 200,
+        height: 250,
         marginHorizontal: 20,
-        marginVertical: 50,
+        marginTop: 20,
+        marginBottom: 20,
         borderRadius: 10,
         alignItems: 'center',
         borderColor: 'white',
@@ -150,19 +247,28 @@ const styles = StyleSheet.create({
         width: '100%',
         borderRadius: 10,
     },
+    bloque: {
+        height: windowHeight - 350,
+        flexDirection: 'column'
+    },
     scroll: {
-        height: 160,
+        flex: 1,
         alignItems: 'center',
         borderColor: 'white',
         borderWidth: 2,
         borderRadius: 10,
         marginBottom: 20,
         backgroundColor: '#419E08',
-        marginHorizontal: 20,
+        marginRight: 20,
+    },
+    lista: {
+        flex: 1,
+        marginBottom: 20,
+        
     },
     description: {
         textAlign: 'center',
-        fontSize: 20,
+        fontSize: 17,
         color: 'white',
         marginVertical: 5,
     },
@@ -170,34 +276,45 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: 'space-between',
         marginHorizontal: 20,
+        flex: 15,
+
+        // backgroundColor:'blue'
     },
     smallButton: {
+        flex: 1,
         backgroundColor: '#419E08',
         justifyContent: 'center',
         paddingVertical: 10,
         borderRadius: 10,
         borderColor: 'white',
         borderWidth: 2,
-        width: '48%'
-    },
-    button: {
-        backgroundColor: '#419E08',
-        justifyContent: 'center',
-        paddingVertical: 10,
-        borderRadius: 10,
-        borderColor: 'white',
-        borderWidth: 2,
-        marginTop: 20,
-        marginHorizontal: 20
+        marginBottom: 20,
+        marginHorizontal: 20,
     },
     buttonText: {
-        fontSize: 17,
+        fontSize: 20,
         alignSelf: 'center',
         fontWeight: 'bold',
         color: 'white',
         marginHorizontal: 20,
         width: '100%',
         textAlign: 'center'
+    },
+    paradas: {
+        fontSize: 20,
+        // alignSelf: 'center',
+        fontWeight: 'bold',
+        color: 'white',
+        // marginTop: 8,
+        paddingVertical: 10,
+        // backgroundColor:'gray',
+        borderColor: 'white',
+        borderWidth: 2,
+        textAlign: 'center',
+        backgroundColor: '#419E08',
+
+        borderRadius: 10,
+
     }
 });
 

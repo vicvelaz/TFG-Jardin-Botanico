@@ -2,7 +2,6 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth"
 import "firebase/compat/firestore"
 import "firebase/compat/storage"
-// import { Firestore } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: "AIzaSyDIhyA7CsMiytlWwIpU7zD64jMONUPahvg",
@@ -17,11 +16,9 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 
-// console.log(app);
-
 const db = firebase.firestore();
 
 firebase.firestore().settings({ experimentalForceLongPolling: true,merge:true });
-// export const PlantsRef = db.collection("Plants");
+
 
 export { firebase,db }

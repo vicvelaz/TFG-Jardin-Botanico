@@ -14,17 +14,22 @@ interface Props {
 
 export const Item = ({ name, img, id, type, navigation }: Props) => {
 
-const details:String = type === 'plants'?'PlantDetails':'ItineraryDetails';
+    const details: String = type === 'plants' ? 'PlantDetails' : 'ItineraryDetails';
 
     return (
         <TouchableOpacity
             style={styles.container}
             onPress={() => navigation.navigate(details, { title: name, id: id })}
         >
-            <Image
-                style={styles.img}
-                source={{ uri: img }}
-            />
+            {img == undefined
+                ? <Image
+                    style={styles.image}
+                    source={require('../img/image-not-found.jpg')}
+                />
+                : <Image
+                    style={styles.image}
+                    source={{ uri: img }}
+                />}
             <Text style={styles.title}>{name}</Text>
         </TouchableOpacity>
     )
@@ -38,7 +43,7 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'space-around',
     },
-    img: {
+    image: {
         width: 125,
         height: 125,
         borderWidth: 2,

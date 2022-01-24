@@ -32,138 +32,58 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
     });
 
 
-    const [image, setImage] = useState<JSX.Element[]>([]);
-    const [paradas, setParadas] = useState<any[]>([]);
+    const [images, setImages] = useState<JSX.Element[]>([]);
+    const [stops, setStops] = useState<any[]>([]);
 
     const getDetails = async () => {
         try {
             await db.collection('itinerary').doc(route.params?.id).get()
                 .then(async (res: any) => {
                     const info: any = res.data();
-                    const arrayParadas: any[] = [];
+                    const arrayStops: any[] = [];
 
                     await info.paradas.reduce(async (promise: any, parada: any) => {
                         await promise;
                         const d = await db.collection('plants').doc(parada?._delegate?._key?.path?.segments.slice(-1)[0]).get();
                         const i = d?.data();
-                        arrayParadas.push(i);
-                        // console.log(i?.media[0]);
-                        // arrayImagenesURL.push(i?.media[0]);
+                        arrayStops.push(i);
                     }, Promise.resolve())
 
-                    console.log(arrayParadas);
-                    setParadas(arrayParadas);
+                    setStops(arrayStops);
 
-                    const arrayImagenesURL: any[] = [];
-                    arrayImagenesURL.push(info.media[0]);
-                    arrayParadas.forEach((p: any) => {
-                        arrayImagenesURL.push(...p.media);
+                    const arrayImagesURL: any[] = [];
+                    arrayImagesURL.push(info.media[0]);
+                    arrayStops.forEach((p: any) => {
+                        arrayImagesURL.push(...p.media);
                     });
 
-                    const arrayImagenes: JSX.Element[] = [];
-                    console.log('arrayImagenesURL', arrayImagenesURL);
-                    arrayImagenesURL.forEach((element: any) => {
-                        arrayImagenes.push(
+                    const arrayImages: JSX.Element[] = [];
+                    arrayImagesURL.forEach((element: any) => {
+                        arrayImages.push(
                             <View >
                                 <Image style={styles.imageCarousel} source={{ uri: element }} />
                             </View>
                         )
                     });
-                    setImage(arrayImagenes);
+                    setImages(arrayImages);
                     setstate({
                         isLoading: false,
                         data: info,
                     })
 
-                    // console.log(image);
 
                 });
 
 
-
-
-
         } catch (error) {
-            console.log('error getDetails', error);
+            console.log(error);
         }
     }
 
-    const getParadas = async (info: any) => {
-        const arrayParadas: any[] = [];
-        const arrayImagenesURL: any[] = [];
-
-        // console.log(info.image)
-        arrayImagenesURL.push(info.image);
-
-        // info.paradas.forEach(async (parada: any) => {
-        //     const d = await db.collection('plants').doc(parada._delegate._key.path.segments.slice(-1)[0]).get();
-        //     const i = d?.data();
-        //     arrayParadas.push(i);
-        //     // console.log(i?.media[0]);
-        //     arrayImagenesURL.push(i?.media[0]);
-        //     console.log(arrayImagenesURL);
-        // })
-
-
-        for await (const parada of paradas) {
-            const d = await db.collection('plants').doc(parada?._delegate?._key?.path?.segments.slice(-1)[0]).get();
-            const i = d?.data();
-            arrayParadas.push(i);
-            // console.log(i?.media[0]);
-            arrayImagenesURL.push(i?.media[0]);
-        }
-        console.log(arrayImagenesURL);
-
-        const arrayImagenes: JSX.Element[] = [];
-        arrayImagenesURL.forEach((element: any) => {
-            arrayImagenes.push(
-                <View >
-                    <Image style={styles.imageCarousel} source={{ uri: element }} />
-                </View>
-            )
-        });
-        console.log(1);
-
-        setParadas(arrayParadas);
-        // console.log(image);
-        // console.log(arrayImagenes);
-        setImage(arrayImagenes);
-        console.log(image);
-        return arrayParadas;
-    }
-
-    const prepareImg = async () => {
-
-        try {
-            const arrayImagenesURL: any[] = [];
-            arrayImagenesURL.push(...state.data.media);
-            paradas.forEach((p: any) => {
-                arrayImagenesURL.push(...p.media);
-            });
-
-            const arrayImagenes: JSX.Element[] = [];
-            arrayImagenesURL.forEach((element: any) => {
-                arrayImagenes.push(
-                    <View >
-                        <Image style={styles.imageCarousel} source={{ uri: element }} />
-                    </View>
-                )
-            });
-            setImage(arrayImagenes);
-            setstate({
-                isLoading: false,
-                data: state.data,
-            })
-            console.log(2);
-        } catch (error) {
-            console.log('si es este', error);
-        }
-    }
-
+  
     useEffect(() => {
         navigation.setOptions({ title: route.params?.title })
         getDetails()
-        // prepareImg();
 
     }, [])
 
@@ -187,8 +107,8 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                 : <View>
                     <View style={styles.carousel}>
                         <Carousel
-                            data={image}
-                            renderItem={({ item, index }: any) => image[index]}
+                            data={images}
+                            renderItem={({ item, index }: any) => images[index]}
                             sliderWidth={windowWidth - 44}
                             itemWidth={windowWidth - 44}
                             sliderHeight={200}
@@ -196,18 +116,18 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                             lockScrollWhileSnapping
                         />
                     </View>
-                    <View style={styles.bloque}>
-                        <View style={styles.rowButtons}>
+                    <View style={styles.block}>
+                        <View style={styles.row}>
 
-                            <View style={styles.scroll}>
+                            <View style={styles.description}>
                                 <ScrollView >
-                                    <Text style={styles.description}>{state.data.description}</Text>
+                                    <Text style={styles.descriptionText}>{state.data.description}</Text>
                                 </ScrollView>
                             </View>
 
                             <FlatList
                                 style={styles.lista}
-                                data={paradas}
+                                data={stops}
                                 renderItem={renderItem}
                                 keyExtractor={item => item.id}
                             />
@@ -215,7 +135,7 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                         </View>
 
                         <TouchableOpacity
-                            style={styles.smallButton}
+                            style={styles.button}
                         // onPress={() => navigation.navigate('PuntosInteresList')}
                         >
                             <Text style={styles.buttonText}>Iniciar itinerario</Text>
@@ -247,11 +167,17 @@ const styles = StyleSheet.create({
         width: '100%',
         borderRadius: 10,
     },
-    bloque: {
+    block: {
         height: windowHeight - 350,
         flexDirection: 'column'
     },
-    scroll: {
+    row: {
+        flexDirection: "row",
+        justifyContent: 'space-between',
+        marginHorizontal: 20,
+        flex: 15,
+    },
+    description: {
         flex: 1,
         alignItems: 'center',
         borderColor: 'white',
@@ -264,23 +190,25 @@ const styles = StyleSheet.create({
     lista: {
         flex: 1,
         marginBottom: 20,
-        
     },
-    description: {
+    descriptionText: {
         textAlign: 'center',
         fontSize: 17,
         color: 'white',
-        marginVertical: 5,
+        margin: 5,
     },
-    rowButtons: {
-        flexDirection: "row",
-        justifyContent: 'space-between',
-        marginHorizontal: 20,
-        flex: 15,
-
-        // backgroundColor:'blue'
+    paradas: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'white',
+        paddingVertical: 10,
+        borderColor: 'white',
+        borderWidth: 2,
+        textAlign: 'center',
+        backgroundColor: '#419E08',
+        borderRadius: 10,
     },
-    smallButton: {
+    button: {
         flex: 1,
         backgroundColor: '#419E08',
         justifyContent: 'center',
@@ -299,22 +227,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         width: '100%',
         textAlign: 'center'
-    },
-    paradas: {
-        fontSize: 20,
-        // alignSelf: 'center',
-        fontWeight: 'bold',
-        color: 'white',
-        // marginTop: 8,
-        paddingVertical: 10,
-        // backgroundColor:'gray',
-        borderColor: 'white',
-        borderWidth: 2,
-        textAlign: 'center',
-        backgroundColor: '#419E08',
-
-        borderRadius: 10,
-
     }
 });
 

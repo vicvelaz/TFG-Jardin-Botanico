@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 
-import { Text, View, StyleSheet, Button, TouchableOpacity, ImageBackground, Image, Dimensions } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, ImageBackground, Image, Dimensions } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack';
 import Carousel from 'react-native-snap-carousel';
 
-import { firebase, db } from '../firebase/firebase-config';
+import { db } from '../firebase/firebase-config';
 
 
 
@@ -18,35 +18,35 @@ export const MainMenu = ({ navigation }: Props) => {
     const [image, setImage] = useState<JSX.Element[]>([]);
 
 
-    const obtenerEventos = async () => {
+    const getEvents = async () => {
 
         try {
             const data = await db.collection('events').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const arrayImagenes: JSX.Element[] = [];
+            const arrayImages: JSX.Element[] = [];
             arrayData.forEach((element: any) => {
-                arrayImagenes.push(
+                arrayImages.push(
                     <View>
                         <Image style={styles.ImgEvent} source={{ uri: element.image }} />
                     </View>
                 )
             });
-            setImage(arrayImagenes);
+            setImage(arrayImages);
 
         } catch (error) {
-            console.log('error');
+            console.log(error);
         }
 
     }
 
 
     useEffect(() => {
-        obtenerEventos();
+        getEvents();
     }, []);
 
 
 
- 
+
 
     return (
         <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.backgroundImage}>
@@ -55,7 +55,7 @@ export const MainMenu = ({ navigation }: Props) => {
                 <View style={styles.events}>
                     <Text style={styles.eventsTitle}>EVENTOS</Text>
                     <Carousel
-                    style={{backgroundColor:'red'}}
+                        style={{ backgroundColor: 'red' }}
                         data={image}
                         renderItem={({ item, index }: any) => image[index]}
                         sliderWidth={windowWidth - 44}
@@ -63,8 +63,8 @@ export const MainMenu = ({ navigation }: Props) => {
                         sliderHeight={200}
                         enableMomentum
                         lockScrollWhileSnapping
-                    autoplay
-                    autoplayInterval={3000}
+                        autoplay
+                        autoplayInterval={3000}
                     />
                 </View>
                 <View>
@@ -139,13 +139,13 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
         textAlignVertical: 'center',
-        paddingVertical:3
+        paddingVertical: 3
     },
     ImgEvent: {
         height: '100%',
-        maxHeight:65,
-        resizeMode:'contain',
-        
+        maxHeight: 65,
+        resizeMode: 'contain',
+
     },
     rowButtons: {
         flexDirection: "row",

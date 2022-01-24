@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {ToastAndroid} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { Text, View, StyleSheet, TouchableOpacity, ImageBackground, Image, Dimensions, Modal } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack';
 import Carousel from 'react-native-snap-carousel';
@@ -10,6 +9,8 @@ import { AudioButton } from '../components/AudioButton';
 interface Props extends StackScreenProps<any, 'PlantDetails'> { };
 
 const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
 interface Data {
     audio?: any,
     category?: string,
@@ -37,25 +38,33 @@ export const PlantDetails = ({ route, navigation }: Props) => {
     const getDetails = async () => {
         try {
             const data = await db.collection('plants').doc(route.params?.id).get();
-            // console.log(data.data());
+            
             const info: any = data.data();
-            const arrayImagenes: JSX.Element[] = [];
-            info.media.forEach((element: any) => {
-                arrayImagenes.push(
+            const arrayImages: JSX.Element[] = [];
+
+            if(info.media == undefined || info.media==''){
+                arrayImages.push(
                     <View >
-                        <Image style={styles.imageCarousel} source={{ uri: element }} />
+                        <Image style={styles.image} source={require('../img/image-not-found.jpg')} />
                     </View>
                 )
-            });
-            setImage(arrayImagenes);
+            }
+            else{
+            info.media.forEach((element: any) => {
+                arrayImages.push(
+                    <View >
+                        <Image style={styles.image} source={{ uri: element }} />
+                    </View>
+                )
+            });}
+
+            setImage(arrayImages);
             setstate({
                 isLoading: false,
                 isAudioPlaying:false,
                 data: info,
             })
-
-
-          
+   
         } catch (error) {
             console.log(error);
         }
@@ -66,9 +75,6 @@ export const PlantDetails = ({ route, navigation }: Props) => {
         getDetails();    
     }, [])
 
-
-  
-  
 
 
     return (
@@ -87,9 +93,10 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                             lockScrollWhileSnapping
                         />
                     </View>
-                    <View style={styles.scroll}>
+                    <View style={styles.block}>
+                    <View style={styles.description}>
                         <ScrollView >
-                            <Text style={styles.description}>{state.data.description}</Text>
+                            <Text style={styles.descriptionText}>{state.data.description}</Text>
                         </ScrollView>
                     </View>
                     <View style={styles.rowButtons}>
@@ -112,6 +119,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                     >
                         <Text style={styles.buttonText}>Iniciar ruta</Text>
                     </TouchableOpacity>
+                </View>
                 </View>}
         </ImageBackground>
     )
@@ -132,13 +140,16 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderWidth: 2,
     },
-    imageCarousel: {
+    image: {
         height: '100%',
         width: '100%',
         borderRadius: 10,
     },
-    scroll: {
-        height: 160,
+    block: {
+        height: windowHeight - 350,
+        flexDirection: 'column',
+    },
+    description: {
         alignItems: 'center',
         borderColor: 'white',
         borderWidth: 2,
@@ -146,12 +157,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         backgroundColor: '#419E08',
         marginHorizontal: 20,
+        flex:1,
     },
-    description: {
+    descriptionText: {
         textAlign: 'center',
         fontSize: 20,
         color: 'white',
-        marginVertical: 5,
+        margin: 5,
     },
     rowButtons: {
         flexDirection: "row",
@@ -174,8 +186,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: 'white',
         borderWidth: 2,
-        marginTop: 20,
-        marginHorizontal: 20
+        margin:20,
     },
     buttonText: {
         fontSize: 17,

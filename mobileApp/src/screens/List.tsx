@@ -1,15 +1,10 @@
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useState } from 'react';
 import { FlatList, ImageBackground, SafeAreaView, StyleSheet, Text } from 'react-native';
-import { firebase, db } from '../firebase/firebase-config';
+import { db } from '../firebase/firebase-config';
 
 
 import { Item } from '../components/Item';
-
-
-
-
-
 
 
 interface Props extends StackScreenProps<any, 'List'> { };
@@ -17,7 +12,7 @@ interface Props extends StackScreenProps<any, 'List'> { };
 interface Data {
     id: string;
     name: string;
-    img: string;
+    image: string;
 }
 
 interface PropState {
@@ -35,60 +30,58 @@ export const List = ({ route, navigation }: Props) => {
     })
 
 
-    let data: Data[] = [];
-
 
     const obtenerPlantas = async () => {
         try {
             const data = await db.collection('plants').where('type', '==', 'plant').orderBy('name').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const arrayPlanta: Data[] = [];
+            const arrayPlants: Data[] = [];
             arrayData.forEach((element: any) => {
-                arrayPlanta.push({ id: element.id, name: element.name, img: element.media[0] });
+                arrayPlants.push({ id: element.id, name: element.name, image: element.media[0] });
             });
             setstate({
                 isLoading: false,
-                items: arrayPlanta,
+                items: arrayPlants,
                 type:'plants',
             })
         } catch (error) {
-            console.log('error',error);
+            console.log(error);
         }
     }
 
-    const obtenerLugares = async () => {
+    const getPlaces = async () => {
         try {
             const data = await db.collection('plants').where('type', '==', 'place').orderBy('name').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const arrayLugar: Data[] = [];
+            const arrayPlaces: Data[] = [];
             arrayData.forEach((element: any) => {
-                    arrayLugar.push({ id: element.id, name: element.name, img: element.media[0] });
+                    arrayPlaces.push({ id: element.id, name: element.name, image: element.media[0] });
             });
             setstate({
                 isLoading: false,
-                items: arrayLugar,
+                items: arrayPlaces,
                 type:'plants',
             })
         } catch (error) {
-            console.log('error2',error);
+            console.log(error);
         }
     }
 
-    const obtenerItinerarios = async () => {
+    const getItineraries = async () => {
         try {
             const data = await db.collection('itinerary').orderBy('name','desc').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            const arrayItinerario: Data[] = [];
+            const arrayItineraries: Data[] = [];
             arrayData.forEach((element: any) => {
-                arrayItinerario.push({ id: element.id, name: element.name, img: element.media[0] });
+                arrayItineraries.push({ id: element.id, name: element.name, image: element.media[0] });
             });
             setstate({
                 isLoading: false,
-                items: arrayItinerario,
+                items: arrayItineraries,
                 type:'itinerary'
             })
         } catch (error) {
-            console.log('error3',error);
+            console.log(error);
         }
     }
 
@@ -99,11 +92,11 @@ export const List = ({ route, navigation }: Props) => {
 
                 break;
             case 'place':
-                obtenerLugares();
+                getPlaces();
                
                 break;
             case 'itinerary':
-                obtenerItinerarios();
+                getItineraries();
     
                 break;
             default:
@@ -127,7 +120,7 @@ export const List = ({ route, navigation }: Props) => {
                             style={styles.list}
                             data={state.items}
                             renderItem={({ item }) => (
-                                <Item name={item.name} img={item.img} id={item.id} type={state.type} navigation={navigation} />
+                                <Item name={item.name} img={item.image} id={item.id} type={state.type} navigation={navigation} />
                             )}
                             keyExtractor={({ id }: Data) => id.toString()}
                             numColumns={2}

@@ -17,7 +17,6 @@ export const AudioButton = ({ audioURL,navigation }: Props) => {
 
     useEffect(() => {
         if (audioURL != '') {
-            console.log('audioURL',audioURL);
             Sound.setCategory('Playback', true);
             setControl_Online(new Sound(audioURL, '', (error) => {
                 if (error) { console.log('fallo al cargar el audio', error) }
@@ -64,7 +63,7 @@ export const AudioButton = ({ audioURL,navigation }: Props) => {
 
 
 
-    if (audioURL == '') {
+    if (audioURL == '' || audioURL == undefined) {
         return (
             <TouchableOpacity
                 disabled={true}
@@ -107,6 +106,11 @@ export const AudioButton = ({ audioURL,navigation }: Props) => {
 }
 
 const styles = StyleSheet.create({
+    rowButtons: {
+        flexDirection: "row",
+        justifyContent: 'space-between',
+        width: '48%',
+    },
     smallButton: {
         backgroundColor: '#419E08',
         justifyContent: 'center',
@@ -133,10 +137,5 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         width: '100%',
         textAlign: 'center'
-    },
-    rowButtons: {
-        flexDirection: "row",
-        justifyContent: 'space-between',
-        width: '48%',
     },
 });

@@ -344,6 +344,7 @@ const Plants = () => {
 
         setNumPaginas(npag);
         setItemActual(5);
+        setPagActual(1);
         let pag = Array.from({length: npag}, (_, index) => index + 1);
         setPaginas(pag);
     }
@@ -461,7 +462,7 @@ const Plants = () => {
                                                 <option value="Terraza de los Bonsáis">Terraza de los Bonsáis</option>
                                             </select>
                                             <div className="form-floating mt-3">
-                                                <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="200" onChange={e => setDescription(e.target.value)}></textarea>
+                                                <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="2000" onChange={e => setDescription(e.target.value)}></textarea>
                                                 <label htmlFor="description">Descripción</label>
                                             </div>
 

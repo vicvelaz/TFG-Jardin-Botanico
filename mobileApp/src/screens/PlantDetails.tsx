@@ -16,6 +16,7 @@ interface Data {
     category?: string,
     description?: string,
     name?: string,
+    scientific_name?: string,
 }
 
 interface PropState {
@@ -28,43 +29,46 @@ export const PlantDetails = ({ route, navigation }: Props) => {
 
     const [state, setstate] = useState<PropState>({
         isLoading: true,
-        isAudioPlaying:false,
+        isAudioPlaying: false,
         data: {},
     });
 
     const [image, setImage] = useState<JSX.Element[]>([]);
 
+    const [index, setIndex] = useState(0);
+
 
     const getDetails = async () => {
         try {
             const data = await db.collection('plants').doc(route.params?.id).get();
-            
+
             const info: any = data.data();
             const arrayImages: JSX.Element[] = [];
 
-            if(info.media == undefined || info.media==''){
+            if (info.media == undefined || info.media == '') {
                 arrayImages.push(
                     <View >
                         <Image style={styles.image} source={require('../img/image-not-found.jpg')} />
                     </View>
                 )
             }
-            else{
-            info.media.forEach((element: any) => {
-                arrayImages.push(
-                    <View >
-                        <Image style={styles.image} source={{ uri: element }} />
-                    </View>
-                )
-            });}
+            else {
+                info.media.forEach((element: any) => {
+                    arrayImages.push(
+                        <View >
+                            <Image style={styles.image} source={{ uri: element }} />
+                        </View>
+                    )
+                });
+            }
 
             setImage(arrayImages);
             setstate({
                 isLoading: false,
-                isAudioPlaying:false,
+                isAudioPlaying: false,
                 data: info,
             })
-   
+
         } catch (error) {
             console.log(error);
         }
@@ -72,9 +76,13 @@ export const PlantDetails = ({ route, navigation }: Props) => {
 
     useEffect(() => {
         navigation.setOptions({ title: route.params?.title });
-        getDetails();    
+        getDetails();
     }, [])
 
+    const imageIndex = (index: any) => {
+        console.log(index);
+        setIndex(index);
+    }
 
 
     return (
@@ -82,6 +90,11 @@ export const PlantDetails = ({ route, navigation }: Props) => {
             {state.isLoading
                 ? <Text style={{ color: 'white', fontSize: 50, textAlign: 'center' }}>Cargando....</Text>
                 : <View>
+                    {
+                        state.data.scientific_name != undefined &&
+                        <Text style={styles.scientific_name} >{state.data.scientific_name}</Text>
+                    }
+
                     <View style={styles.carousel}>
                         <Carousel
                             data={image}
@@ -91,35 +104,39 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                             sliderHeight={200}
                             enableMomentum
                             lockScrollWhileSnapping
+                            onSnapToItem={setIndex}
+                            style={{ zIndex: -1 }}
                         />
+                        <Text style={styles.carouselIndex}>{`${index + 1}/${image.length}`}</Text>
                     </View>
-                    <View style={styles.block}>
-                    <View style={styles.description}>
-                        <ScrollView >
-                            <Text style={styles.descriptionText}>{state.data.description}</Text>
-                        </ScrollView>
-                    </View>
-                    <View style={styles.rowButtons}>
-                        <AudioButton 
-                        audioURL={state.data.audio} 
-                        navigation={navigation}
-                        />
+                    <View style={[styles.block, state.data.scientific_name != undefined ? { height: windowHeight - 405 } : { height: windowHeight - 350 }]}>
+                        <View style={styles.description}>
+                            <ScrollView >
+                                <Text style={styles.descriptionText}>{state.data.description}</Text>
+                            </ScrollView>
+                        </View>
+
+                        <View style={styles.rowButtons}>
+                            <AudioButton
+                                audioURL={state.data.audio}
+                                navigation={navigation}
+                            />
+                            <TouchableOpacity
+                                style={styles.smallButton}
+                            // onPress={() => navigation.navigate('PuntosInteresList')}
+                            >
+                                <Text style={styles.buttonText}>Mostrar ubicación</Text>
+                            </TouchableOpacity>
+
+                        </View>
+
                         <TouchableOpacity
-                            style={styles.smallButton}
-                        // onPress={() => navigation.navigate('PuntosInteresList')}
+                            style={styles.button}
+                        // onPress={() => navigation.navigate('ItinerariosList')}
                         >
-                            <Text style={styles.buttonText}>Mostrar ubicación</Text>
+                            <Text style={styles.buttonText}>Iniciar ruta</Text>
                         </TouchableOpacity>
-
                     </View>
-
-                    <TouchableOpacity
-                        style={styles.button}
-                    // onPress={() => navigation.navigate('ItinerariosList')}
-                    >
-                        <Text style={styles.buttonText}>Iniciar ruta</Text>
-                    </TouchableOpacity>
-                </View>
                 </View>}
         </ImageBackground>
     )
@@ -129,6 +146,31 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'column',
+    },
+    scientific_name: {
+        backgroundColor: '#419E08',
+        justifyContent: 'center',
+        paddingVertical: 5,
+        borderRadius: 10,
+        borderColor: 'white',
+        borderWidth: 2,
+        marginTop: 20,
+        marginHorizontal: 20,
+
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center'
+    },
+    carouselIndex: {
+        position: 'absolute',
+        bottom: 0,
+        color: 'white',
+        opacity:0.8,
+        fontSize: 15,
+        textShadowColor: '#419E08',
+        textShadowOffset: { width: -2, height: 2 },
+        textShadowRadius: 10,
     },
     carousel: {
         height: 250,
@@ -146,7 +188,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     block: {
-        height: windowHeight - 350,
         flexDirection: 'column',
     },
     description: {
@@ -157,13 +198,14 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         backgroundColor: '#419E08',
         marginHorizontal: 20,
-        flex:1,
+        flex: 1,
     },
     descriptionText: {
-        textAlign: 'center',
+        textAlign: 'justify',
         fontSize: 20,
         color: 'white',
-        margin: 5,
+        margin: 10,
+
     },
     rowButtons: {
         flexDirection: "row",
@@ -186,7 +228,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: 'white',
         borderWidth: 2,
-        margin:20,
+        margin: 20,
     },
     buttonText: {
         fontSize: 17,

@@ -56,7 +56,7 @@ export const List = ({ route, navigation }: Props) => {
             const arrayPlaces: Data[] = [];
             arrayData.forEach((element: any) => {
                     arrayPlaces.push({ id: element.id, name: element.name, image: element.media[0] });
-            });
+                });
             setstate({
                 isLoading: false,
                 items: arrayPlaces,
@@ -120,7 +120,12 @@ export const List = ({ route, navigation }: Props) => {
                             style={styles.list}
                             data={state.items}
                             renderItem={({ item }) => (
-                                <Item name={item.name} img={item.image} id={item.id} type={state.type} navigation={navigation} />
+                                <Item 
+                                name={item.name} 
+                                img={item.image} 
+                                id={item.id} 
+                                type={state.type} 
+                                navigation={navigation} />
                             )}
                             keyExtractor={({ id }: Data) => id.toString()}
                             numColumns={2}

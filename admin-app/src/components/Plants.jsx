@@ -73,7 +73,7 @@ const Plants = () => {
     const nuevoItem = async (e) => {
         e.preventDefault();
 
-        if (name === "" || description === "") {
+        if (name === "" || description === ""||images==="") {
             setError("El campo nombre o el campo descripción están vacíos")
             return
         }

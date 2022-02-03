@@ -58,7 +58,7 @@ const Events = () => {
     const nuevoEvento = async(e) => {
         e.preventDefault();
 
-        if(name===""||startDate===""||endDate===""){
+        if(name===""||startDate===""||endDate===""||image===""||startDate===""||endDate===""){
             setError("Los campos están vacios")
             return
         }
@@ -281,7 +281,7 @@ const Events = () => {
                                             <label htmlFor="name">Nombre</label>
                                         </div>
                                         <div className="form-floating mt-3">
-                                            <textarea className="form-control" id="description" name="description" placeholder="Descripción" maxLength="200" onChange={e => setDescription(e.target.value)}></textarea>
+                                            <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="200" onChange={e => setDescription(e.target.value)}></textarea>
                                             <label htmlFor="description">Descripción</label>
                                         </div>
                                         <div className="d-flex mt-4">

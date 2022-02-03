@@ -176,7 +176,7 @@ const Itineraries = () => {
 
   const nuevoItinerario = async (e) => {
     e.preventDefault();
-    if (name === "" || description === "") {
+    if (name === "" || description === ""||image==="") {
       setError("Los campos están vacios");
       return;
     }
@@ -323,7 +323,7 @@ const irAPagina = (pag) => {
                     </div>
                     <div className="form-floating mt-3">
                       <textarea
-                        className="form-control"
+                        className="form-control texto"
                         id="description"
                         name="description"
                         placeholder="Descripción"

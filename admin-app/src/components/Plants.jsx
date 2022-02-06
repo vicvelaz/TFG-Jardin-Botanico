@@ -209,10 +209,12 @@ const Plants = () => {
                 const arr = Array.from(images);
                 if (arr.length !== 0) {
                     arr.map(async (i, index) => {
-                        const imagenRef = storage.ref().child(`/images/plants/${it.id}`).child(`${index}-${Date.now()}`);
+                        console.log('i'+i);
+                        console.log('id' +id);
+                        const imagenRef = storage.ref().child(`/images/plants/${id}`).child(`${index}-${Date.now()}`);
                         await imagenRef.put(i);
                         const imagenURL = await imagenRef.getDownloadURL();
-                        await db.collection('plants').doc(it.id).update({ media: firebase.firestore.FieldValue.arrayUnion(imagenURL) });
+                        await db.collection('plants').doc(id).update({ media: firebase.firestore.FieldValue.arrayUnion(imagenURL) });
                     })
                 }
             }

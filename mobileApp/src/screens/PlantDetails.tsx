@@ -79,10 +79,6 @@ export const PlantDetails = ({ route, navigation }: Props) => {
         getDetails();
     }, [])
 
-    const imageIndex = (index: any) => {
-        console.log(index);
-        setIndex(index);
-    }
 
 
     return (
@@ -107,7 +103,9 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                             onSnapToItem={setIndex}
                             style={{ zIndex: -1 }}
                         />
-                        <Text style={styles.carouselIndex}>{`${index + 1}/${image.length}`}</Text>
+                        {image.length > 1 &&
+                            <Text style={styles.carouselIndex}>{`${index + 1}/${image.length}`}</Text>
+                        }
                     </View>
                     <View style={[styles.block, state.data.scientific_name != undefined ? { height: windowHeight - 405 } : { height: windowHeight - 350 }]}>
                         <View style={styles.description}>
@@ -166,11 +164,15 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         color: 'white',
-        opacity:0.8,
         fontSize: 15,
         textShadowColor: '#419E08',
         textShadowOffset: { width: -2, height: 2 },
         textShadowRadius: 10,
+        backgroundColor: 'rgba(128,128,128, 0.85)',
+        paddingHorizontal: 5,
+        paddingVertical: 1,
+        marginBottom: 2,
+        borderRadius: 50,
     },
     carousel: {
         height: 250,

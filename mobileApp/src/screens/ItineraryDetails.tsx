@@ -34,6 +34,7 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
 
     const [images, setImages] = useState<JSX.Element[]>([]);
     const [stops, setStops] = useState<any[]>([]);
+    const [index, setIndex] = useState(0);
 
     const getDetails = async () => {
         try {
@@ -113,8 +114,12 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                             itemWidth={windowWidth - 44}
                             sliderHeight={200}
                             enableMomentum
+                            onSnapToItem={setIndex}
                             lockScrollWhileSnapping
                         />
+                        {images.length > 1 &&
+                            <Text style={styles.carouselIndex}>{`${index + 1}/${images.length}`}</Text>
+                        }
                     </View>
                     <View style={styles.block}>
                         <View style={styles.row}>
@@ -161,6 +166,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderColor: 'white',
         borderWidth: 2,
+    },
+    carouselIndex: {
+        position: 'absolute',
+        bottom: 0,
+        color: 'white',
+        fontSize: 15,
+        textShadowColor: '#419E08',
+        textShadowOffset: { width: -2, height: 2 },
+        textShadowRadius: 10,
+        backgroundColor: 'rgba(128,128,128, 0.85)',
+        paddingHorizontal: 5,
+        paddingVertical: 1,
+        marginBottom: 2,
+        borderRadius: 50,
     },
     imageCarousel: {
         height: '100%',

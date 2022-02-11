@@ -1,8 +1,8 @@
 import { StackScreenProps } from '@react-navigation/stack';
-import React, { useEffect, useState } from 'react';
-import { FlatList, ImageBackground, SafeAreaView, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Dimensions, FlatList, Image, ImageBackground, SafeAreaView, StyleSheet, Text } from 'react-native';
 import { db } from '../firebase/firebase-config';
-
+import { SearchBar } from 'react-native-elements';
 
 import { Item } from '../components/Item';
 
@@ -18,16 +18,36 @@ interface Data {
 interface PropState {
     isLoading: boolean;
     items: Data[];
-    type:string;
+    type: string;
 }
 
 export const List = ({ route, navigation }: Props) => {
 
     const [state, setstate] = useState<PropState>({
         isLoading: true,
-        type:'',
+        type: '',
         items: [],
     })
+
+    const [search, setSearch] = useState("");
+    const [items, setItems] = useState<any>([]);
+
+
+    const updateSearch: any = (text: any) => {
+
+        setSearch(text);
+        if (search.replace(/\s/g, '') === "") {
+            setItems(state.items);
+        } else {
+
+            let filterData = state.items.filter((item: any) => {
+                return item.name.toLowerCase().includes(search.toLowerCase());
+            })
+
+            setItems(filterData);
+        }
+    };
+
 
 
 
@@ -39,10 +59,11 @@ export const List = ({ route, navigation }: Props) => {
             arrayData.forEach((element: any) => {
                 arrayPlants.push({ id: element.id, name: element.name, image: element.media[0] });
             });
+            setItems(arrayPlants);
             setstate({
                 isLoading: false,
                 items: arrayPlants,
-                type:'plants',
+                type: 'plants',
             })
         } catch (error) {
             console.log(error);
@@ -55,12 +76,13 @@ export const List = ({ route, navigation }: Props) => {
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const arrayPlaces: Data[] = [];
             arrayData.forEach((element: any) => {
-                    arrayPlaces.push({ id: element.id, name: element.name, image: element.media[0] });
-                });
+                arrayPlaces.push({ id: element.id, name: element.name, image: element.media[0] });
+            });
+            setItems(arrayData);
             setstate({
                 isLoading: false,
                 items: arrayPlaces,
-                type:'plants',
+                type: 'plants',
             })
         } catch (error) {
             console.log(error);
@@ -69,16 +91,17 @@ export const List = ({ route, navigation }: Props) => {
 
     const getItineraries = async () => {
         try {
-            const data = await db.collection('itinerary').orderBy('name','desc').get();
+            const data = await db.collection('itinerary').orderBy('name', 'desc').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const arrayItineraries: Data[] = [];
             arrayData.forEach((element: any) => {
                 arrayItineraries.push({ id: element.id, name: element.name, image: element.media[0] });
             });
+            setItems(arrayData);
             setstate({
                 isLoading: false,
                 items: arrayItineraries,
-                type:'itinerary'
+                type: 'itinerary'
             })
         } catch (error) {
             console.log(error);
@@ -93,44 +116,51 @@ export const List = ({ route, navigation }: Props) => {
                 break;
             case 'place':
                 getPlaces();
-               
+
                 break;
             case 'itinerary':
                 getItineraries();
-    
+
                 break;
             default:
                 break;
         }
     }
 
-
     useEffect(() => {
-        navigation.setOptions({ title: route.params?.title })
+        // navigation.setOptions({ title: route.params?.title });
+
         getItems();
     }, [route.params?.title])
 
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.container}>
-                {
-                    state.isLoading
-                        ? <Text style={{ color: 'white', fontSize: 50, textAlign: 'center' }}>Cargando....</Text>
-                        : <FlatList
-                            style={styles.list}
-                            data={state.items}
-                            renderItem={({ item }) => (
-                                <Item 
-                                name={item.name} 
-                                img={item.image} 
-                                id={item.id} 
-                                type={state.type} 
-                                navigation={navigation} />
-                            )}
-                            keyExtractor={({ id }: Data) => id.toString()}
-                            numColumns={2}
-                        />
-                }
+                <SearchBar
+                    placeholder="Escribe aquí..."
+                    accessibilityRole="search"
+                    onChangeText={updateSearch}
+                    value={search}
+                    platform='android'
+                    onKeyPress={updateSearch}
+                    onClear={() => setItems(state.items)}
+                    showLoading={state.isLoading} 
+                />
+
+                <FlatList
+                    style={styles.list}
+                    data={items}
+                    renderItem={({ item }) => (
+                        <Item
+                            name={item.name}
+                            img={item.image}
+                            id={item.id}
+                            type={state.type}
+                            navigation={navigation} />
+                    )}
+                    keyExtractor={({ id }: Data) => id.toString()}
+                    numColumns={2}
+                />
 
             </ImageBackground>
         </SafeAreaView>
@@ -140,6 +170,11 @@ export const List = ({ route, navigation }: Props) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+    },
+    searchBar: {
+
     },
     list: {
         marginHorizontal: 10,

@@ -45,9 +45,10 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
 
                     await info.paradas.reduce(async (promise: any, parada: any) => {
                         await promise;
-                        const d = await db.collection('plants').doc(parada?._delegate?._key?.path?.segments.slice(-1)[0]).get();
+                        const id = parada?._delegate?._key?.path?.segments.slice(-1)[0];
+                        const d = await db.collection('plants').doc(id).get();
                         const i = d?.data();
-                        arrayStops.push(i);
+                        arrayStops.push({id: id,... i});
                     }, Promise.resolve())
 
                     setStops(arrayStops);
@@ -97,7 +98,12 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
     );
 
     const renderItem = ({ item }: any) => (
+        <TouchableOpacity
+            // style={styles.container}
+            onPress={() => navigation.navigate('PlantDetails', { title: item.name, id: item.id })}
+        >
         <Item title={item.name} />
+        </TouchableOpacity>
     );
 
 
@@ -134,7 +140,7 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                                 style={styles.lista}
                                 data={stops}
                                 renderItem={renderItem}
-                                keyExtractor={item => item.id}
+                                keyExtractor={stops => stops.id}
                             />
 
                         </View>

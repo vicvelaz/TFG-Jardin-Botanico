@@ -327,7 +327,6 @@ const irAPagina = (pag) => {
                         id="description"
                         name="description"
                         placeholder="Descripción"
-                        maxLength="200"
                         onChange={(e) => setDescription(e.target.value)}
                       ></textarea>
                       <label htmlFor="description">Descripción</label>
@@ -397,7 +396,7 @@ const irAPagina = (pag) => {
               {itinerarios.map((e) => (
                 <tr key={e.id}>
                   <td>{e.name}</td>
-                  <td>{e.description}</td>
+                  <td>{e.description.length>200 ?`${e.description.substring(0,200)}...`:e.description}</td>
                   <td>
                     <div className="d-flex">
                       <button

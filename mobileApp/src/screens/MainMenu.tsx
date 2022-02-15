@@ -1,35 +1,59 @@
 import React, { useEffect, useState } from 'react'
-
-import { Text, View, StyleSheet, TouchableOpacity, ImageBackground, Image, Dimensions } from 'react-native'
+import moment from 'moment'
+import { Text, View, StyleSheet, TouchableOpacity, ImageBackground, Image, Dimensions, Alert, LayoutAnimation } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack';
 import Carousel from 'react-native-snap-carousel';
 
 import { db } from '../firebase/firebase-config';
+import { Overlay } from 'react-native-elements';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 
 interface Props extends StackScreenProps<any, any> { };
 
+interface Data {
+    description: string,
+    title: string,
+    date:string,
+}
+
 const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 export const MainMenu = ({ navigation }: Props) => {
 
 
     const [image, setImage] = useState<JSX.Element[]>([]);
+    const [visible, setVisible] = useState<boolean>(false);
+    const [overlayInfo, setOverlayInfo] = useState<Data>({ title: '', description: '',date:'' })
 
+    //   const onClose = () => setVisible(false);
+
+
+    const execute = (title: string, description: string,date:string): any => {
+        setOverlayInfo({ title: title, description: description, date:date });
+        setVisible(!visible);
+
+    }
 
     const getEvents = async () => {
-
+        const today = new Date();
         try {
-            const data = await db.collection('events').get();
+            const data = await db.collection('events').where('end_date','>=',today).orderBy('end_date','desc').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const arrayImages: JSX.Element[] = [];
             arrayData.forEach((element: any) => {
-                arrayImages.push(
-                    <View>
-                        <Image style={styles.ImgEvent} source={{ uri: element.image }} />
-                    </View>
-                )
+                if(moment(today)>=moment.unix(element.start_date.seconds)){
+                    const date = moment.unix(element.start_date.seconds).format('DD/MM/YY')+ ' - ' + moment.unix(element.end_date.seconds).format('DD/MM/YY')
+                    arrayImages.push(
+                        <TouchableOpacity onPress={() => execute(element.name, element.description,date)}>
+                            <Image style={styles.ImgEvent}
+                                source={{ uri: element.image }}
+                            />
+                        </TouchableOpacity >
+                    )
+                }
             });
             setImage(arrayImages);
 
@@ -63,10 +87,20 @@ export const MainMenu = ({ navigation }: Props) => {
                         sliderHeight={200}
                         enableMomentum
                         lockScrollWhileSnapping
-                        autoplay
-                        autoplayInterval={3000}
                     />
                 </View>
+                <Overlay
+                    visible={visible}
+                    isVisible={visible}
+                    onBackdropPress={() => execute('', '','')}
+                    overlayStyle={styles.overlay}
+                >
+                    <Text style={styles.overlayTitle}>{overlayInfo.title}</Text>
+                    <Text style={styles.overlayDate}>{overlayInfo.date}</Text>
+                    <ScrollView scrollToOverflowEnabled>
+                        <Text style={styles.overlayText}>{overlayInfo.description}</Text>
+                    </ScrollView>
+                </Overlay>
                 <View>
                     <View style={styles.rowButtons}>
                         <TouchableOpacity
@@ -179,6 +213,43 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
         width: '100%',
         textAlign: 'center'
+    },
+    overlay: {
+        backgroundColor: '#419E08',
+        maxHeight: windowHeight/3,
+        // height:windowHeight/4,
+        alignSelf: 'stretch',
+        marginHorizontal: 20,
+        borderRadius: 10,
+        flexDirection: 'column',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        borderColor: 'white',
+        borderWidth: 2,
+        padding:0,
+        paddingBottom:10,
+    },
+    overlayTitle: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 25,
+        marginTop:10,
+        marginHorizontal:5,
+        // backgroundColor:'blue',
+        fontWeight:'bold'
+    },
+    overlayDate:{
+        marginVertical:5
+    },
+    overlayText: {
+        color: 'white',
+        fontSize: 16,
+        // width: 200,
+        // backgroundColor:'red',
+        // marginBottom:15,
+        marginHorizontal:10,
+        textAlign: 'justify',
+        
     }
 });
 

@@ -1,10 +1,13 @@
 import { StackScreenProps } from '@react-navigation/stack';
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, FlatList, Image, ImageBackground, SafeAreaView, StyleSheet, Text } from 'react-native';
+import { Dimensions, FlatList, Image, ImageBackground, LogBox, SafeAreaView, StyleSheet, Text, TextInput } from 'react-native';
 import { db } from '../firebase/firebase-config';
 import { SearchBar } from 'react-native-elements';
 
 import { Item } from '../components/Item';
+
+
+
 
 
 interface Props extends StackScreenProps<any, 'List'> { };
@@ -23,25 +26,30 @@ interface PropState {
 
 export const List = ({ route, navigation }: Props) => {
 
+    LogBox.ignoreLogs(['EventEmitter']); //Para eliminar el warning: EventEmitter.removeListener('keyboardDidHide', ...): Method has been deprecated. Please instead use `remove()` on the subscription returned by `EventEmitter.addListener`. 
+
     const [state, setstate] = useState<PropState>({
         isLoading: true,
         type: '',
         items: [],
     })
 
-    const [search, setSearch] = useState("");
+    // const [search, setSearch] = useState<string>("");
     const [items, setItems] = useState<any>([]);
 
 
     const updateSearch: any = (text: any) => {
 
-        setSearch(text);
-        if (search.replace(/\s/g, '') === "") {
+
+        if(text === undefined){return}
+
+
+        if (text === "") {
             setItems(state.items);
         } else {
 
             let filterData = state.items.filter((item: any) => {
-                return item.name.toLowerCase().includes(search.toLowerCase());
+                return item.name.toLowerCase().includes(text.toLowerCase());
             })
 
             setItems(filterData);
@@ -78,7 +86,7 @@ export const List = ({ route, navigation }: Props) => {
             arrayData.forEach((element: any) => {
                 arrayPlaces.push({ id: element.id, name: element.name, image: element.media[0] });
             });
-            setItems(arrayData);
+            setItems(arrayPlaces);
             setstate({
                 isLoading: false,
                 items: arrayPlaces,
@@ -97,7 +105,7 @@ export const List = ({ route, navigation }: Props) => {
             arrayData.forEach((element: any) => {
                 arrayItineraries.push({ id: element.id, name: element.name, image: element.media[0] });
             });
-            setItems(arrayData);
+            setItems(arrayItineraries);
             setstate({
                 isLoading: false,
                 items: arrayItineraries,
@@ -112,15 +120,12 @@ export const List = ({ route, navigation }: Props) => {
         switch (route.params?.type) {
             case 'plants':
                 obtenerPlantas();
-
                 break;
             case 'place':
                 getPlaces();
-
                 break;
             case 'itinerary':
                 getItineraries();
-
                 break;
             default:
                 break;
@@ -129,7 +134,6 @@ export const List = ({ route, navigation }: Props) => {
 
     useEffect(() => {
         // navigation.setOptions({ title: route.params?.title });
-
         getItems();
     }, [route.params?.title])
 
@@ -139,13 +143,20 @@ export const List = ({ route, navigation }: Props) => {
                 <SearchBar
                     placeholder="Escribe aquí..."
                     accessibilityRole="search"
-                    onChangeText={updateSearch}
-                    value={search}
                     platform='android'
-                    onKeyPress={updateSearch}
+                    onChangeText={updateSearch}
+                    onKeyPress={(event) => updateSearch( undefined )}
                     onClear={() => setItems(state.items)}
                     showLoading={state.isLoading} 
                 />
+
+                {/* <TextInput
+                placeholder="Escribe aquí..."
+                // onTextInput={updateSearch}
+                // onSubmitEditing={(event) => updateSearch( event.nativeEvent.text )}
+                onChangeText={(event) => updateSearch( event )}
+                onKeyPress={(event) => updateSearch( undefined )}
+                /> */}
 
                 <FlatList
                     style={styles.list}

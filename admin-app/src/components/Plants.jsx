@@ -54,7 +54,7 @@ const Plants = () => {
             setNumPaginas(arrayData.length % 5 === 0 ? (arrayData.length / 5) : (Math.trunc(arrayData.length / 5)) + 1);
             setList(arrayData.slice(0, 5));
             setItemActual(itemActual + 5);
-            let pag = Array.from({length: numPaginas}, (_, index) => index + 1);
+            let pag = Array.from({ length: numPaginas }, (_, index) => index + 1);
             setPaginas(pag);
 
         } catch (error) {
@@ -73,7 +73,7 @@ const Plants = () => {
     const nuevoItem = async (e) => {
         e.preventDefault();
 
-        if (name === "" || description === ""||images==="") {
+        if (name === "" || description === "" || images === "") {
             setError("El campo nombre o el campo descripción están vacíos")
             return
         }
@@ -209,8 +209,8 @@ const Plants = () => {
                 const arr = Array.from(images);
                 if (arr.length !== 0) {
                     arr.map(async (i, index) => {
-                        console.log('i'+i);
-                        console.log('id' +id);
+                        console.log('i' + i);
+                        console.log('id' + id);
                         const imagenRef = storage.ref().child(`/images/plants/${id}`).child(`${index}-${Date.now()}`);
                         await imagenRef.put(i);
                         const imagenURL = await imagenRef.getDownloadURL();
@@ -301,12 +301,12 @@ const Plants = () => {
         setBusqueda(e.target.value);
         if (busqueda === "") {
             let npag = 0;
-            if (radioTodos) { setList(items.slice(0,5)); npag = items.length % 5 === 0 ? (items.length / 5) : (Math.trunc(items.length / 5)) + 1 }
-            if (radioPlantas) { setList(plants.slice(0,5)); npag= plants.length % 5 === 0 ? (plants.length / 5) : (Math.trunc(plants.length / 5)) + 1 }
-            if (radioLugares) { setList(places.slice(0,5)); npag= places.length % 5 === 0 ? (places.length / 5) : (Math.trunc(places.length / 5)) + 1}
+            if (radioTodos) { setList(items.slice(0, 5)); npag = items.length % 5 === 0 ? (items.length / 5) : (Math.trunc(items.length / 5)) + 1 }
+            if (radioPlantas) { setList(plants.slice(0, 5)); npag = plants.length % 5 === 0 ? (plants.length / 5) : (Math.trunc(plants.length / 5)) + 1 }
+            if (radioLugares) { setList(places.slice(0, 5)); npag = places.length % 5 === 0 ? (places.length / 5) : (Math.trunc(places.length / 5)) + 1 }
             setNumPaginas(npag);
             setItemActual(5);
-            let pag = Array.from({length: npag}, (_, index) => index + 1);
+            let pag = Array.from({ length: npag }, (_, index) => index + 1);
             setPaginas(pag);
         } else {
             const filterlist = list.filter(ev => ev.name.toLowerCase().includes(busqueda.toLowerCase())).slice(0, 5);
@@ -314,7 +314,7 @@ const Plants = () => {
             setList(filterlist);
             setNumPaginas(numpag);
             setItemActual(5);
-            let pag = Array.from({length: numpag}, (_, index) => index + 1);
+            let pag = Array.from({ length: numpag }, (_, index) => index + 1);
             setPaginas(pag);
         }
     }
@@ -326,61 +326,61 @@ const Plants = () => {
             setRadioTodos(true);
             setRadioPlantas(false);
             setRadioLugares(false);
-            setList(items.slice(0,5));
-            npag = items.length % 5 === 0 ? (items.length / 5) : (Math.trunc(items.length / 5)) + 1 ;
+            setList(items.slice(0, 5));
+            npag = items.length % 5 === 0 ? (items.length / 5) : (Math.trunc(items.length / 5)) + 1;
         }
         else if (e.target.id === "inlineRadio2") {
             setRadioTodos(false);
             setRadioPlantas(true);
             setRadioLugares(false);
-            setList(plants.slice(0,5));
-            npag= plants.length % 5 === 0 ? (plants.length / 5) : (Math.trunc(plants.length / 5)) + 1 ;
+            setList(plants.slice(0, 5));
+            npag = plants.length % 5 === 0 ? (plants.length / 5) : (Math.trunc(plants.length / 5)) + 1;
         }
         else {
             setRadioTodos(false);
             setRadioPlantas(false);
             setRadioLugares(true);
-            setList(places.slice(0,5));
-            npag= places.length % 5 === 0 ? (places.length / 5) : (Math.trunc(places.length / 5)) + 1 ;
+            setList(places.slice(0, 5));
+            npag = places.length % 5 === 0 ? (places.length / 5) : (Math.trunc(places.length / 5)) + 1;
         }
 
         setNumPaginas(npag);
         setItemActual(5);
         setPagActual(1);
-        let pag = Array.from({length: npag}, (_, index) => index + 1);
+        let pag = Array.from({ length: npag }, (_, index) => index + 1);
         setPaginas(pag);
     }
 
     const siguientePagina = () => {
-        if(pagActual !== numPaginas){
+        if (pagActual !== numPaginas) {
             let ia = itemActual + 5;
             setItemActual(ia);
-            if (radioTodos) { setList(items.slice(itemActual, ia))}
-            if (radioPlantas) { setList(plants.slice(itemActual, ia))}
-            if (radioLugares) { setList(places.slice(itemActual, ia))}
+            if (radioTodos) { setList(items.slice(itemActual, ia)) }
+            if (radioPlantas) { setList(plants.slice(itemActual, ia)) }
+            if (radioLugares) { setList(places.slice(itemActual, ia)) }
             setPagActual(pagActual + 1);
         }
     }
 
     const paginaAnterior = () => {
-        if(pagActual !== 1){
+        if (pagActual !== 1) {
             let ia = itemActual - 5;
             const itt = ia - 5;
             setItemActual(ia);
-            if (radioTodos) { setList(items.slice(itt, ia))}
-            if (radioPlantas) { setList(plants.slice(itt, ia))}
-            if (radioLugares) { setList(places.slice(itt, ia))}
+            if (radioTodos) { setList(items.slice(itt, ia)) }
+            if (radioPlantas) { setList(plants.slice(itt, ia)) }
+            if (radioLugares) { setList(places.slice(itt, ia)) }
             setPagActual(pagActual - 1);
-        } 
+        }
     }
 
     const irAPagina = (pag) => {
         const it = pag * 5;
         const itt = it - 5;
         setItemActual(it);
-        if (radioTodos) { setList(items.slice(itt,it))}
-        if (radioPlantas) { setList(plants.slice(itt,it))}
-        if (radioLugares) { setList(places.slice(itt,it))}
+        if (radioTodos) { setList(items.slice(itt, it)) }
+        if (radioPlantas) { setList(plants.slice(itt, it)) }
+        if (radioLugares) { setList(places.slice(itt, it)) }
         setPagActual(pag);
     }
 
@@ -549,7 +549,7 @@ const Plants = () => {
                                         {!radioLugares && (<td>{e.category}</td>)}
                                         <td>{e.terrace}</td>
                                         <td>[{e.position._lat},{e.position._long}]</td>
-                                        <td>{e.description.length > 200 ? e.description.substring(0, 200) + "..." : e.description}</td>
+                                        <td>{e.description.length > 200 ? `${e.description.substring(0, 200)}...` : e.description}</td>
                                         <td><div className="d-flex"><button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevoitemmodal" onClick={() => loadModalModificarItem(e.id)}>Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarItem(e.id)}>Eliminar</button></div></td>
                                     </tr>
                                 ))
@@ -563,11 +563,11 @@ const Plants = () => {
                             <a className={pagActual === 1 ? "page-link deshabilitado" : "page-link clickable"}>Anterior</a>
                         </li>
                         {paginas.map((e) =>
-                            <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}> 
-                                <a className="page-link clickable">{e}</a> 
+                            <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}>
+                                <a className="page-link clickable">{e}</a>
                             </li>
                         )}
-                        
+
                         <li className={pagActual === numPaginas ? "page-item disabled" : "page-item"} onClick={() => siguientePagina()}>
                             <a className={pagActual === numPaginas ? "page-link deshabilitado" : "page-link clickable"}>Siguiente</a>
                         </li>

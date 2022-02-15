@@ -21,15 +21,10 @@ export const Item = ({ name, img, id, type, navigation }: Props) => {
             style={styles.container}
             onPress={() => navigation.navigate(details, { title: name, id: id })}
         >
-            {img == undefined
-                ? <Image
-                    style={styles.image}
-                    source={require('../img/image-not-found.jpg')}
-                />
-                : <Image
-                    style={styles.image}
-                    source={{ uri: img }}
-                />}
+            <Image
+                style={styles.image}
+                source={{ uri: img }}
+            />
             <Text style={styles.title}>{name}</Text>
         </TouchableOpacity>
     )

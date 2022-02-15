@@ -281,7 +281,7 @@ const Events = () => {
                                             <label htmlFor="name">Nombre</label>
                                         </div>
                                         <div className="form-floating mt-3">
-                                            <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="200" onChange={e => setDescription(e.target.value)}></textarea>
+                                            <textarea className="form-control texto" id="description" name="description" placeholder="Descripción"  onChange={e => setDescription(e.target.value)}></textarea>
                                             <label htmlFor="description">Descripción</label>
                                         </div>
                                         <div className="d-flex mt-4">
@@ -333,7 +333,7 @@ const Events = () => {
                                 eventos.map(e => (
                                     <tr key={e.id}>
                                         <td>{e.name}</td>
-                                        <td>{e.description}</td>
+                                        <td>{e.description.length>200 ?`${e.description.substring(0,200)}...`:e.description}</td>
                                         <td>{moment.unix(e.start_date.seconds).format('DD/MM/YY')}</td>
                                         <td>{moment.unix(e.end_date.seconds).format('DD/MM/YY')}</td>
                                         <td><div className="d-flex"><button className="btn btn-success" onClick={() => loadModalModificarEvento(e.id)} data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarEvento(e.id)}>Eliminar</button></div></td>

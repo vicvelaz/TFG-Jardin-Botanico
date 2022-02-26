@@ -87,7 +87,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                 ? <Text style={{ color: 'white', fontSize: 50, textAlign: 'center' }}>Cargando....</Text>
                 : <View>
                     {
-                        state.data.scientific_name != undefined &&
+                        (state.data.scientific_name != '' && state.data.scientific_name != undefined ) &&
                         <Text style={styles.scientific_name} >{state.data.scientific_name}</Text>
                     }
 
@@ -107,7 +107,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                             <Text style={styles.carouselIndex}>{`${index + 1}/${image.length}`}</Text>
                         }
                     </View>
-                    <View style={[styles.block, state.data.scientific_name != undefined ? { height: windowHeight - 405 } : { height: windowHeight - 350 }]}>
+                    <View style={[styles.block, (state.data.scientific_name != '' && state.data.scientific_name != undefined ) ? { height: windowHeight - 405 } : { height: windowHeight - 350 }]}>
                         <View style={styles.description}>
                             <ScrollView >
                                 <Text style={styles.descriptionText}>{state.data.description}</Text>

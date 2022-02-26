@@ -5,10 +5,11 @@ import { Text, PermissionsAndroid } from 'react-native'
 
 
 export const MapScreen = () => {
+    const userposition:number = 2;
 
     const [userPosition, setUserPosition] = useState<Geolocation.GeoPosition>();
-    const [userPositionLat, setUserPositionLat] = useState<number>();
-    const [userPositionLong, setUserPositionLong] = useState<number>();
+    const [userPositionLat, setUserPositionLat] = useState<number>(40.412386);
+    const [userPositionLong, setUserPositionLong] = useState<number>(-3.691977);
 
     async function requestPermissions(){
         await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
@@ -30,8 +31,8 @@ export const MapScreen = () => {
         );
     }, []);
 
-    //Poner <Map></Map> para ver mapa de mapbox
+    //Poner <Text>{userPositionLat},{userPositionLong}</Text> para ver mapa de mapbox
     return (
-        <Text>{userPositionLat},{userPositionLong}</Text>
+        <Map lat={userPositionLat} lng={userPositionLong}></Map>
     )
 }

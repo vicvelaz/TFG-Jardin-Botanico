@@ -10,12 +10,15 @@ interface Props {
 }
 
 const Map = ({ lat,lng }: Props) => {
+    const centerLng : number = -3.690750;
+    const centerLat : number = 40.411147;
 
     return (
       <View style={styles.page}>
         <View style={styles.container}>
-          <MapboxGL.MapView style={styles.map}>
-            <MapboxGL.Camera zoomLevel={16} centerCoordinate={[lng,lat]} />
+          <MapboxGL.MapView style={styles.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
+            <MapboxGL.Camera zoomLevel={16.15} centerCoordinate={[centerLng,centerLat]} />
+            <MapboxGL.UserLocation androidRenderMode='compass' showsUserHeadingIndicator={true} />
           </MapboxGL.MapView>
         </View>
       </View>

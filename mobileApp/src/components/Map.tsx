@@ -28,6 +28,7 @@ const Map = () => {
     //estados para la posicion del usuario
     const [userPositionLat, setUserPositionLat] = React.useState<number>(40.412386);
     const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.691977);
+    const [alertShown, setAlertShown] = React.useState<boolean>();
 
     React.useEffect(() => {
         requestPermissions();
@@ -44,8 +45,10 @@ const Map = () => {
               setUserPositionLat(position.coords.latitude);
               setUserPositionLong(position.coords.longitude);
               const userCoords = point([position.coords.longitude,position.coords.latitude]);
-              if(!booleanPointInPolygon(userCoords,perimetro)){
-                Alert.alert("Estás fuera del Jardín Botánico","Por favor, camina hacia el jardín para poder utilizar el mapa");
+              if(!booleanPointInPolygon(userCoords,perimetro) && !alertShown){
+                Alert.alert("Estás fuera del Jardín Botánico","Por favor, camina hacia el jardín para poder utilizar el mapa",
+                [{ text: "OK", onPress: () => setAlertShown(false) }]);
+                setAlertShown(true);
               }
             },
             (error) => {

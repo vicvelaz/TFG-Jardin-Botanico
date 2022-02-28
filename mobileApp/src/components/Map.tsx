@@ -131,6 +131,7 @@ const textStyle = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 20,
     height: 500,
+    width: 400,
   }
 });
 

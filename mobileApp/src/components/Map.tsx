@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { StyleSheet, View, Alert, PermissionsAndroid } from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Alert, PermissionsAndroid, Text } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
 import {booleanPointInPolygon,point,polygon} from '@turf/turf';
@@ -24,11 +24,47 @@ const Map = () => {
       [-3.691293597221374,40.41247085981296],
       [-3.6925971508026127,40.41231565042066]
     ]]);
+    const terrazaCuadros = polygon([[
+      [-3.6924737691879277,40.412262552388476],
+      [-3.6918890476226807,40.40973830529021],
+      [-3.690934181213379,40.40981591300332],
+      [-3.6915135383605957,40.412393255161554],
+      [-3.6924737691879277,40.412262552388476]
+    ]]);
+    const terrazaEscuelas = polygon([[
+      [-3.6908376216888428,40.409852674520415],
+      [-3.6904406547546387,40.40996704355622],
+      [-3.690054416656494,40.41021211940711],
+      [-3.690510392189026,40.412180863026386],
+      [-3.6913901567459106,40.41241367744691],
+      [-3.6908376216888428,40.409852674520415]
+    ]]);
+    const planoFlor = polygon([[
+      [-3.690043687820434,40.41020395022645],
+      [-3.6894160509109497,40.410571562373974],
+      [-3.6897593736648564,40.4120256529652],
+      [-3.690505027770996,40.41218494749685],
+      [-3.690043687820434,40.41020395022645]
+    ]]);
+
+    const terrazaBonsais = polygon([[
+      [-3.689311444759369,40.41193375210237],
+      [-3.6890673637390137,40.41086973519647],
+      [-3.688962757587433,40.41084727016682],
+      [-3.689040541648865,40.411966427979095],
+      [-3.6892604827880855,40.411988892635144],
+      [-3.689311444759369,40.41193375210237]
+    ]]);
+
+    //terrazas
+    const terracelist = [terrazaCuadros,terrazaEscuelas,planoFlor,terrazaBonsais];
+    const terraces = ["Terraza de los Cuadros", "Terraza de las Escuelas", "Plano de la Flor", "Terraza de los Bonsáis"];
 
     //estados para la posicion del usuario
     const [userPositionLat, setUserPositionLat] = React.useState<number>(40.412386);
     const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.691977);
     const [alertShown, setAlertShown] = React.useState<boolean>();
+    const [actualPlace, setActualPlace] = React.useState<string>();
 
     React.useEffect(() => {
         requestPermissions();
@@ -46,9 +82,14 @@ const Map = () => {
               setUserPositionLong(position.coords.longitude);
               const userCoords = point([position.coords.longitude,position.coords.latitude]);
               if(!booleanPointInPolygon(userCoords,perimetro) && !alertShown){
+                setActualPlace("Fuera del Jardín");
                 Alert.alert("Estás fuera del Jardín Botánico","Por favor, camina hacia el jardín para poder utilizar el mapa",
                 [{ text: "OK", onPress: () => setAlertShown(false) }]);
                 setAlertShown(true);
+              }else{
+                
+                const i = terracelist.findIndex(t => booleanPointInPolygon(userCoords,t));
+                setActualPlace(terraces[i]);
               }
             },
             (error) => {
@@ -67,9 +108,31 @@ const Map = () => {
             <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()}/>
           </MapboxGL.MapView>
         </View>
+        <View style={textStyle.viewTextStyle}>
+          <Text style={textStyle.titulo}>UBICACIÓN ACTUAL: </Text>
+          <Text style={textStyle.baseText}>{actualPlace}</Text>
+        </View>
       </View>
     );
 }
+
+const textStyle = StyleSheet.create({
+  baseText: {
+    color: "black",
+    fontSize: 20
+  },
+  titulo: {
+    fontSize: 15
+  },
+  viewTextStyle: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 20,
+    height: 500,
+  }
+});
 
 const styles = StyleSheet.create({
   page: {
@@ -79,7 +142,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF'
   },
   container: {
-    height: 700,
+    height: 600,
     width: 400,
     backgroundColor: 'tomato'
   },

@@ -17,6 +17,7 @@ interface Data {
     description?: string,
     name?: string,
     scientific_name?: string,
+    position?: any
 }
 
 interface PropState {
@@ -121,7 +122,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                             />
                             <TouchableOpacity
                                 style={styles.smallButton}
-                            // onPress={() => navigation.navigate('PuntosInteresList')}
+                                onPress={() => navigation.navigate('ShowItemPosition',{ info: state.data, id:route.params?.id })}
                             >
                                 <Text style={styles.buttonText}>Mostrar ubicación</Text>
                             </TouchableOpacity>

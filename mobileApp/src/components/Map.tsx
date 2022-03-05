@@ -3,12 +3,24 @@ import { StyleSheet, View, Alert, PermissionsAndroid, Text } from 'react-native'
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
 import {booleanPointInPolygon,point,polygon} from '@turf/turf';
+import { db } from '../firebase/firebase-config';
 
 MapboxGL.setAccessToken('pk.eyJ1IjoicmFteG5jaHYiLCJhIjoiY2t6c2IybzZrNXB2aDMwbzFnbmFsOXptNSJ9.CQqoytOo3yM-pGaCRIGgjw');
+
+interface Data {
+  id: string,
+  name?: string,
+  scientific_name?: string,
+  description?: string,
+  positionLat?: any,
+  positionLong?: any,
+  image: string
+}
 
 const Map = () => {
 
     //constantes del jardin con coordenadas fijas
+    const zoomMinimo : number = 18;
     const centerLng : number = -3.690750;
     const centerLat : number = 40.411147;
     const perimetro = polygon([[
@@ -60,20 +72,33 @@ const Map = () => {
     const terracelist = [terrazaCuadros,terrazaEscuelas,planoFlor,terrazaBonsais];
     const terraces = ["Terraza de los Cuadros", "Terraza de las Escuelas", "Plano de la Flor", "Terraza de los Bonsáis"];
 
-    //mapa
+    //mapa y listas
     const [map,setMap] = React.useState<MapboxGL.MapView>();
+    const [plants, setPlants] = React.useState<any>([]);
 
-    //estados para la posicion del usuario
+    //estados del mapa y del user
     const [userPositionLat, setUserPositionLat] = React.useState<number>(40.412386);
     const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.691977);
     const [alertShown, setAlertShown] = React.useState<boolean>();
     const [actualPlace, setActualPlace] = React.useState<string>();
-    const [actualZoom, setActualZoom] = React.useState<number>();
+    const [showItemMarkers, setShowItemMarkers] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         requestPermissions();
         checkUserPosition();
+        obtenerPlantas();
     }, []);
+
+    const obtenerPlantas = async () => {
+      const data = await db.collection('plants').where('type', '==', 'plant').get();
+      const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const arrayPlants: Data[] = [];
+      arrayData.forEach((element: any) => {
+        arrayPlants.push({ id: element.id, name: element.name, scientific_name: element.scientific_name, description: element.description,
+        positionLat:element.position._lat, positionLong:element.position._long, image: element.media[0] });
+      });
+      setPlants(arrayPlants);
+    }
 
     async function requestPermissions(){
       await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
@@ -107,8 +132,11 @@ const Map = () => {
     const updateZoom = async () => {
       if(map!== undefined){
         const zoom = await map.getZoom();
-        setActualZoom(zoom);
-        console.log(zoom);
+        if(zoom > zoomMinimo){
+          setShowItemMarkers(true);
+        }else{
+          setShowItemMarkers(false);
+        }
       }
     }
 
@@ -118,6 +146,9 @@ const Map = () => {
           <MapboxGL.MapView ref={c => c!== null && setMap(c)} onRegionDidChange={() => updateZoom()} style={styles.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
             <MapboxGL.Camera zoomLevel={16.15} centerCoordinate={[centerLng,centerLat]} />
             <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()}/>
+            {showItemMarkers && plants.map((e: Data) => (
+              <MapboxGL.PointAnnotation key={e.id} id={e.id} anchor={{x:0.5,y:0.5}} coordinate={[e.positionLong,e.positionLat]}></MapboxGL.PointAnnotation>
+            ))}
           </MapboxGL.MapView>
         </View>
         <View style={textStyle.viewTextStyle}>

@@ -119,6 +119,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                             <AudioButton
                                 audioURL={state.data.audio}
                                 navigation={navigation}
+                                plantButton={true}
                             />
                             <TouchableOpacity
                                 style={styles.smallButton}

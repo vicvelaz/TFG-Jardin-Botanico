@@ -6,11 +6,12 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
     audioURL: string,
-    navigation:StackNavigationProp<any, "PlantDetails">,
+    navigation: StackNavigationProp<any, "PlantDetails">|StackNavigationProp<any, "MapScreen">,
+    plantButton: boolean
 }
 
 
-export const AudioButton = ({ audioURL,navigation }: Props) => {
+export const AudioButton = ({ audioURL,navigation,plantButton}: Props) => {
 
     const [audioState, setAudioState] = useState<string>('off');//Puede estar playing, pause, off
     const [control_Online, setControl_Online] = useState<Sound>();
@@ -67,9 +68,9 @@ export const AudioButton = ({ audioURL,navigation }: Props) => {
         return (
             <TouchableOpacity
                 disabled={true}
-                style={{ ...styles.button, backgroundColor: 'grey' }}
+                style={plantButton ? { ...styles.button, backgroundColor: 'grey' }:{ ...stylesButtonMap.button, backgroundColor: 'grey' }}
             >
-                <Text style={styles.buttonText}>Play audio</Text>
+                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Play audio</Text>
 
             </TouchableOpacity>
         )
@@ -79,27 +80,27 @@ export const AudioButton = ({ audioURL,navigation }: Props) => {
     return (
         audioState == 'playing' || audioState == 'pause'
             ? <View
-                style={styles.rowButtons}>
+                style={plantButton ? styles.rowButtons : stylesButtonMap.rowButtons}>
                 <TouchableOpacity
-                    style={styles.smallButton}
+                    style={plantButton ? styles.smallButton : stylesButtonMap.smallButton}
                     onPress={() => { audioState == 'playing' ? executeAction('pause') : executeAction('play') }}
                 >
-                    <Text style={styles.buttonText}>
+                    <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>
                         {audioState == 'playing' ? 'Pause' : 'Resume'}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                    style={styles.smallButton}
+                    style={plantButton ? styles.smallButton : stylesButtonMap.smallButton}
                     onPress={() => executeAction('stop')}
                 >
-                    <Text style={styles.buttonText}>Stop</Text>
+                    <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Stop</Text>
                 </TouchableOpacity>
             </View>
             : <TouchableOpacity
-                style={styles.button}
+                style={plantButton ? styles.button : stylesButtonMap.button}
                 onPress={() => executeAction('play')}
             >
-                <Text style={styles.buttonText}>Play audio</Text>
+                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Play audio</Text>
             </TouchableOpacity>
 
     )
@@ -128,6 +129,43 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         borderWidth: 2,
         width: '48%'
+    },
+    buttonText: {
+        fontSize: 17,
+        alignSelf: 'center',
+        fontWeight: 'bold',
+        color: 'white',
+        marginHorizontal: 20,
+        width: '100%',
+        textAlign: 'center'
+    },
+});
+
+const stylesButtonMap = StyleSheet.create({
+    rowButtons: {
+        flexDirection: "row",
+        justifyContent: 'center',
+        width: '60%',
+        marginLeft: 10
+    },
+    smallButton: {
+        backgroundColor: '#419E08',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        borderRadius: 10,
+        borderColor: 'white',
+        borderWidth: 2,
+        width: '45%'
+    },
+    button: {
+        backgroundColor: '#419E08',
+        justifyContent: 'center',
+        paddingVertical: 10,
+        borderRadius: 10,
+        borderColor: 'white',
+        borderWidth: 2,
+        width: 120,
+        marginLeft: 10
     },
     buttonText: {
         fontSize: 17,

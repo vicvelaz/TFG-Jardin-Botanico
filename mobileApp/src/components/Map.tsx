@@ -82,6 +82,10 @@ const Map = () => {
     const [alertShown, setAlertShown] = React.useState<boolean>();
     const [actualPlace, setActualPlace] = React.useState<string>();
     const [showItemMarkers, setShowItemMarkers] = React.useState<boolean>(false);
+    const [showPosition, setShowPosition] = React.useState<boolean>(true);
+
+    //estados planta seleccionada para view con info
+    const [selectedPlantName, setSelectedPlantName] = React.useState<string>();
 
     React.useEffect(() => {
         requestPermissions();
@@ -140,6 +144,12 @@ const Map = () => {
       }
     }
 
+    const showPlantInfo = (e:Data) => {
+      setShowPosition(false);
+      setSelectedPlantName(e.name);
+      console.log(e.name);
+    }
+
     return (
       <View style={styles.page}>
         <View style={styles.container}>
@@ -147,14 +157,20 @@ const Map = () => {
             <MapboxGL.Camera zoomLevel={16.15} centerCoordinate={[centerLng,centerLat]} />
             <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()}/>
             {showItemMarkers && plants.map((e: Data) => (
-              <MapboxGL.PointAnnotation key={e.id} id={e.id} anchor={{x:0.5,y:0.5}} coordinate={[e.positionLong,e.positionLat]}></MapboxGL.PointAnnotation>
+              <MapboxGL.PointAnnotation key={e.id} id={e.id} onSelected={() => showPlantInfo(e)} anchor={{x:0.5,y:0.5}} coordinate={[e.positionLong,e.positionLat]}></MapboxGL.PointAnnotation>
             ))}
           </MapboxGL.MapView>
         </View>
-        <View style={textStyle.viewTextStyle}>
+        {showPosition ?
+        (<View style={textStyle.viewTextStyle}>
           <Text style={textStyle.titulo}>UBICACIÓN ACTUAL: </Text>
           <Text style={textStyle.baseText}>{actualPlace}</Text>
-        </View>
+        </View>)
+        :
+        (<View style={textStyle.viewTextStyle}>
+          <Text style={textStyle.titulo}>Planta: </Text>
+          <Text style={textStyle.baseText}>{selectedPlantName}</Text>
+        </View>)}
       </View>
     );
 }

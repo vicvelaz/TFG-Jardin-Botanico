@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Alert, PermissionsAndroid, Text } from 'react-native';
+import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity} from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
 import {booleanPointInPolygon,point,polygon} from '@turf/turf';
 import { db } from '../firebase/firebase-config';
+import SwipeUpDown, { SwipeUpDownProps } from 'react-native-swipe-up-down';
 
 MapboxGL.setAccessToken('pk.eyJ1IjoicmFteG5jaHYiLCJhIjoiY2t6c2IybzZrNXB2aDMwbzFnbmFsOXptNSJ9.CQqoytOo3yM-pGaCRIGgjw');
 
@@ -74,6 +75,7 @@ const Map = () => {
 
     //mapa y listas
     const [map,setMap] = React.useState<MapboxGL.MapView>();
+    const [camera,setCamera] = React.useState<MapboxGL.Camera>();
     const [plants, setPlants] = React.useState<any>([]);
 
     //estados del mapa y del user
@@ -86,7 +88,12 @@ const Map = () => {
 
     //estados planta seleccionada para view con info
     const [selectedPlantName, setSelectedPlantName] = React.useState<string>();
-
+    const [selectedPlantScientificName, setSelectedPlantScientificName] = React.useState<string>();
+    const [selectedPlantDescription, setSelectedDescription] = React.useState<string>();
+    const [selectedPlantImage, setSelectedPlantImage] = React.useState<string>();
+    const [swipeUpMinimized, setSwipeUpMinimized] = React.useState<boolean>(true);
+    const [loadPlantImage,setLoadPlantImage] = React.useState<boolean>(false);
+    
     React.useEffect(() => {
         requestPermissions();
         checkUserPosition();
@@ -145,16 +152,19 @@ const Map = () => {
     }
 
     const showPlantInfo = (e:Data) => {
+      camera?.flyTo([e.positionLong,e.positionLat]);
       setShowPosition(false);
       setSelectedPlantName(e.name);
-      console.log(e.name);
+      setSelectedPlantScientificName(e.scientific_name);
+      setSelectedDescription(e.description);
+      setSelectedPlantImage(e.image);
     }
 
     return (
-      <View style={styles.page}>
-        <View style={styles.container}>
-          <MapboxGL.MapView ref={c => c!== null && setMap(c)} onRegionDidChange={() => updateZoom()} style={styles.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
-            <MapboxGL.Camera zoomLevel={16.15} centerCoordinate={[centerLng,centerLat]} />
+      <View style={mapStyle.page}>
+        <View style={mapStyle.container}>
+          <MapboxGL.MapView ref={c => c!== null && setMap(c)} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
+            <MapboxGL.Camera ref={c => c!== null && setCamera(c)} zoomLevel={16.15} centerCoordinate={[centerLng,centerLat]} />
             <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()}/>
             {showItemMarkers && plants.map((e: Data) => (
               <MapboxGL.PointAnnotation key={e.id} id={e.id} onSelected={() => showPlantInfo(e)} anchor={{x:0.5,y:0.5}} coordinate={[e.positionLong,e.positionLat]}></MapboxGL.PointAnnotation>
@@ -167,21 +177,111 @@ const Map = () => {
           <Text style={textStyle.baseText}>{actualPlace}</Text>
         </View>)
         :
-        (<View style={textStyle.viewTextStyle}>
-          <Text style={textStyle.titulo}>Planta: </Text>
-          <Text style={textStyle.baseText}>{selectedPlantName}</Text>
-        </View>)}
+        (<SwipeUpDown
+	        itemMini={(show : SwipeUpDownProps) => 
+            <View style={[textStyle.miniInfoView]}>
+              <Text style={textStyle.baseText}>{selectedPlantName}</Text>
+              <Text style={textStyle.sci_name}>{selectedPlantScientificName}</Text>
+            </View>}
+	        itemFull={(hide : SwipeUpDownProps) => 
+            <View style={textStyle.maxInfoView}>
+              <View style={textStyle.nombres}>
+                <Text style={swipeUpMinimized ? textStyle.baseText : textStyle.baseTextMinimized}>{selectedPlantName}</Text>
+                <Text style={swipeUpMinimized ? textStyle.sci_name : textStyle.sci_name_minimized}>{selectedPlantScientificName}</Text>
+              </View>
+              <Text style={textStyle.infoText}>{selectedPlantDescription}</Text>
+              <View style={textStyle.imageButtonsView}>
+                {loadPlantImage && (
+                  <ActivityIndicator size="large" color="#00ff00" />
+                )}
+                <Image source={{ uri: selectedPlantImage }} onLoadStart={() => setLoadPlantImage(true)} onLoadEnd={() => setLoadPlantImage(false)} style={{ width: 150, height: 150 }} />
+                <TouchableOpacity style={buttonStyle.button}>
+                  <Text style={buttonStyle.buttonText}>Ver planta</Text>
+                </TouchableOpacity>
+              </View>
+            </View>}
+	        onShowMini={() => setSwipeUpMinimized(true)}
+	        onShowFull={() => setSwipeUpMinimized(false)}
+	        animation="spring"
+	        disableSwipeIcon={false}
+	        extraMarginTop={70}
+          swipeHeight={40}
+	        style={swipeUpMinimized ? {backgroundColor: '#419E08', height: 80}:{backgroundColor: '#fff', height: 80}} // style for swipe
+          iconColor={"black"}
+          iconSize={30}
+        />)}
       </View>
     );
 }
 
+const mapStyle = StyleSheet.create({
+  page: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF'
+  },
+  container: {
+    height: 800,
+    width: 400,
+    backgroundColor: 'tomato'
+  },
+  map: {
+    flex: 1
+  }
+});
+
+const buttonStyle = StyleSheet.create({
+  button: {
+    backgroundColor: '#419E08',
+    paddingVertical:10,
+    borderRadius: 10,
+    borderColor: 'white',
+    borderWidth: 2,
+   
+    marginLeft: 10,
+    width: 120,
+    height: 50
+  },
+  buttonText: {
+    fontSize: 20,
+    alignSelf: 'center',
+    fontWeight: 'bold',
+    color: 'white',
+    marginHorizontal: 20,
+    width: '100%',
+    textAlign: 'center'
+  }
+});
+
 const textStyle = StyleSheet.create({
   baseText: {
     color: "black",
-    fontSize: 20
+    fontSize: 20,
+    marginTop: 10
+  },
+  baseTextMinimized: {
+    color: "white",
+    fontSize: 20,
+    marginTop: 10
   },
   titulo: {
     fontSize: 15
+  },
+  sci_name:{
+    fontStyle: 'italic',
+    fontSize: 13
+  },
+  sci_name_minimized:{
+    fontStyle: 'italic',
+    fontSize: 13,
+    color: "white"
+  },
+  infoText:{
+    color: "black",
+    fontSize: 12,
+    marginTop: 10,
+    padding: 20
   },
   viewTextStyle: {
     flex: 1,
@@ -191,23 +291,27 @@ const textStyle = StyleSheet.create({
     padding: 20,
     height: 500,
     width: 400,
-  }
-});
-
-const styles = StyleSheet.create({
-  page: {
+  },
+  miniInfoView: {
+    backgroundColor: "#fff",
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF'
+    alignItems: "center",
   },
-  container: {
-    height: 600,
+  maxInfoView: {
+    backgroundColor: "#fff",
+    flex: 1,
+    alignItems: "center",
+  },
+  imageButtonsView: {
+    flex:1,
+    flexDirection: "row"
+  },
+  nombres: {
+    flex: 0.12,
+    alignItems: "center",
+    backgroundColor: "#419E08",
     width: 400,
-    backgroundColor: 'tomato'
-  },
-  map: {
-    flex: 1
+    height: 100
   }
 });
 

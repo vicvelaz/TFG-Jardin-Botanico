@@ -28,6 +28,7 @@
     "react-native-screens": "^3.10.1",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-sound": "^0.11.2",
+    "react-native-swipe-up-down": "^1.1.6",
     "react-native-vector-icons": "^9.0.0"
   },
   "devDependencies": {

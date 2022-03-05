@@ -204,7 +204,7 @@ const Map = () => {
 	        onShowFull={() => setSwipeUpMinimized(false)}
 	        animation="spring"
 	        disableSwipeIcon={false}
-	        extraMarginTop={70}
+	        extraMarginTop={300}
           swipeHeight={40}
 	        style={swipeUpMinimized ? {backgroundColor: '#419E08', height: 80}:{backgroundColor: '#fff', height: 80}} // style for swipe
           iconColor={"black"}

@@ -60,11 +60,15 @@ const Map = () => {
     const terracelist = [terrazaCuadros,terrazaEscuelas,planoFlor,terrazaBonsais];
     const terraces = ["Terraza de los Cuadros", "Terraza de las Escuelas", "Plano de la Flor", "Terraza de los Bonsáis"];
 
+    //mapa
+    const [map,setMap] = React.useState<MapboxGL.MapView>();
+
     //estados para la posicion del usuario
     const [userPositionLat, setUserPositionLat] = React.useState<number>(40.412386);
     const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.691977);
     const [alertShown, setAlertShown] = React.useState<boolean>();
     const [actualPlace, setActualPlace] = React.useState<string>();
+    const [actualZoom, setActualZoom] = React.useState<number>();
 
     React.useEffect(() => {
         requestPermissions();
@@ -100,10 +104,18 @@ const Map = () => {
       );
     }
 
+    const updateZoom = async () => {
+      if(map!== undefined){
+        const zoom = await map.getZoom();
+        setActualZoom(zoom);
+        console.log(zoom);
+      }
+    }
+
     return (
       <View style={styles.page}>
         <View style={styles.container}>
-          <MapboxGL.MapView style={styles.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
+          <MapboxGL.MapView ref={c => c!== null && setMap(c)} onRegionDidChange={() => updateZoom()} style={styles.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
             <MapboxGL.Camera zoomLevel={16.15} centerCoordinate={[centerLng,centerLat]} />
             <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()}/>
           </MapboxGL.MapView>

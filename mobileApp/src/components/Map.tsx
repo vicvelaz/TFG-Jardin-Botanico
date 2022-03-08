@@ -1,12 +1,13 @@
 import React from 'react';
 import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
-import MapboxGL from '@react-native-mapbox-gl/maps';
+import MapboxGL, {Logger} from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
 import { booleanPointInPolygon, point, polygon } from '@turf/turf';
 import { db } from '../firebase/firebase-config';
 import SwipeUpDown, { SwipeUpDownProps } from 'react-native-swipe-up-down';
 import { AudioButton } from '../components/AudioButton';
 import { StackScreenProps } from '@react-navigation/stack';
+import { ScrollView } from 'react-native-gesture-handler';
 
 MapboxGL.setAccessToken('pk.eyJ1IjoicmFteG5jaHYiLCJhIjoiY2t6c2IybzZrNXB2aDMwbzFnbmFsOXptNSJ9.CQqoytOo3yM-pGaCRIGgjw');
 interface Props extends StackScreenProps<any, 'MapScreen'> { };
@@ -101,12 +102,32 @@ const Map = ({ route, navigation }: Props) => {
   const [swipeUpMinimized, setSwipeUpMinimized] = React.useState<boolean>(true);
   const [loadPlantImage, setLoadPlantImage] = React.useState<boolean>(false);
 
+  //useEffect al cargar el componente
   React.useEffect(() => {
     requestPermissions();
     checkUserPosition();
     obtenerPlantas();
+    disableLogger();
   }, []);
 
+  //metodo para deshabilitar el logger del mapa con warnings de la API de mapbox
+  const disableLogger = () => {
+    Logger.setLogCallback(log => {
+      const { message } = log;
+    
+      // expected warnings - see https://github.com/mapbox/mapbox-gl-native/issues/15341#issuecomment-522889062
+      if (
+        message.match('Request failed due to a permanent error: Canceled') ||
+        message.match('Request failed due to a permanent error: Socket Closed') ||
+        message.match('MapRenderer::onSurfaceCreated GlyphsRasterizationMode was specified without providing LocalIdeographFontFamily. Switching glyphsRasterizationMode to NoGlyphsRasterizedLocally mode.')
+      ) {
+        return true;
+      }
+      return false;
+    });
+  }
+
+  //consulta de plantas a firebase
   const obtenerPlantas = async () => {
     const data = await db.collection('plants').where('type', '==', 'plant').get();
     const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -120,10 +141,12 @@ const Map = ({ route, navigation }: Props) => {
     setPlants(arrayPlants);
   }
 
+  //permisos de geolocalizacion a android
   async function requestPermissions() {
     await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
   }
 
+  //obtener la posicion del usuario y comprobar si está dentro de un area concreta
   const checkUserPosition = () => {
     Geolocation.getCurrentPosition(
       (position) => {
@@ -149,6 +172,7 @@ const Map = ({ route, navigation }: Props) => {
     );
   }
 
+  //comprobar el zoom del usuario para mostrar plantas
   const updateZoom = async () => {
     if (map !== undefined) {
       const zoom = await map.getZoom();
@@ -160,6 +184,7 @@ const Map = ({ route, navigation }: Props) => {
     }
   }
 
+  //obtener informacion de la planta en onclick del marcador
   const showPlantInfo = (e: Data) => {
     camera?.flyTo([e.positionLong, e.positionLat]);
     setShowPosition(false);
@@ -170,6 +195,7 @@ const Map = ({ route, navigation }: Props) => {
     setSelectedPlantAudio(e.audio);
   }
 
+  //volver de la informacion de la planta en swipeup a informacion de ubicacion del usuario
   const backToPosition = () => {
     setShowPosition(true);
     camera?.flyTo([userPositionLong,userPositionLat]);
@@ -178,7 +204,7 @@ const Map = ({ route, navigation }: Props) => {
   return (
     <View style={mapStyle.page}>
       <View style={mapStyle.container}>
-        <MapboxGL.MapView ref={c => c !== null && setMap(c)} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
+        <MapboxGL.MapView ref={c => c !== null && setMap(c)} onPress={() => backToPosition()} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
           <MapboxGL.Camera ref={c => c !== null && setCamera(c)} zoomLevel={16.15} centerCoordinate={[centerLng, centerLat]} />
           <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()} />
           {showItemMarkers && plants.map((e: Data) => (
@@ -222,7 +248,11 @@ const Map = ({ route, navigation }: Props) => {
                 <Text style={swipeUpMinimized ? textStyle.baseText : textStyle.baseTextMinimized}>{selectedPlantName}</Text>
                 <Text style={swipeUpMinimized ? textStyle.sci_name : textStyle.sci_name_minimized}>{selectedPlantScientificName}</Text>
               </View>
-              <Text style={textStyle.infoText}>{selectedPlantDescription}</Text>
+              <View style={textStyle.descripcion}>
+                <ScrollView >
+                  <Text style={textStyle.infoText}>{selectedPlantDescription}</Text>
+                </ScrollView>
+              </View>
               <View style={textStyle.imageButtonsView}>
                 {loadPlantImage && (
                   <ActivityIndicator size="large" color="#00ff00" />
@@ -378,6 +408,12 @@ const textStyle = StyleSheet.create({
     backgroundColor: "#419E08",
     width: 400,
     height: 100
+  },
+  descripcion: {
+    flex: 0.4,
+    marginBottom: 20,
+    marginTop: 20,
+    textAlign: 'justify'
   }
 });
 

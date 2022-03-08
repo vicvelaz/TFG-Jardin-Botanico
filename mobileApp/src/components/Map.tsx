@@ -262,7 +262,8 @@ const mapStyle = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF'
+    backgroundColor: '#F5FCFF',
+    fontFamily: 'Noto Sans'
   },
   container: {
     height: 800,

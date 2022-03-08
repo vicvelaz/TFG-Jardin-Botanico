@@ -36,34 +36,33 @@ export const ShowItemItinerary = ({ route, navigation }: Props) => {
     }
     return (
         <View style={styles.container}>
-            {/* <MapboxNavigation
-        origin={[-97.760288, 30.273566]}
-        destination={[-97.918842, 30.494466]}
-        shouldSimulateRoute
-        showsEndOfRouteFeedback
-        onLocationChange={(event) => {
-          const { latitude, longitude } = event.nativeEvent;
-        }}
-        onRouteProgressChange={(event) => {
-          const {
-            distanceTraveled,
-            durationRemaining,
-            fractionTraveled,
-            distanceRemaining,
-          } = event.nativeEvent;
-        }}
-        onError={(event) => {
-          const { message } = event.nativeEvent;
-        }}
-        onCancelNavigation={() => {
-          // User tapped the "X" cancel button in the nav UI
-          // or canceled via the OS system tray on android.
-          // Do whatever you need to here.
-        }}
-        onArrive={() => {
-          // Called when you arrive at the destination.
-        }}
-      /> */}
+            <View style={styles.mapContainer}>
+                <MapboxNavigation
+                    origin={[userPositionLong, userPositionLat]}
+                    destination={[route.params?.info.position._long, route.params?.info.position._lat]}
+                    shouldSimulateRoute={true}
+                    showsEndOfRouteFeedback
+                    onLocationChange={(event) => {
+                        console.log('onLocationChange', event.nativeEvent)
+                        console.log('[' + event.nativeEvent?.latitude + '],[' + event.nativeEvent?.longitude + ']')
+                    }}
+                    onRouteProgressChange={(event) => {
+                        console.log(event.nativeEvent?.distanceTraveled);
+                        console.log(event.nativeEvent?.durationRemaining);
+                        console.log(event.nativeEvent?.fractionTraveled);
+                        console.log(event.nativeEvent?.distanceRemaining);
+                    }}
+                    onError={(event) => {
+                        console.log(event.nativeEvent?.message);
+                    }}
+                    onCancelNavigation={() => {
+                        console.log("Ruta cancelada");
+                    }}
+                    onArrive={() => {
+                        console.log("Has llegado");
+                    }}
+                />
+            </View>
         </View>
     );
 };
@@ -71,5 +70,12 @@ export const ShowItemItinerary = ({ route, navigation }: Props) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: '100%',
     },
+    mapContainer: {
+        flex: 1
+    }
 });

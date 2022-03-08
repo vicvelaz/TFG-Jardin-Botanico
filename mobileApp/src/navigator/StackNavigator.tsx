@@ -7,6 +7,7 @@ import { MapScreen } from '../screens/MapScreen';
 import { PlantDetails } from '../screens/PlantDetails';
 import { ItineraryDetails } from '../screens/ItineraryDetails';
 import { ShowItemPosition } from '../screens/ShowItemPosition';
+import { ShowItemItinerary } from '../screens/ShowItemItinerary';
 
 export type RootStackParams = {
   MainMenu: undefined;
@@ -14,7 +15,8 @@ export type RootStackParams = {
   MapScreen:undefined;
   PlantDetails: String;
   ItineraryDetails: String;
-  ShowItemPosition:undefined;
+  ShowItemPosition: undefined;
+  ShowItemItinerary: undefined;
 }
 
 
@@ -27,6 +29,7 @@ export const StackNavigator = () => {
       <Stack.Screen name="List" component={List} options={{headerShown:false}}/>
       <Stack.Screen name="MapScreen" component={MapScreen} options={{ title:"Mapa" }}/>
       <Stack.Screen name="ShowItemPosition" component={ShowItemPosition} options={{ title:"Mostrar Ubicación" }}/>
+      <Stack.Screen name="ShowItemItinerary" component={ShowItemItinerary} options={{ title:"Mostrar Ruta" }}/>
       <Stack.Screen name="PlantDetails" component={PlantDetails}/>
       <Stack.Screen name="ItineraryDetails" component={ItineraryDetails}/>
     </Stack.Navigator>

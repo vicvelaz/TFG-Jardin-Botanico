@@ -132,7 +132,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
 
                         <TouchableOpacity
                             style={styles.button}
-                        // onPress={() => navigation.navigate('ItinerariosList')}
+                            onPress={() => navigation.navigate('ShowItemItinerary',{ info: state.data, id:route.params?.id })}
                         >
                             <Text style={styles.buttonText}>Iniciar ruta</Text>
                         </TouchableOpacity>

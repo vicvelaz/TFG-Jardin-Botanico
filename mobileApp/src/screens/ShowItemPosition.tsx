@@ -1,5 +1,4 @@
 import React from 'react'
-import Map from '../components/Map';
 import { StyleSheet, View, Alert, Text, PermissionsAndroid } from 'react-native';
 import MapboxGL from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';

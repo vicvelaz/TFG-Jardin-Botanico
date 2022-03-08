@@ -7,9 +7,8 @@ import Geolocation from 'react-native-geolocation-service';
 interface Props extends StackScreenProps<any, 'ShowItemItinerary'> { };
 
 export const ShowItemItinerary = ({ route, navigation }: Props) => {
-
-    const [userPositionLat, setUserPositionLat] = React.useState<number>(40.412386);
-    const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.691977);
+    const [userPositionLat, setUserPositionLat] = React.useState<number>(40.411147);
+    const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.690750);
 
     React.useEffect(() => {
         navigation.setOptions({ title: "Ruta a " + route.params?.info.name });
@@ -26,6 +25,8 @@ export const ShowItemItinerary = ({ route, navigation }: Props) => {
             (position) => {
                 setUserPositionLat(position.coords.latitude);
                 setUserPositionLong(position.coords.longitude);
+                console.log('[ '+position.coords.longitude+' , '+position.coords.latitude+' ]')
+                console.log('[ '+userPositionLong+' , '+userPositionLat+' ]')
             },
             (error) => {
                 // See error code charts below.

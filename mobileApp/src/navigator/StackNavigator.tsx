@@ -29,7 +29,7 @@ export const StackNavigator = () => {
       <Stack.Screen name="List" component={List} options={{headerShown:false}}/>
       <Stack.Screen name="MapScreen" component={MapScreen} options={{ title:"Mapa" }}/>
       <Stack.Screen name="ShowItemPosition" component={ShowItemPosition} options={{ title:"Mostrar Ubicación" }}/>
-      <Stack.Screen name="ShowItemItinerary" component={ShowItemItinerary} options={{ title:"Mostrar Ruta" }}/>
+      <Stack.Screen name="ShowItemItinerary" component={ShowItemItinerary} />
       <Stack.Screen name="PlantDetails" component={PlantDetails}/>
       <Stack.Screen name="ItineraryDetails" component={ItineraryDetails}/>
     </Stack.Navigator>

@@ -11,6 +11,12 @@ export const ShowItemItinerary = ({ route, navigation }: Props) => {
     const [userPositionLat, setUserPositionLat] = React.useState<number>(40.412386);
     const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.691977);
 
+    React.useEffect(() => {
+        navigation.setOptions({ title: "Ruta a " + route.params?.info.name });
+        requestPermissions();
+        checkUserPosition();
+    }, []);
+
     async function requestPermissions() {
         await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
     }

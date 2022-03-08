@@ -5,3 +5,5 @@ include ':app'
 include ':react-native-vector-icons'
 project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')
 
+include ':mapboxnavigation'
+project(':mapboxnavigation').projectDir = new File(rootProject.projectDir, '../node_modules/@homee/react-native-mapbox-navigation/android')

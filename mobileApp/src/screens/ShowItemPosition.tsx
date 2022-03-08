@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, View, Alert, Text, PermissionsAndroid } from 'react-native';
-import MapboxGL from '@react-native-mapbox-gl/maps';
+import MapboxGL , {Logger} from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
 import { booleanPointInPolygon, point, polygon } from '@turf/turf';
 import { StackScreenProps } from '@react-navigation/stack';
@@ -35,9 +35,26 @@ export const ShowItemPosition = ({ route, navigation }: Props) => {
     const [itemLat,setItemLat] = React.useState<number>(40.412386);
 
     React.useEffect(() => {
+        disableLogger();
         requestPermissions();
         checkUserPosition();
     }, []);
+
+    const disableLogger = () => {
+      Logger.setLogCallback(log => {
+        const { message } = log;
+      
+        // expected warnings - see https://github.com/mapbox/mapbox-gl-native/issues/15341#issuecomment-522889062
+        if (
+          message.match('Request failed due to a permanent error: Canceled') ||
+          message.match('Request failed due to a permanent error: Socket Closed') ||
+          message.match('MapRenderer::onSurfaceCreated GlyphsRasterizationMode was specified without providing LocalIdeographFontFamily. Switching glyphsRasterizationMode to NoGlyphsRasterizedLocally mode.')
+        ) {
+          return true;
+        }
+        return false;
+      });
+    }
 
     async function requestPermissions(){
       await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);

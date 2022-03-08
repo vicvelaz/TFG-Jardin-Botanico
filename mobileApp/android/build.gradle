@@ -2,10 +2,10 @@
 
 buildscript {
     ext {
-        buildToolsVersion = "30.0.3"
+        buildToolsVersion = "30.0.2"
         minSdkVersion = 21
-        compileSdkVersion = 31
-        targetSdkVersion = 31
+        compileSdkVersion = 30
+        targetSdkVersion = 30
         ndkVersion = "23.1.7779620"
     }
 
@@ -57,9 +57,9 @@ project.ext {
       // Overriding Build/Android SDK Versions
       android : [
         minSdk    : 19,
-        targetSdk : 31,
-        compileSdk: 31,
-        buildTools: "30.0.3"
+        targetSdk : 30,
+        compileSdk: 30,
+        buildTools: "30.0.2"
       ],
 
       // Overriding Library SDK Versions

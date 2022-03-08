@@ -43,14 +43,9 @@ export const ShowItemItinerary = ({ route, navigation }: Props) => {
                     shouldSimulateRoute={true}
                     showsEndOfRouteFeedback
                     onLocationChange={(event) => {
-                        console.log('onLocationChange', event.nativeEvent)
-                        console.log('[' + event.nativeEvent?.latitude + '],[' + event.nativeEvent?.longitude + ']')
                     }}
                     onRouteProgressChange={(event) => {
-                        console.log(event.nativeEvent?.distanceTraveled);
-                        console.log(event.nativeEvent?.durationRemaining);
-                        console.log(event.nativeEvent?.fractionTraveled);
-                        console.log(event.nativeEvent?.distanceRemaining);
+
                     }}
                     onError={(event) => {
                         console.log(event.nativeEvent?.message);

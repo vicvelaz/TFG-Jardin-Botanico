@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, ImageBackground, Image, Dimensions, Modal } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, ImageBackground, Image, Dimensions, Modal,PermissionsAndroid } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack';
 import Carousel from 'react-native-snap-carousel';
 import { ScrollView } from 'react-native-gesture-handler';
 import { db } from '../firebase/firebase-config';
 import { AudioButton } from '../components/AudioButton';
+import Geolocation from 'react-native-geolocation-service';
 
 interface Props extends StackScreenProps<any, 'PlantDetails'> { };
 
@@ -37,6 +38,9 @@ export const PlantDetails = ({ route, navigation }: Props) => {
     const [image, setImage] = useState<JSX.Element[]>([]);
 
     const [index, setIndex] = useState(0);
+
+    const [userPositionLat, setUserPositionLat] = React.useState<number>(40.411147);
+    const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.690750);
 
 
     const getDetails = async () => {
@@ -77,8 +81,28 @@ export const PlantDetails = ({ route, navigation }: Props) => {
 
     useEffect(() => {
         navigation.setOptions({ title: route.params?.title });
+        requestPermissions();
+        checkUserPosition();
         getDetails();
     }, [])
+
+    async function requestPermissions() {
+        await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+    }
+
+    const checkUserPosition = () => {
+        Geolocation.getCurrentPosition(
+            (position) => {
+                setUserPositionLat(position.coords.latitude);
+                setUserPositionLong(position.coords.longitude);
+            },
+            (error) => {
+                // See error code charts below.
+                console.log(error.code, error.message);
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
+    }
 
 
 
@@ -132,7 +156,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
 
                         <TouchableOpacity
                             style={styles.button}
-                            onPress={() => navigation.navigate('ShowItemItinerary',{ info: state.data, id:route.params?.id })}
+                            onPress={() => navigation.navigate('ShowItemItinerary',{ info: state.data, userposition: {long: userPositionLong, lat: userPositionLat}, id:route.params?.id })}
                         >
                             <Text style={styles.buttonText}>Iniciar ruta</Text>
                         </TouchableOpacity>

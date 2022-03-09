@@ -19,12 +19,13 @@ export const ShowItemItinerary = ({ route, navigation }: Props) => {
                     destination={[route.params?.info.position._long, route.params?.info.position._lat]}
                     shouldSimulateRoute={true}
                     onLocationChange={(event) => {
+
                     }}
                     onRouteProgressChange={(event) => {
                         
                     }}
                     onError={(event) => {
-                        console.log(event.nativeEvent?.message);
+                        console.log(event.nativeEvent);
                     }}
                     onCancelNavigation={() => {
                         console.log("Ruta cancelada");

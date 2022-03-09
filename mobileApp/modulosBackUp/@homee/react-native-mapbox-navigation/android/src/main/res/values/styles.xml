@@ -1,0 +1,30 @@
+<resources>
+    <declare-styleable name="MapboxManeuverView">
+        <!-- Defines the background color of MapboxManeuverView showing the primary and secondary maneuvers as well as step distance remaining and maneuver turn icon -->
+        <attr name="maneuverViewBackgroundColor" format="reference|color"/>
+        <!-- Defines the background color of MapboxManeuverView sub instructions and turn icon -->
+        <attr name="subManeuverViewBackgroundColor" format="reference|color"/>
+        <!-- Defines the background color of upcoming maneuvers -->
+        <attr name="upcomingManeuverViewBackgroundColor" format="reference|color"/>
+        <!-- Defines the style of maneuver arrow in the primary and sub maneuver view -->
+        <attr name="maneuverViewIconStyle" format="reference" />
+        <!-- Defines the style of maneuver arrow in the lane guidance view -->
+        <attr name="laneGuidanceManeuverIconStyle" format="reference" />
+    </declare-styleable>
+    <style name="PrimaryManeuverTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">30sp</item>
+    </style>
+    <style name="ManeuverTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">25sp</item>
+    </style>
+    <style name="StepDistanceRemainingAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">21sp</item>
+    </style>
+    <style name="MapboxCustomManeuverStyle" parent="MapboxStyleManeuverView">
+        <item name="maneuverViewBackgroundColor">#419E08</item>
+    </style>
+</resources>

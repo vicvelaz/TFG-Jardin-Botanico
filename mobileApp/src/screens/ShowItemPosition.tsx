@@ -36,8 +36,10 @@ export const ShowItemPosition = ({ route, navigation }: Props) => {
 
     React.useEffect(() => {
         disableLogger();
-        requestPermissions();
-        checkUserPosition();
+        setItemName(route.params?.info.name);
+        setItemTerrace(route.params?.info.terrace);
+        setItemLng(route.params?.info.position._long);
+        setItemLat(route.params?.info.position._lat);
     }, []);
 
     const disableLogger = () => {
@@ -56,42 +58,12 @@ export const ShowItemPosition = ({ route, navigation }: Props) => {
       });
     }
 
-    async function requestPermissions(){
-      await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
-    }
-
-    const checkUserPosition = () => {
-      Geolocation.getCurrentPosition(
-            (position) => {
-              setUserPositionLat(position.coords.latitude);
-              setUserPositionLong(position.coords.longitude);
-              const userCoords = point([position.coords.longitude,position.coords.latitude]);
-              if(!booleanPointInPolygon(userCoords,perimetro) && !alertShown){
-                Alert.alert("Estás fuera del Jardín Botánico","Por favor, camina hacia el jardín para poder utilizar el mapa",
-                [{ text: "OK", onPress: () => setAlertShown(false) }]);
-                setAlertShown(true);
-              }else{
-                setItemName(route.params?.info.name);
-                setItemTerrace(route.params?.info.terrace);
-                setItemLng(route.params?.info.position._long);
-                setItemLat(route.params?.info.position._lat);
-              }
-            },
-            (error) => {
-              // See error code charts below.
-              console.log(error.code, error.message);
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-      );
-    }
-
     return (
       <View style={styles.page}>
         <View style={styles.container}>
           <MapboxGL.MapView style={styles.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
             <MapboxGL.Camera zoomLevel={17.5} centerCoordinate={[itemLng,itemLat]} />
             <MapboxGL.PointAnnotation id={route.params?.id} anchor={{x:0.5,y:0.5}}  coordinate={[itemLng,itemLat]}></MapboxGL.PointAnnotation>
-            <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} visible={false} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()}/>
           </MapboxGL.MapView>
         </View>
         <View style={textStyle.viewTextStyle}>

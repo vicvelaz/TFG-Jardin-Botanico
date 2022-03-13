@@ -6,7 +6,7 @@ import { SearchBar } from 'react-native-elements';
 
 import { Item } from '../components/Item';
 
-
+import traducir from "../traducir"
 
 
 

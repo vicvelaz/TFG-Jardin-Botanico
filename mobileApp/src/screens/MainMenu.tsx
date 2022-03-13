@@ -8,14 +8,15 @@ import { db } from '../firebase/firebase-config';
 import { Overlay } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
 
-
+import * as RNLocalize from "react-native-localize";
+import axios from 'axios';
 
 interface Props extends StackScreenProps<any, any> { };
 
 interface Data {
     description: string,
     title: string,
-    date:string,
+    date: string,
 }
 
 const windowWidth = Dimensions.get('window').width;
@@ -26,28 +27,35 @@ export const MainMenu = ({ navigation }: Props) => {
 
     const [image, setImage] = useState<JSX.Element[]>([]);
     const [visible, setVisible] = useState<boolean>(false);
-    const [overlayInfo, setOverlayInfo] = useState<Data>({ title: '', description: '',date:'' })
+    const [overlayInfo, setOverlayInfo] = useState<Data>({ title: '', description: '', date: '' })
+    const [staticText, setStaticText] = useState<string[]>(['EVENTOS, Plantas, Puntos de interés, Itinerarios, Mapa']);
 
     //   const onClose = () => setVisible(false);
 
 
-    const execute = (title: string, description: string,date:string): any => {
-        setOverlayInfo({ title: title, description: description, date:date });
-        setVisible(!visible);
+    const execute = async (title: string, description: string, date: string) => {
+        if (RNLocalize.getLocales()[0].languageCode !== 'es') {
+            const trad = await traducir([title,description,date]);
+            setOverlayInfo({ title: trad[0], description: trad[1], date: trad[2] });
 
+        } else {
+            setOverlayInfo({ title: title, description: description, date: date });
+        }
+
+        setVisible(!visible);
     }
 
     const getEvents = async () => {
         const today = new Date();
         try {
-            const data = await db.collection('events').where('end_date','>=',today).orderBy('end_date','desc').get();
+            const data = await db.collection('events').where('end_date', '>=', today).orderBy('end_date', 'desc').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const arrayImages: JSX.Element[] = [];
             arrayData.forEach((element: any) => {
-                if(moment(today)>=moment.unix(element.start_date.seconds)){
-                    const date = moment.unix(element.start_date.seconds).format('DD/MM/YY')+ ' - ' + moment.unix(element.end_date.seconds).format('DD/MM/YY')
+                if (moment(today) >= moment.unix(element.start_date.seconds)) {
+                    const date = moment.unix(element.start_date.seconds).format('DD/MM/YY') + ' - ' + moment.unix(element.end_date.seconds).format('DD/MM/YY')
                     arrayImages.push(
-                        <TouchableOpacity onPress={() => execute(element.name, element.description,date)}>
+                        <TouchableOpacity onPress={() => execute(element.name, element.description, date)}>
                             <Image style={styles.ImgEvent}
                                 source={{ uri: element.image }}
                             />
@@ -63,13 +71,45 @@ export const MainMenu = ({ navigation }: Props) => {
 
     }
 
+    const traducir = async (text: string[]) => {
+        try {
+            console.log(text)
+            const response = await axios
+                .post(
+                    'https://translation.googleapis.com/language/translate/v2',
+                    {},
+                    {
+                        params: {
+                            q: JSON.stringify(text),
+                            source: 'es',
+                            target: RNLocalize.getLocales()[0].languageCode,
+                            key: 'AIzaSyBncVh-3ckA9tPjbWstXnSGDRI8ySEnQ08'
+                        }
+                    }
+                );
+
+            console.log(response.data.data.translations[0].translatedText.replace(/&quot;/g,'"').replace(/，/g,',').replace(/、/g,',').replace(/“/g,'"').replace(/”/g,'"'));
+
+            return JSON.parse(response.data.data.translations[0].translatedText.replace(/、/g,',').replace(/，/g,',').replace(/&quot;/g,'"').replace(/“/g,'"').replace(/”/g,'"'));
+
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const getLanguage = async () => {
+        if (RNLocalize.getLocales()[0].languageCode != 'es') {
+            const trad = await traducir(['EVENTOS', 'Plantas', 'Puntos de interés', 'Itinerarios', 'Mapa'])
+            setStaticText(trad);
+        } else {
+            setStaticText(['EVENTOS', 'Plantas', 'Puntos de interés', 'Itinerarios', 'Mapa'])
+        }
+    }
 
     useEffect(() => {
         getEvents();
+        getLanguage();
     }, []);
-
-
-
 
 
     return (
@@ -77,7 +117,8 @@ export const MainMenu = ({ navigation }: Props) => {
             <View style={styles.container}>
                 <Text style={styles.mainTitle}>Real Jardín Botánico App</Text>
                 <View style={styles.events}>
-                    <Text style={styles.eventsTitle}>EVENTOS</Text>
+                    {/*EVENTOS*/}
+                    <Text style={styles.eventsTitle}>{staticText[0]}</Text>
                     <Carousel
                         style={{ backgroundColor: 'red' }}
                         data={image}
@@ -92,7 +133,7 @@ export const MainMenu = ({ navigation }: Props) => {
                 <Overlay
                     visible={visible}
                     isVisible={visible}
-                    onBackdropPress={() => execute('', '','')}
+                    onBackdropPress={() => execute('', '', '')}
                     overlayStyle={styles.overlay}
                 >
                     <Text style={styles.overlayTitle}>{overlayInfo.title}</Text>
@@ -107,13 +148,15 @@ export const MainMenu = ({ navigation }: Props) => {
                             style={styles.smallButton}
                             onPress={() => navigation.navigate('List', { title: 'Lista de plantas', type: 'plants' })}
                         >
-                            <Text style={styles.buttonText}>Plantas</Text>
+                            {/*Plantas*/}
+                            <Text style={styles.buttonText}>{staticText[1]}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.smallButton}
                             onPress={() => navigation.navigate('List', { title: 'Lista de puntos de interés', type: 'place' })}
                         >
-                            <Text style={styles.buttonText}>Puntos de interés</Text>
+                            {/*Puntos de interés*/}
+                            <Text style={styles.buttonText}>{staticText[2]}</Text>
                         </TouchableOpacity>
 
                     </View>
@@ -122,13 +165,15 @@ export const MainMenu = ({ navigation }: Props) => {
                         style={styles.button}
                         onPress={() => navigation.navigate('List', { title: 'Lista de itinerarios', type: 'itinerary' })}
                     >
-                        <Text style={styles.buttonText}>Itinerarios</Text>
+                        {/*Itinerarios*/} 
+                        <Text style={styles.buttonText}>{staticText[3]}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => navigation.navigate('MapScreen')}
-                    >
-                        <Text style={styles.buttonText}>Mapa</Text>
+                    >   
+                        {/*Mapa*/} 
+                        <Text style={styles.buttonText}>{staticText[4]}</Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -216,7 +261,7 @@ const styles = StyleSheet.create({
     },
     overlay: {
         backgroundColor: '#419E08',
-        maxHeight: windowHeight/3,
+        maxHeight: windowHeight / 3,
         // height:windowHeight/4,
         alignSelf: 'stretch',
         marginHorizontal: 20,
@@ -226,20 +271,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderColor: 'white',
         borderWidth: 2,
-        padding:0,
-        paddingBottom:10,
+        padding: 0,
+        paddingBottom: 10,
     },
     overlayTitle: {
         color: 'white',
         textAlign: 'center',
         fontSize: 25,
-        marginTop:10,
-        marginHorizontal:5,
+        marginTop: 10,
+        marginHorizontal: 5,
         // backgroundColor:'blue',
-        fontWeight:'bold'
+        fontWeight: 'bold'
     },
-    overlayDate:{
-        marginVertical:5
+    overlayDate: {
+        marginVertical: 5
     },
     overlayText: {
         color: 'white',
@@ -247,9 +292,9 @@ const styles = StyleSheet.create({
         // width: 200,
         // backgroundColor:'red',
         // marginBottom:15,
-        marginHorizontal:10,
+        marginHorizontal: 10,
         textAlign: 'justify',
-        
+
     }
 });
 

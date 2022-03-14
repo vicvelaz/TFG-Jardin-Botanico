@@ -18,9 +18,9 @@ const traducir = async (text: string[]) => {
                 }
             );
 
-        console.log(response.data.data.translations[0].translatedText.replace(/&quot;/g,'"').replace(/，/g,',').replace(/、/g,',').replace(/“/g,'"').replace(/”/g,'"'));
+        console.log(response.data.data.translations[0].translatedText.replace(/&quot;/g,'"').replace(/，/g,',').replace(/、/g,',').replace(/“/g,'"').replace(/”/g,'"').replace(/&#39;/g,"`"));
 
-        return JSON.parse(response.data.data.translations[0].translatedText.replace(/、/g,',').replace(/，/g,',').replace(/&quot;/g,'"').replace(/“/g,'"').replace(/”/g,'"'));
+        return JSON.parse(response.data.data.translations[0].translatedText.replace(/、/g,',').replace(/，/g,',').replace(/&quot;/g,'"').replace(/“/g,'"').replace(/”/g,'"').replace(/&#39;/g,"`"));
 
     } catch (e) {
         console.log(e)

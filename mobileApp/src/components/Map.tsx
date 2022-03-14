@@ -159,7 +159,6 @@ const Map = ({ route, navigation }: Props) => {
             [{ text: "OK", onPress: () => setAlertShown(false) }]);
           setAlertShown(true);
         } else {
-
           const i = terracelist.findIndex(t => booleanPointInPolygon(userCoords, t));
           setActualPlace(terraces[i]);
         }
@@ -403,7 +402,7 @@ const textStyle = StyleSheet.create({
     justifyContent: 'center'
   },
   nombres: {
-    flex: 0.12,
+    flex: 0.15,
     alignItems: "center",
     backgroundColor: "#419E08",
     width: 400,

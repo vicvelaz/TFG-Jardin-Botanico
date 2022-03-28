@@ -1,6 +1,7 @@
 package com.homee.mapboxnavigation
 
 import android.content.pm.PackageManager
+import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.common.MapBuilder
@@ -70,6 +71,30 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) : Sim
             return
         }
         view.setDestination(Point.fromLngLat(sources.getDouble(0), sources.getDouble(1)))
+    }
+
+    @ReactProp(name = "waypoints")
+    fun setWaypoints(view: MapboxNavigationView, sources: ReadableArray?) {
+        if(sources == null) {
+            Log.i("Null Waypoints",sources?.size().toString())
+            view.setWayPoints(null)
+            return
+        }
+
+        Log.i("Readable Array",sources.toString())
+
+        var wp: ArrayList<Point> = ArrayList()
+        val numElements: Int = sources.size()-1
+
+        for(i in 0..numElements){
+            var coordinate:ReadableArray = sources.getArray(i)
+            wp.add(Point.fromLngLat(coordinate.getDouble(0),coordinate.getDouble(1)))
+        }
+
+        var coords: String = wp.joinToString(",")
+        Log.i("Coordinates",coords)
+
+        view.setWayPoints(wp)
     }
 
     @ReactProp(name = "shouldSimulateRoute")

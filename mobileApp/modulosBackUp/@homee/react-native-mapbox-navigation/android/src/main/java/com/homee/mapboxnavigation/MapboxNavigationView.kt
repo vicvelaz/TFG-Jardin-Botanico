@@ -3,8 +3,10 @@ package com.homee.mapboxnavigation
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
@@ -78,6 +80,8 @@ import com.mapbox.navigation.ui.voice.model.SpeechValue
 import com.mapbox.navigation.ui.voice.model.SpeechVolume
 import java.util.Locale
 import com.facebook.react.uimanager.events.RCTEventEmitter
+import com.mapbox.navigation.ui.maps.route.line.model.RouteLineColorResources
+import com.mapbox.navigation.ui.maps.route.line.model.RouteLineResources
 
 class MapboxNavigationView(private val context: ThemedReactContext, private val accessToken: String?) :
     FrameLayout(context.baseContext) {
@@ -88,6 +92,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     private var origin: Point? = null
     private var destination: Point? = null
+    private var waypoints: List<Point>? = null
     private var shouldSimulateRoute = false
     private var showsEndOfRouteFeedback = false
     /**
@@ -321,6 +326,9 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         if (style != null) {
             val maneuverArrowResult = routeArrowApi.addUpcomingManeuverArrow(routeProgress)
             routeArrowView.renderManeuverUpdate(style, maneuverArrowResult)
+            routeLineApi.updateWithRouteProgress(routeProgress) { result ->
+                routeLineView.renderRouteLineUpdate(style, result)
+            }
         }
 
         // update top banner with maneuver instructions
@@ -571,9 +579,12 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         // the route line below road labels layer on the map
         // the value of this option will depend on the style that you are using
         // and under which layer the route line should be placed on the map layers stack
+
         val mapboxRouteLineOptions = MapboxRouteLineOptions.Builder(context)
+                .styleInactiveRouteLegsIndependently(true)
             .withRouteLineBelowLayerId("road-label")
             .build()
+
         routeLineApi = MapboxRouteLineApi(mapboxRouteLineOptions)
         routeLineView = MapboxRouteLineView(mapboxRouteLineOptions)
 
@@ -627,7 +638,8 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         mapboxNavigation.registerVoiceInstructionsObserver(voiceInstructionsObserver)
         mapboxNavigation.registerRouteProgressObserver(replayProgressObserver)
 
-        this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
+//        this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
+        this.origin?.let { this.destination?.let { it1 -> this.waypoints.let { it2 -> this.findRoute(it,it1,it2) } } }
     }
 
     override fun onDetachedFromWindow() {
@@ -649,36 +661,71 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         voiceInstructionsPlayer.shutdown()
     }
 
-    private fun findRoute(origin: Point, destination: Point) {
+    private fun findRoute(origin: Point, destination: Point, waypoints: List<Point>?) {
         try {
-            mapboxNavigation.requestRoutes(
-                RouteOptions.builder()
-                    .applyDefaultNavigationOptions()
-                    .applyLanguageAndVoiceUnitOptions(context)
-                    .coordinatesList(listOf(origin, destination))
-                    .profile(DirectionsCriteria.PROFILE_WALKING)
-                    .steps(true)
-                    .build(),
-                object : RouterCallback {
-                    override fun onRoutesReady(
-                        routes: List<DirectionsRoute>,
-                        routerOrigin: RouterOrigin
-                    ) {
-                        setRouteAndStartNavigation(routes)
-                    }
+            Log.i("Origin", this.origin.toString())
+            Log.i("Destination", this.destination.toString())
+            if(waypoints != null){
+                Log.i("ArrayCoordinates", listOf(origin, *waypoints.toTypedArray(), destination).joinToString(","))
+                mapboxNavigation.requestRoutes(
+                        RouteOptions.builder()
+                                .applyDefaultNavigationOptions()
+                                .applyLanguageAndVoiceUnitOptions(context)
+                                .coordinatesList(listOf(origin, *waypoints?.toTypedArray() as Array<Point>, destination))
+                                .profile(DirectionsCriteria.PROFILE_WALKING)
+                                .steps(true)
+                                .build(),
+                        object : RouterCallback {
+                            override fun onRoutesReady(
+                                    routes: List<DirectionsRoute>,
+                                    routerOrigin: RouterOrigin
+                            ) {
+                                setRouteAndStartNavigation(routes)
+                            }
 
-                    override fun onFailure(
-                        reasons: List<RouterFailure>,
-                        routeOptions: RouteOptions
-                    ) {
-                        sendErrorToReact("Error finding route $reasons")
-                    }
+                            override fun onFailure(
+                                    reasons: List<RouterFailure>,
+                                    routeOptions: RouteOptions
+                            ) {
+                                sendErrorToReact("Error finding route $reasons")
+                            }
 
-                    override fun onCanceled(routeOptions: RouteOptions, routerOrigin: RouterOrigin) {
-                        // no impl
-                    }
-                }
-            )
+                            override fun onCanceled(routeOptions: RouteOptions, routerOrigin: RouterOrigin) {
+                                // no impl
+                            }
+                        }
+                )
+
+            }else{
+                mapboxNavigation.requestRoutes(
+                        RouteOptions.builder()
+                                .applyDefaultNavigationOptions()
+                                .applyLanguageAndVoiceUnitOptions(context)
+                                .coordinatesList(listOf(origin,destination))
+                                .profile(DirectionsCriteria.PROFILE_WALKING)
+                                .steps(true)
+                                .build(),
+                        object : RouterCallback {
+                            override fun onRoutesReady(
+                                    routes: List<DirectionsRoute>,
+                                    routerOrigin: RouterOrigin
+                            ) {
+                                setRouteAndStartNavigation(routes)
+                            }
+
+                            override fun onFailure(
+                                    reasons: List<RouterFailure>,
+                                    routeOptions: RouteOptions
+                            ) {
+                                sendErrorToReact("Error finding route $reasons")
+                            }
+
+                            override fun onCanceled(routeOptions: RouteOptions, routerOrigin: RouterOrigin) {
+                                // no impl
+                            }
+                        }
+                )
+            }
         } catch (ex: Exception) {
             sendErrorToReact(ex.toString())
         }
@@ -751,6 +798,10 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
     fun setDestination(destination: Point?) {
         this.destination = destination
+    }
+
+    fun setWayPoints(waypoints: List<Point>?){
+        this.waypoints = waypoints
     }
 
     fun setShouldSimulateRoute(shouldSimulateRoute: Boolean) {

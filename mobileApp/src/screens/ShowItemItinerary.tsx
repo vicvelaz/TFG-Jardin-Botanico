@@ -17,7 +17,7 @@ export const ShowItemItinerary = ({ route, navigation }: Props) => {
                 <MapboxNavigation
                     origin={[route.params?.userposition.long, route.params?.userposition.lat]}
                     destination={[route.params?.info.position._long, route.params?.info.position._lat]}
-                    shouldSimulateRoute={false}
+                    shouldSimulateRoute={true/*false*/}
                     onLocationChange={(event) => {
 
                     }}

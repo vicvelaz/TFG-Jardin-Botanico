@@ -51,6 +51,7 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) : Sim
                 "onError", MapBuilder.of("registrationName", "onError"),
                 "onCancelNavigation", MapBuilder.of("registrationName", "onCancelNavigation"),
                 "onArrive", MapBuilder.of("registrationName", "onArrive"),
+                "onWaypointArrive", MapBuilder.of("registrationName", "onWaypointArrive"),
                 "onRouteProgressChange", MapBuilder.of("registrationName", "onRouteProgressChange"),
         )
     }

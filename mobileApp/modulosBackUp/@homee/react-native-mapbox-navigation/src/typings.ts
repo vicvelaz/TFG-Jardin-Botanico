@@ -10,6 +10,18 @@ type OnLocationChangeEvent = {
   };
 };
 
+type OnWaypointArriveEvent = {
+  nativeEvent?: {
+    remainingWaypoints: number;
+  };
+};
+
+type OnArriveEvent = {
+  nativeEvent?: {
+    onArrive: string;
+  };
+};
+
 type OnRouteProgressChangeEvent = {
   nativeEvent?: {
     distanceTraveled: number;
@@ -32,9 +44,10 @@ export interface IMapboxNavigationProps {
   shouldSimulateRoute?: boolean;
   onLocationChange?: (event: OnLocationChangeEvent) => void;
   onRouteProgressChange?: (event: OnRouteProgressChangeEvent) => void;
+  onWaypointArrive?: (event: OnWaypointArriveEvent) => void;
   onError?: (event: OnErrorEvent) => void;
   onCancelNavigation?: () => void;
-  onArrive?: () => void;
+  onArrive?: (event: OnArriveEvent) => void;
   showsEndOfRouteFeedback?: boolean;
   hideStatusView?: boolean;
 }

@@ -413,6 +413,11 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
         override fun onWaypointArrival(routeProgress: RouteProgress) {
             // do something when the user arrives at a waypoint
+            val event = Arguments.createMap()
+            event.putString("remainingWaypoints", routeProgress.remainingWaypoints.toString())
+            context
+                    .getJSModule(RCTEventEmitter::class.java)
+                    .receiveEvent(id, "onWaypointArrive", event)
         }
 
         override fun onNextRouteLegStart(routeLegProgress: RouteLegProgress) {
@@ -421,10 +426,10 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
         override fun onFinalDestinationArrival(routeProgress: RouteProgress) {
             val event = Arguments.createMap()
-            event.putString("onArrive", "")
+            event.putString("onArrive", "Has llegado a tu destino")
             context
                 .getJSModule(RCTEventEmitter::class.java)
-                .receiveEvent(id, "onRouteProgressChange", event)
+                .receiveEvent(id, "onArrive", event)
         }
     }
 
@@ -595,7 +600,7 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         setCameraPositionToOrigin()
         // load map style
         mapboxMap.loadStyleUri(
-            Style.MAPBOX_STREETS
+                "mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"
         )
 
         // initialize view interactions

@@ -26,7 +26,7 @@ interface Data {
 const Map = ({ route, navigation }: Props) => {
 
   //constantes del jardin con coordenadas fijas
-  const zoomMinimo: number = 18;
+  const zoomMinimo: number = 17;
   const centerLng: number = -3.690750;
   const centerLat: number = 40.411147;
   const perimetro = polygon([[
@@ -99,6 +99,8 @@ const Map = ({ route, navigation }: Props) => {
   const [selectedPlantDescription, setSelectedDescription] = React.useState<string>();
   const [selectedPlantImage, setSelectedPlantImage] = React.useState<string>();
   const [selectedPlantAudio, setSelectedPlantAudio] = React.useState<any>();
+  const [selectedPlantLong, setSelectedPlantLong] = React.useState<number>();
+  const [selectedPlantLat, setSelectedPlantLat] = React.useState<number>();
   const [swipeUpMinimized, setSwipeUpMinimized] = React.useState<boolean>(true);
   const [loadPlantImage, setLoadPlantImage] = React.useState<boolean>(false);
 
@@ -192,6 +194,8 @@ const Map = ({ route, navigation }: Props) => {
     setSelectedDescription(e.description);
     setSelectedPlantImage(e.image);
     setSelectedPlantAudio(e.audio);
+    setSelectedPlantLat(e.positionLat);
+    setSelectedPlantLong(e.positionLong);
   }
 
   //volver de la informacion de la planta en swipeup a informacion de ubicacion del usuario
@@ -258,8 +262,12 @@ const Map = ({ route, navigation }: Props) => {
                 )}
                 <Image source={{ uri: selectedPlantImage }} onLoadStart={() => setLoadPlantImage(true)} onLoadEnd={() => setLoadPlantImage(false)} style={{ width: 150, height: 150 }} />
                 <View>
-                  <TouchableOpacity style={buttonStyle.button}>
-                    <Text style={buttonStyle.buttonText}>Iniciar Ruta</Text>
+                  <TouchableOpacity style={buttonStyle.button} 
+                      onPress={() => navigation.navigate('ShowItemItinerary',
+                      { info: {position: {_long: selectedPlantLong, _lat: selectedPlantLat}, name: selectedPlantName}, 
+                        userposition: {long: userPositionLong, lat: userPositionLat}, 
+                        id:route.params?.id })}>
+                      <Text style={buttonStyle.buttonText}>Iniciar Ruta</Text>
                   </TouchableOpacity>
                   <AudioButton
                     audioURL={selectedPlantAudio}

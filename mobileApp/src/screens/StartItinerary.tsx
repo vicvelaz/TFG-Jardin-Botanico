@@ -23,7 +23,7 @@ export const StartItinerary = ({ route, navigation }: Props) => {
                     origin={[route.params?.userposition.long, route.params?.userposition.lat]}
                     destination={[route.params?.stops[route.params?.stops.length-1].position._long, route.params?.stops[route.params?.stops.length-1].position._lat]}
                     waypoints={route.params?.stops.filter(filterLast).map((s : any) => [s.position._long,s.position._lat])}
-                    shouldSimulateRoute={true}
+                    shouldSimulateRoute={true/*false*/}
                     onLocationChange={(event) => {
                         
                     }}
@@ -36,9 +36,13 @@ export const StartItinerary = ({ route, navigation }: Props) => {
                     onCancelNavigation={() => {
                         console.log("Ruta cancelada");
                     }}
-                    onArrive={() => {
-                        Alert.alert("Has llegado a tu destino","Enhorabuena, has llegado a "+route.params?.info.name,
-                        [{ text: "OK", onPress: () => true }]);
+                    onArrive={(event) => {
+                        console.log("Has completado el itinerario: "+ route.params?.info.name + ", ¡enhorabuena!");
+                        // Alert.alert("Has llegado a tu destino","Enhorabuena, has llegado a "+route.params?.info.name,
+                        // [{ text: "OK", onPress: () => true }]);
+                    }}
+                    onWaypointArrive={(event) => {
+                        console.log("Has llegado a un waypoint. Faltan: "+ event.nativeEvent?.remainingWaypoints);
                     }}
                 />
             </View>

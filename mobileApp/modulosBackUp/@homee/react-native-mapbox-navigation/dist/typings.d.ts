@@ -12,7 +12,7 @@ declare type OnWaypointArriveEvent = {
     nativeEvent?: {
       remainingWaypoints: number;
     };
-  };
+};
 declare type OnArriveEvent = {
     nativeEvent?: {
       onArrive: string;

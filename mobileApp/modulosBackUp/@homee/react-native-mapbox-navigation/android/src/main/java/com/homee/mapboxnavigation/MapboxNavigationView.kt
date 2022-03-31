@@ -6,10 +6,12 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.location.Location
 import android.location.LocationManager
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.Arguments
@@ -80,6 +82,9 @@ import com.mapbox.navigation.ui.voice.model.SpeechValue
 import com.mapbox.navigation.ui.voice.model.SpeechVolume
 import java.util.Locale
 import com.facebook.react.uimanager.events.RCTEventEmitter
+import com.mapbox.navigation.core.arrival.ArrivalController
+import com.mapbox.navigation.core.arrival.AutoArrivalController
+import com.mapbox.navigation.core.trip.session.LegIndexUpdatedCallback
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLineColorResources
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLineResources
 
@@ -95,6 +100,8 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
     private var waypoints: List<Point>? = null
     private var shouldSimulateRoute = false
     private var showsEndOfRouteFeedback = false
+    private var goToNextRouteLeg = false
+
     /**
      * Debug tool used to play, pause and seek route progress events that can be used to produce mocked location updates along the route.
      */
@@ -631,6 +638,21 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
         // start the trip session to being receiving location updates in free drive
         // and later when a route is set also receiving route progress updates
         mapboxNavigation.startTripSession()
+
+        //initialize next route leg button
+        val btn_NextLeg = findViewById<ImageButton>(R.id.triggerNextLeg)
+        btn_NextLeg.setOnClickListener {
+            mapboxNavigation.navigateNextRouteLeg(LegIndexUpdatedCallback {  })
+        }
+
+        val myArrivalController = object : ArrivalController {
+            override fun navigateNextRouteLeg(routeLegProgress: RouteLegProgress): Boolean {
+                return false
+            }
+        }
+
+        mapboxNavigation.setArrivalController(myArrivalController)
+
         startRoute()
     }
 
@@ -820,4 +842,13 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
     fun setMute(mute: Boolean) {
         this.isVoiceInstructionsMuted = mute
     }
+
+    fun getGoToNextRouteLeg(): Boolean {
+        return this.goToNextRouteLeg
+    }
+
+    fun setGoToNextRouteLeg(goToNextRoute: Boolean){
+        this.goToNextRouteLeg = goToNextRoute
+    }
+
 }

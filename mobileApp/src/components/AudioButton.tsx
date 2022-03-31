@@ -6,7 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 interface Props {
     audioURL: string,
-    navigation: StackNavigationProp<any, "PlantDetails">|StackNavigationProp<any, "MapScreen">,
+    navigation: StackNavigationProp<any, "PlantDetails">|StackNavigationProp<any, "MapScreen">|StackNavigationProp<any, "StartItinerary">,
     plantButton: boolean
 }
 

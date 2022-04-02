@@ -189,16 +189,12 @@ const Plants = () => {
                     type: "plant",
                     terrace: terrace,
                     position: new firebase.firestore.GeoPoint(lat, long),
-                    media: '',
-                    audio: ''
                 } : {
                     name: name,
                     description: description,
                     type: "place",
                     terrace: terrace,
-                    position: new firebase.firestore.GeoPoint(lat, long),
-                    media: '',
-                    audio: ''
+                    position: new firebase.firestore.GeoPoint(lat, long)
                 };
 
             setLoading(true);
@@ -219,7 +215,8 @@ const Plants = () => {
                 }
             }
 
-            if (audio !== null && audio !== "") {
+            if (audio !== "" && audio !== null ) {
+                console.log("hay audio nuevo")
                 const audioRef = storage.ref().child("/audio/plants").child(it.id);
                 await audioRef.put(audio);
                 const audioURL = await audioRef.getDownloadURL();

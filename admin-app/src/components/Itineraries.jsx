@@ -91,10 +91,9 @@ const Itineraries = () => {
     setID(itinerarioInfo.id);
     setName(itinerarioInfo.name);
     setDescription(itinerarioInfo.description);
-    // setPuntos(itinerarioInfo.paradas);
     document.getElementById("editsortableselect").click()
-    //puntos.push({value:itinerarioInfo.paradas.id,label:itinerarioInfo.paradas.id});
     setImage(itinerarioInfo.image);
+    console.log(itinerarioInfo.image);
   };
 
   const prepararParadas = (itinerarioInfo) => {

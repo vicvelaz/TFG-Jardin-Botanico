@@ -192,6 +192,7 @@ const Events = () => {
         setStartDate(eventoInfo.start_date);
         setEndDate(eventoInfo.end_date);
         setImage(eventoInfo.image);
+
     }
 
     const cancelarEdit = () => {

@@ -40,6 +40,7 @@ const Plants = () => {
     const [position, setPosition] = React.useState([]);
     const [images, setImages] = React.useState([]);
     const [audio, setAudio] = React.useState(null);
+    const [otherServices, setOtherServices] = React.useState(false);
 
 
 
@@ -72,8 +73,11 @@ const Plants = () => {
 
     const nuevoItem = async (e) => {
         e.preventDefault();
-
-        if (name === "" || description === "" || images === "") {
+        console.log(otherServices);
+        if(otherServices){
+            console.log("check true")
+        }
+        else if(name === "" || description === "" || images === "") {
             setError("El campo nombre o el campo descripción están vacíos")
             return
         }
@@ -98,7 +102,8 @@ const Plants = () => {
                     terrace: terrace,
                     position: new firebase.firestore.GeoPoint(lat, long),
                     media: '',
-                    audio: ''
+                    audio: '',
+                    otherServices: otherServices
                 };
 
             setLoading(true);
@@ -137,6 +142,7 @@ const Plants = () => {
             setAudio('');
             setLong(0);
             setLat(0);
+            setOtherServices(false);
             setMarcadorVisible(false)
 
             setError(null);
@@ -175,7 +181,10 @@ const Plants = () => {
     const modificarItem = async (e) => {
         e.preventDefault();
 
-        if (name === "" || description === "") {
+        if(otherServices){
+            console.log("check true")
+        }
+        else if (name === "" || description === "") {
             setError("El campo nombre o el campo descripción están vacíos")
             return
         }
@@ -189,16 +198,13 @@ const Plants = () => {
                     type: "plant",
                     terrace: terrace,
                     position: new firebase.firestore.GeoPoint(lat, long),
-                    media: '',
-                    audio: ''
                 } : {
                     name: name,
                     description: description,
                     type: "place",
                     terrace: terrace,
                     position: new firebase.firestore.GeoPoint(lat, long),
-                    media: '',
-                    audio: ''
+                    otherServices: otherServices,
                 };
 
             setLoading(true);
@@ -219,7 +225,8 @@ const Plants = () => {
                 }
             }
 
-            if (audio !== null && audio !== "") {
+            if (audio !== "" && audio !== null) {
+                console.log("hay audio nuevo")
                 const audioRef = storage.ref().child("/audio/plants").child(it.id);
                 await audioRef.put(audio);
                 const audioURL = await audioRef.getDownloadURL();
@@ -242,6 +249,7 @@ const Plants = () => {
             setLat(0);
             setMarcadorVisible(false)
             setBusqueda("");
+            setOtherServices(false);
             setError(null);
 
             document.getElementById("formularioitems").reset();
@@ -262,8 +270,10 @@ const Plants = () => {
         if (itemInfo.type === "plant") {
             document.getElementById("scientificname").value = itemInfo.scientific_name;
             document.getElementById("category").value = itemInfo.category;
-            setScientificName(itemInfo.scientific_name);
             setCategory(itemInfo.category);
+        }else{
+            console.log(itemInfo.otherServices);
+             setOtherServices(itemInfo.otherServices);
         }
 
         document.getElementById("tipo").value = itemInfo.type;
@@ -292,7 +302,8 @@ const Plants = () => {
         setImages(null);
         setError(null);
         setType("plant");
-        setMarcadorVisible(false)
+        setMarcadorVisible(false);
+        setOtherServices(false);
 
         document.getElementById("formularioitems").reset();
     }
@@ -463,19 +474,31 @@ const Plants = () => {
                                                 <option value="Terraza del Plano de la Flor">Terraza del Plano de la Flor</option>
                                                 <option value="Terraza de los Bonsáis">Terraza de los Bonsáis</option>
                                             </select>
+                                            <div className="form-check mt-3" hidden={type === "plant"}>
+                                                <input
+                                                    type={type === "plant" ? "hidden" : "checkbox"}
+                                                    onChange={e => setOtherServices(!otherServices)}
+                                                    id="otherservices"
+                                                    className="form-check-input"
+                                                    name={"Otros servicios"}
+                                                    checked={otherServices}
+                                                />
+                                                <label className='form-check-label' for="otherservices" >Otros servicios </label>
+                                            </div>
                                             <div className="form-floating mt-3">
-                                                <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="2000" onChange={e => setDescription(e.target.value)}></textarea>
+                                                <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="2000" onChange={e => setDescription(e.target.value)} disabled={type === "place" && otherServices}></textarea>
                                                 <label htmlFor="description">Descripción</label>
                                             </div>
 
                                             <div className="d-flex justify-content-center align-items-center mt-4">
                                                 <label htmlFor="formFile" className="form-label">Imágenes: </label>
-                                                <input className="form-control w-100 ms-2" type="file" accept="image/*,video/*" multiple id="formFile" onChange={e => setImages(e.target.files)}></input>
+                                                <input className="form-control w-100 ms-2" type="file" accept="image/*,video/*" multiple id="formFile" onChange={e => setImages(e.target.files)} disabled={type === "place" && otherServices}></input>
                                             </div>
                                             <div className="d-flex justify-content-center align-items-center mt-4">
                                                 <label htmlFor="formFileAudio" className="form-label">Audio: </label>
-                                                <input className="form-control w-100 ms-2" type="file" accept="audio/*" id="formFileAudio" onChange={e => setAudio(e.target.files[0])}></input>
+                                                <input className="form-control w-100 ms-2" type="file" accept="audio/*" id="formFileAudio" onChange={e => setAudio(e.target.files[0])} disabled={type === "place" && otherServices}></input>
                                             </div>
+
                                         </div>
                                         <div className="der ms-3 me-auto">
                                             <div className="d-flex justify-content-center align-items-center mt-4">

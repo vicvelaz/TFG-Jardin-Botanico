@@ -28,7 +28,7 @@ export const MainMenu = ({ navigation }: Props) => {
     const [image, setImage] = useState<JSX.Element[]>([]);
     const [visible, setVisible] = useState<boolean>(false);
     const [overlayInfo, setOverlayInfo] = useState<Data>({ title: '', description: '', date: '' })
-    const [staticText, setStaticText] = useState<string[]>(['EVENTOS, Plantas, Puntos de interés, Itinerarios, Mapa']);
+    const [staticText, setStaticText] = useState<string[]>(['EVENTOS, Plantas, Puntos de interés, Itinerarios, Mapa', 'Identificador de Plantas']);
 
     //   const onClose = () => setVisible(false);
 
@@ -73,10 +73,10 @@ export const MainMenu = ({ navigation }: Props) => {
 
     const getLanguage = async () => {
         if (RNLocalize.getLocales()[0].languageCode != 'es') {
-            const trad = await traducir(['EVENTOS', 'Plantas', 'Puntos de interés', 'Itinerarios', 'Mapa'])
+            const trad = await traducir(['EVENTOS', 'Plantas', 'Puntos de interés', 'Itinerarios', 'Mapa', 'Identificador de Plantas'])
             setStaticText(trad);
         } else {
-            setStaticText(['EVENTOS', 'Plantas', 'Puntos de interés', 'Itinerarios', 'Mapa'])
+            setStaticText(['EVENTOS', 'Plantas', 'Puntos de interés', 'Itinerarios', 'Mapa', 'Identificador de Plantas'])
         }
     }
 
@@ -148,6 +148,13 @@ export const MainMenu = ({ navigation }: Props) => {
                     >   
                         {/*Mapa*/} 
                         <Text style={styles.buttonText}>{staticText[4]}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => navigation.navigate('CameraScreen')}
+                    >   
+                        {/*Identificador de Plantas*/} 
+                        <Text style={styles.buttonText}>{staticText[5]}</Text>
                     </TouchableOpacity>
                 </View>
             </View>

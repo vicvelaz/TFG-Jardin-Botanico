@@ -9,6 +9,7 @@ import { ItineraryDetails } from '../screens/ItineraryDetails';
 import { ShowItemPosition } from '../screens/ShowItemPosition';
 import { ShowItemItinerary } from '../screens/ShowItemItinerary';
 import { StartItinerary } from '../screens/StartItinerary';
+import { CameraScreen } from '../screens/CameraScreen';
 
 export type RootStackParams = {
   MainMenu: undefined;
@@ -19,6 +20,7 @@ export type RootStackParams = {
   ShowItemPosition: undefined;
   ShowItemItinerary: undefined;
   StartItinerary : undefined;
+  CameraScreen: undefined;
 }
 
 
@@ -35,6 +37,7 @@ export const StackNavigator = () => {
       <Stack.Screen name="PlantDetails" component={PlantDetails}/>
       <Stack.Screen name="ItineraryDetails" component={ItineraryDetails}/>
       <Stack.Screen name="StartItinerary" component={StartItinerary}/>
+      <Stack.Screen name="CameraScreen" component={CameraScreen} options={{ title:"Identificador de Plantas" }}/>
     </Stack.Navigator>
   );
 }

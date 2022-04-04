@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity, Switch } from 'react-native';
 import MapboxGL, {Logger} from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
 import { booleanPointInPolygon, point, polygon } from '@turf/turf';
@@ -82,6 +82,8 @@ const Map = ({ route, navigation }: Props) => {
 
   //mapa y listas
   const [map, setMap] = React.useState<MapboxGL.MapView>();
+  const [styleURL, setStyleURL] = React.useState<string>("mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm");
+  const [isEnabled, setEnabled] = React.useState<boolean>(false);
   const [camera, setCamera] = React.useState<MapboxGL.Camera>();
   const [plants, setPlants] = React.useState<any>([]);
 
@@ -204,10 +206,15 @@ const Map = ({ route, navigation }: Props) => {
     camera?.flyTo([userPositionLong,userPositionLat]);
   }
 
+  const updateAccessibilitySwitch = (value: boolean) => {
+    setEnabled(previousState => !previousState);
+    value ? setStyleURL("mapbox://styles/ramxnchv/cl1kwik9i00c615qs8phvcjcp") : setStyleURL("mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm");
+  }
+
   return (
     <View style={mapStyle.page}>
       <View style={mapStyle.container}>
-        <MapboxGL.MapView ref={c => c !== null && setMap(c)} onPress={() => backToPosition()} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
+        <MapboxGL.MapView ref={c => c !== null && setMap(c)} onPress={() => backToPosition()} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={styleURL}>
           <MapboxGL.Camera ref={c => c !== null && setCamera(c)} zoomLevel={16.15} centerCoordinate={[centerLng, centerLat]} />
           <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()} />
           {showItemMarkers && plants.map((e: Data) => (
@@ -220,12 +227,25 @@ const Map = ({ route, navigation }: Props) => {
 	        itemMini={(show : SwipeUpDownProps) => 
             <View style={[textStyle.miniInfoView]}>
               <Text style={textStyle.baseText}>{actualPlace}</Text>
-              <Text style={textStyle.titulo}>UBICACIÓN ACTUAL </Text>
+              <Text style={textStyle.titulo}>UBICACIÓN ACTUAL</Text>
             </View>}
 	        itemFull={(hide : SwipeUpDownProps) =>
-            <View style={[textStyle.miniInfoView]}>
-              <Text style={textStyle.baseText}>{actualPlace}</Text>
-              <Text style={textStyle.titulo}>UBICACIÓN ACTUAL </Text>
+            <View style={textStyle.maxInfoView}>
+              <View style={textStyle.ubicacionInfo}>
+                <Text style={swipeUpMinimized ? textStyle.baseText : textStyle.baseTextMinimized}>{actualPlace}</Text>
+                <Text style={swipeUpMinimized ? textStyle.sci_name : textStyle.sci_name_minimized}>UBICACIÓN ACTUAL</Text>
+              </View>
+              <View style={textStyle.switchView}>
+                <Image source={require('../img/wheelchair.png')} style={textStyle.switchImg}></Image>
+                <Text style={textStyle.switchText}>Mostrar caminos accesibles</Text>
+                <Switch
+                  trackColor={{ false: "#9c9c9c", true: "#9c9c9c" }}
+                  thumbColor="#003d88"
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={(value: boolean) => updateAccessibilitySwitch(value)}
+                  value={isEnabled}
+                />
+              </View>
             </View>
           }
 	        onShowMini={() => setSwipeUpMinimized(true)}
@@ -421,6 +441,27 @@ const textStyle = StyleSheet.create({
     marginBottom: 20,
     marginTop: 20,
     textAlign: 'justify'
+  },
+  switchView: {
+    flex: 0.2,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  switchText: {
+    fontSize: 13,
+    marginStart: 10,
+    marginEnd: 10
+  },
+  switchImg: {
+    height: 25,
+    width: 25
+  },
+  ubicacionInfo: {
+    flex: 0.10,
+    alignItems: "center",
+    backgroundColor: "#419E08",
+    width: 400,
+    height: 100
   }
 });
 

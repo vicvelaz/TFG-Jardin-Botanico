@@ -31,8 +31,11 @@ const MultiSelectSort = (props) => {
   const [selected, setSelected] = React.useState([]);
 
   const onChange = selectedOptions => {
-    setSelected(selectedOptions);
-    props.actualizarPuntos(selectedOptions);
+    if(selectedOptions.length<=24){
+      setSelected(selectedOptions);
+      props.actualizarPuntos(selectedOptions);
+    }
+
   } 
 
   const onSortEnd = ({ oldIndex, newIndex }) => {

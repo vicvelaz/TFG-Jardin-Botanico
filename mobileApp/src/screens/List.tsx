@@ -36,12 +36,13 @@ export const List = ({ route, navigation }: Props) => {
 
     // const [search, setSearch] = useState<string>("");
     const [items, setItems] = useState<any>([]);
+    const [otherServices, setOtherServices] = useState<any>([])
 
 
     const updateSearch: any = (text: any) => {
 
 
-        if(text === undefined){return}
+        if (text === undefined) { return }
 
 
         if (text === "") {
@@ -80,13 +81,25 @@ export const List = ({ route, navigation }: Props) => {
 
     const getPlaces = async () => {
         try {
+
             const data = await db.collection('plants').where('type', '==', 'place').orderBy('name').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
             const arrayPlaces: Data[] = [];
-            arrayData.forEach((element: any) => {
+            const arrayOtherServices: Data[] = [];
+
+            const os = arrayData.filter((place: any) => place.otherServices !== undefined && place.otherServices);
+            const pl = arrayData.filter((place: any) => place.otherServices === undefined || !place.otherServices);
+
+            pl.forEach((element: any) => {
                 arrayPlaces.push({ id: element.id, name: element.name, image: element.media[0] });
             });
+            os.forEach((element: any) => {
+                arrayOtherServices.push({ id: element.id, name: element.name, image: element.media[0] });
+            });
+
             setItems(arrayPlaces);
+            setOtherServices(arrayOtherServices);
             setstate({
                 isLoading: false,
                 items: arrayPlaces,
@@ -145,9 +158,9 @@ export const List = ({ route, navigation }: Props) => {
                     accessibilityRole="search"
                     platform='android'
                     onChangeText={updateSearch}
-                    onKeyPress={(event) => updateSearch( undefined )}
+                    onKeyPress={(event) => updateSearch(undefined)}
                     onClear={() => setItems(state.items)}
-                    showLoading={state.isLoading} 
+                    showLoading={state.isLoading}
                 />
 
                 {/* <TextInput
@@ -158,6 +171,7 @@ export const List = ({ route, navigation }: Props) => {
                 onKeyPress={(event) => updateSearch( undefined )}
                 /> */}
 
+                <Text style={styles.title}>Puntos de Interés</Text>
                 <FlatList
                     style={styles.list}
                     data={items}
@@ -172,7 +186,21 @@ export const List = ({ route, navigation }: Props) => {
                     keyExtractor={({ id }: Data) => id.toString()}
                     numColumns={2}
                 />
-
+                <Text style={styles.title}>Otros Servicios</Text>
+                <FlatList
+                    style={styles.list}
+                    data={otherServices}
+                    renderItem={({ item }) => (
+                        <Item
+                            name={item.name}
+                            img={item.image}
+                            id={item.id}
+                            type={state.type}
+                            navigation={navigation} />
+                    )}
+                    keyExtractor={({ id }: Data) => id.toString()}
+                    numColumns={2}
+                />
             </ImageBackground>
         </SafeAreaView>
     );
@@ -190,5 +218,20 @@ const styles = StyleSheet.create({
     list: {
         marginHorizontal: 10,
         marginTop: 8,
+    },
+    title: {
+        backgroundColor: '#419E08',
+        justifyContent: 'center',
+        paddingVertical: 5,
+        borderRadius: 10,
+        borderColor: 'white',
+        borderWidth: 2,
+        marginTop: 20,
+        marginHorizontal: 20,
+
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'white',
+        textAlign: 'center'
     }
 });

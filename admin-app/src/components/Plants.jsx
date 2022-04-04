@@ -492,7 +492,7 @@ const Plants = () => {
 
                                             <div className="d-flex justify-content-center align-items-center mt-4">
                                                 <label htmlFor="formFile" className="form-label">Imágenes: </label>
-                                                <input className="form-control w-100 ms-2" type="file" accept="image/*,video/*" multiple id="formFile" onChange={e => setImages(e.target.files)} disabled={type === "place" && otherServices}></input>
+                                                <input className="form-control w-100 ms-2" type="file" accept="image/*,video/*" multiple id="formFile" onChange={e => setImages(e.target.files)}></input>
                                             </div>
                                             <div className="d-flex justify-content-center align-items-center mt-4">
                                                 <label htmlFor="formFileAudio" className="form-label">Audio: </label>

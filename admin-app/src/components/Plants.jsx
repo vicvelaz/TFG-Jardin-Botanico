@@ -14,7 +14,6 @@ const Plants = () => {
     //estados de control
     const [loading, setLoading] = React.useState(false);
     const [edit, setEdit] = React.useState(false);
-    const [error, setError] = React.useState(null);
     const [marcadorVisible, setMarcadorVisible] = React.useState(true);
     const [numPaginas, setNumPaginas] = React.useState(4);
     const [pagActual, setPagActual] = React.useState(1);
@@ -73,14 +72,6 @@ const Plants = () => {
 
     const nuevoItem = async (e) => {
         e.preventDefault();
-        console.log(otherServices);
-        if(otherServices){
-            console.log("check true")
-        }
-        else if(name === "" || description === "" || images === "") {
-            setError("El campo nombre o el campo descripción están vacíos")
-            return
-        }
 
         try {
 
@@ -145,7 +136,6 @@ const Plants = () => {
             setOtherServices(false);
             setMarcadorVisible(false)
 
-            setError(null);
 
             document.getElementById("formularioitems").reset();
             window.$('#nuevoitemmodal').modal('toggle');
@@ -181,13 +171,6 @@ const Plants = () => {
     const modificarItem = async (e) => {
         e.preventDefault();
 
-        if(otherServices){
-            console.log("check true")
-        }
-        else if (name === "" || description === "") {
-            setError("El campo nombre o el campo descripción están vacíos")
-            return
-        }
         try {
             const nuevoItem = type === "plant" ?
                 {
@@ -250,7 +233,6 @@ const Plants = () => {
             setMarcadorVisible(false)
             setBusqueda("");
             setOtherServices(false);
-            setError(null);
 
             document.getElementById("formularioitems").reset();
             window.$('#nuevoitemmodal').modal('toggle');
@@ -300,7 +282,6 @@ const Plants = () => {
         setName('');
         setDescription('');
         setImages(null);
-        setError(null);
         setType("plant");
         setMarcadorVisible(false);
         setOtherServices(false);
@@ -445,11 +426,6 @@ const Plants = () => {
                             </div>
                             <form id="formularioitems" onSubmit={e => edit ? modificarItem(e) : nuevoItem(e)}>
                                 <div className="modal-body">
-                                    {error && (
-                                        <div className="alert alert-danger">
-                                            {error}
-                                        </div>
-                                    )}
                                     <select id="tipo" className="form-select form-select-lg mb-3" aria-label=".form-select-lg example" onChange={e => setType(e.target.value)} defaultValue="plant">
                                         <option value="plant">Planta</option>
                                         <option value="place">Lugar</option>
@@ -457,15 +433,15 @@ const Plants = () => {
                                     <div className="d-flex flex-row">
                                         <div className="izq ms-auto me-3">
                                             <div className="form-floating mt-4">
-                                                <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value)}></input>
+                                                <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value.replace(/"/g,"'"))} required></input>
                                                 <label htmlFor="name">Nombre</label>
                                             </div>
                                             <div className="form-floating mt-3">
-                                                <input type={type === "place" ? "hidden" : "text"} className="form-control" id="scientificname" placeholder="Nombre Científico" name="scientificname" maxLength="50" onChange={e => setScientificName(e.target.value)} disabled={type === "place"}></input>
+                                                <input type={type === "place" ? "hidden" : "text"} className="form-control" id="scientificname" placeholder="Nombre Científico" name="scientificname" maxLength="50" onChange={e => setScientificName(e.target.value.replace(/"/g,"'"))} disabled={type === "place"}></input>
                                                 <label htmlFor="scientificname" hidden={type === "place"}>Nombre Científico</label>
                                             </div>
                                             <div className="form-floating mt-3">
-                                                <input type={type === "place" ? "hidden" : "text"} className="form-control" id="category" placeholder="Categoría" name="category" maxLength="50" onChange={e => setCategory(e.target.value)} disabled={type === "place"}></input>
+                                                <input type={type === "place" ? "hidden" : "text"} className="form-control" id="category" placeholder="Categoría" name="category" maxLength="50" onChange={e => setCategory(e.target.value.replace(/"/g,"'"))} disabled={type === "place"}></input>
                                                 <label htmlFor="category" hidden={type === "place"}>Categoría</label>
                                             </div>
                                             <select id="terrace" className="form-select mt-3" aria-label="Default select example" onChange={e => setTerrace(e.target.value)} defaultValue="Terraza de los Cuadros">
@@ -486,13 +462,13 @@ const Plants = () => {
                                                 <label className='form-check-label' for="otherservices" >Otros servicios </label>
                                             </div>
                                             <div className="form-floating mt-3">
-                                                <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="2000" onChange={e => setDescription(e.target.value)} disabled={type === "place" && otherServices}></textarea>
+                                                <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="2000" onChange={e => setDescription(e.target.value.replace(/"/g,"'"))} disabled={type === "place" && otherServices} required></textarea>
                                                 <label htmlFor="description">Descripción</label>
                                             </div>
 
                                             <div className="d-flex justify-content-center align-items-center mt-4">
                                                 <label htmlFor="formFile" className="form-label">Imágenes: </label>
-                                                <input className="form-control w-100 ms-2" type="file" accept="image/*,video/*" multiple id="formFile" onChange={e => setImages(e.target.files)}></input>
+                                                <input className="form-control w-100 ms-2" type="file" accept="image/*,video/*" multiple id="formFile" onChange={e => setImages(e.target.files)} required={!edit}></input>
                                             </div>
                                             <div className="d-flex justify-content-center align-items-center mt-4">
                                                 <label htmlFor="formFileAudio" className="form-label">Audio: </label>
@@ -518,11 +494,11 @@ const Plants = () => {
                                             </div>
                                             <div className="d-flex mt-3">
                                                 <div className="form-floating mt-3 ms-auto">
-                                                    <input type="text" className="form-control" id="lat" placeholder="Latitud" name="lat" maxLength="50" onChange={e => setName(e.target.value)}></input>
+                                                    <input type="text" className="form-control" id="lat" placeholder="Latitud" name="lat" maxLength="50" onChange={e => setName(e.target.value)} required></input>
                                                     <label htmlFor="lat">Latitud</label>
                                                 </div>
                                                 <div className="form-floating mt-3 ms-1 me-auto">
-                                                    <input type="text" className="form-control" id="long" placeholder="Longitud" name="long" maxLength="50" onChange={e => setName(e.target.value)}></input>
+                                                    <input type="text" className="form-control" id="long" placeholder="Longitud" name="long" maxLength="50" onChange={e => setName(e.target.value)} required></input>
                                                     <label htmlFor="long">Longitud</label>
                                                 </div>
                                             </div>

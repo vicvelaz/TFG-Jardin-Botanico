@@ -27,7 +27,6 @@ const Itineraries = () => {
   //estados de control
   const [loading, setLoading] = React.useState(false);
   const [edit, setEdit] = React.useState(false);
-  const [error, setError] = React.useState(null);
   const [numPaginas, setNumPaginas] = React.useState(1);
   const [pagActual, setPagActual] = React.useState(1);
   const [itemActual, setItemActual] = React.useState(0);
@@ -93,7 +92,6 @@ const Itineraries = () => {
     setDescription(itinerarioInfo.description);
     document.getElementById("editsortableselect").click()
     setImage(itinerarioInfo.image);
-    console.log(itinerarioInfo.image);
   };
 
   const prepararParadas = (itinerarioInfo) => {
@@ -117,7 +115,6 @@ const Itineraries = () => {
     setDescription("");
     setPuntos([]);
     setImage("");
-    setError(null);
     document.getElementById("resetsortableselect").click();
     document.getElementById("formularioitinerarios").reset();
 
@@ -125,10 +122,7 @@ const Itineraries = () => {
 
   const modificarItinerario = async (e) => {
     e.preventDefault();
-    if (name === "" || description === "") {
-      setError("Los campos están vacios");
-      return;
-    }
+    
     try {
       setLoading(true);
 
@@ -159,7 +153,6 @@ const Itineraries = () => {
       setDescription("");
       setPuntos([]);
       setImage("");
-      setError(null);
 
       document.getElementById("formularioitinerarios").reset();
       document.getElementById("resetsortableselect").click();
@@ -175,10 +168,7 @@ const Itineraries = () => {
 
   const nuevoItinerario = async (e) => {
     e.preventDefault();
-    if (name === "" || description === ""||image==="") {
-      setError("Los campos están vacios");
-      return;
-    }
+   
     try {
       let paradas = [];
       puntos.forEach((element) => {
@@ -212,7 +202,6 @@ const Itineraries = () => {
       setDescription("");
       setPuntos([]);
       setImage("");
-      setError(null);
 
       document.getElementById("formularioitinerarios").reset();
       document.getElementById("resetsortableselect").click();
@@ -307,7 +296,6 @@ const irAPagina = (pag) => {
                   }
                 >
                   <div className="modal-body">
-                    {error && <div className="alert alert-danger">{error}</div>}
                     <div className="form-floating mt-3">
                       <input
                         type="text"
@@ -316,7 +304,8 @@ const irAPagina = (pag) => {
                         placeholder="Nombre"
                         name="name"
                         maxLength="50"
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => setName(e.target.value.replace(/"/g,"'"))}
+                        required
                       ></input>
                       <label htmlFor="name">Nombre</label>
                     </div>
@@ -326,7 +315,8 @@ const irAPagina = (pag) => {
                         id="description"
                         name="description"
                         placeholder="Descripción"
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(e) => setDescription(e.target.value.replace(/"/g,"'"))}
+                        required
                       ></textarea>
                       <label htmlFor="description">Descripción</label>
                     </div>
@@ -349,6 +339,7 @@ const irAPagina = (pag) => {
                       type="file"
                       accept="image/*"
                       id="formFile"
+                      required={!edit}
                     ></input>
                   </div>
                   <div className="modal-footer">

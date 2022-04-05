@@ -58,10 +58,6 @@ const Events = () => {
     const nuevoEvento = async(e) => {
         e.preventDefault();
 
-        if(name===""||startDate===""||endDate===""||image===""||startDate===""||endDate===""){
-            setError("Los campos están vacios")
-            return
-        }
         if(new Date(startDate) > new Date(endDate)){
             setError("La fecha de inicio no puede ser posterior a la de fin")
             return
@@ -123,13 +119,15 @@ const Events = () => {
 
     const modificarEvento = async(e) => {
         e.preventDefault();
-        if(name===""||startDate===""||endDate===""){
-            setError("Los campos están vacios");
-            return
-        }
+        
         try {
             const fecha_ini = editFechaIni ? new Date (startDate) : new Date (startDate.seconds*1000);
             const fecha_fin = editFechaFin ? new Date (endDate) : new Date (endDate.seconds*1000);
+
+            if(new Date(fecha_ini) > new Date(fecha_fin)){
+                setError("La fecha de inicio no puede ser posterior a la de fin")
+                return
+            }
 
             setLoading(true);
 
@@ -278,26 +276,26 @@ const Events = () => {
                                             </div>
                                         )}
                                         <div className="form-floating mt-3">
-                                            <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value)}></input>
+                                            <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value.replace(/"/g,"'"))} required></input>
                                             <label htmlFor="name">Nombre</label>
                                         </div>
                                         <div className="form-floating mt-3">
-                                            <textarea className="form-control texto" id="description" name="description" placeholder="Descripción"  onChange={e => setDescription(e.target.value)}></textarea>
+                                            <textarea className="form-control texto" id="description" name="description" placeholder="Descripción"  onChange={e => setDescription(e.target.value.replace(/"/g,"'"))} required></textarea>
                                             <label htmlFor="description">Descripción</label>
                                         </div>
                                         <div className="d-flex mt-4">
                                             <div className="">
                                                 <label className="ms-5 me-2" htmlFor="startevent">Inicio evento: </label>
-                                                <input type="date" id="startevent" name="startevent" onChange={e => modificarFechaIni(e)}></input>
+                                                <input type="date" id="startevent" name="startevent" onChange={e => modificarFechaIni(e)} required></input>
                                             </div>
                                             <div className="ms-auto me-5">
                                                 <label className="me-2" htmlFor="endevent">Fin evento: </label>
-                                                <input type="date" id="endevent" name="endevent" onChange={e => modificarFechaFin(e)}></input>
+                                                <input type="date" id="endevent" name="endevent" onChange={e => modificarFechaFin(e)} required></input>
                                             </div>
                                         </div>
                                         <div className="d-flex justify-content-center align-items-center mt-4">
                                             <label htmlFor="formFile" className="form-label">Imagen: </label>
-                                            <input className="form-control w-50 ms-2" type="file" accept="image/*" id="formFile" onChange={e => setImage(e.target.files[0])}></input>
+                                            <input className="form-control w-50 ms-2" type="file" accept="image/*" id="formFile" onChange={e => setImage(e.target.files[0])} required={!edit}></input>
                                         </div>
                                     </div>
                                     <div className="modal-footer">

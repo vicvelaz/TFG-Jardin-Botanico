@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity, Switch } from 'react-native';
+import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity, Switch, Dimensions } from 'react-native';
 import MapboxGL, { Logger } from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
 import { booleanPointInPolygon, Feature, point, Polygon, polygon, Properties } from '@turf/turf';
@@ -22,6 +22,9 @@ interface Data {
   audio?: any,
   image: string
 }
+
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 const Map = ({ route, navigation }: Props) => {
 
@@ -339,8 +342,8 @@ const mapStyle = StyleSheet.create({
     fontFamily: 'Noto Sans'
   },
   container: {
-    height: 800,
-    width: 400,
+    height: windowHeight,
+    width: windowWidth,
     backgroundColor: 'tomato'
   },
   map: {
@@ -464,8 +467,8 @@ const textStyle = StyleSheet.create({
     alignItems: 'center'
   },
   switchText: {
-    fontSize: 13,
-    marginStart: 10,
+    fontSize: 16,
+    marginStart: 15,
     marginEnd: 10
   },
   switchImg: {

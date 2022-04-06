@@ -37,7 +37,7 @@ export const List = ({ route, navigation }: Props) => {
     // const [search, setSearch] = useState<string>("");
     const [items, setItems] = useState<any>([]);
     const [otherServices, setOtherServices] = useState<any>([])
-
+    const [isPlaces, setIsPlaces] = useState<boolean>(false)
 
     const updateSearch: any = (text: any) => {
 
@@ -100,6 +100,7 @@ export const List = ({ route, navigation }: Props) => {
 
             setItems(arrayPlaces);
             setOtherServices(arrayOtherServices);
+            setIsPlaces(true)
             setstate({
                 isLoading: false,
                 items: arrayPlaces,
@@ -171,7 +172,7 @@ export const List = ({ route, navigation }: Props) => {
                 onKeyPress={(event) => updateSearch( undefined )}
                 /> */}
 
-                {state.type === "places" && <Text style={styles.title}>Puntos de Interés</Text>}
+                {isPlaces && <Text style={styles.title}>Puntos de Interés</Text>}
                 <FlatList
                     style={styles.list}
                     data={items}
@@ -186,8 +187,8 @@ export const List = ({ route, navigation }: Props) => {
                     keyExtractor={({ id }: Data) => id.toString()}
                     numColumns={2}
                 />
-                {state.type === "places" && <Text style={styles.title}>Otros Servicios</Text>}
-                {state.type === "places" && <FlatList
+                {isPlaces && <Text style={styles.title}>Otros Servicios</Text>}
+                {isPlaces && <FlatList
                     style={styles.list}
                     data={otherServices}
                     renderItem={({ item }) => (

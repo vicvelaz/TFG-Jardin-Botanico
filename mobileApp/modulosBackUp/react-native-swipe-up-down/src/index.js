@@ -106,7 +106,10 @@ const SwipeUpDown = forwardRef(
 
     const panResponder = React.useRef(
       PanResponder.create({
-        onMoveShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: (event, gestureState) => {
+          console.log(gestureState.dx + "," + gestureState.dy);
+          return !(Math.abs(gestureState.dx) < 5 && Math.abs(gestureState.dy) < 5);
+        },
         onPanResponderMove,
         onPanResponderRelease,
       })

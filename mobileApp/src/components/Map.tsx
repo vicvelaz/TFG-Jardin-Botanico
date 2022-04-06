@@ -1,13 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity, Switch, Dimensions } from 'react-native';
+import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity, Switch, Dimensions, Pressable, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import MapboxGL, { Logger } from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
-import { booleanPointInPolygon, Feature, point, Polygon, polygon, Properties } from '@turf/turf';
+import { booleanClockwise, booleanPointInPolygon, Feature, point, Polygon, polygon, Properties } from '@turf/turf';
 import { db } from '../firebase/firebase-config';
 import SwipeUpDown, { SwipeUpDownProps } from 'react-native-swipe-up-down';
 import { AudioButton } from '../components/AudioButton';
 import { StackScreenProps } from '@react-navigation/stack';
-import { ScrollView } from 'react-native-gesture-handler';
 
 MapboxGL.setAccessToken('pk.eyJ1IjoicmFteG5jaHYiLCJhIjoiY2t6c2IybzZrNXB2aDMwbzFnbmFsOXptNSJ9.CQqoytOo3yM-pGaCRIGgjw');
 interface Props extends StackScreenProps<any, 'MapScreen'> { };
@@ -207,7 +206,7 @@ const Map = ({ route, navigation }: Props) => {
           <View>
             <Image
               source={require("../img/red_marker.png")}
-              style={{ width: 30, height: 47 }}
+              style={{ width: 33, height: 53 }}
               onLoad={() => markers && markers[i].refresh()}
             />
           </View>
@@ -225,7 +224,7 @@ const Map = ({ route, navigation }: Props) => {
           <View>
             <Image
               source={require("../img/red_marker.png")}
-              style={{ width: 30, height: 45 }}
+              style={{ width: 33, height: 54 }}
               onLoad={() => markers && markers[i].refresh()}
             />
           </View>
@@ -289,7 +288,7 @@ const Map = ({ route, navigation }: Props) => {
                 <Text style={swipeUpMinimized ? textStyle.sci_name : textStyle.sci_name_minimized}>{selectedPlantScientificName}</Text>
               </View>
               <View style={textStyle.descripcion}>
-                <ScrollView >
+                <ScrollView style={textStyle.scrollView}>
                   <Text style={textStyle.infoText}>{selectedPlantDescription}</Text>
                 </ScrollView>
               </View>
@@ -299,23 +298,23 @@ const Map = ({ route, navigation }: Props) => {
                 )}
                 <Image source={{ uri: selectedPlantImage }} onLoadStart={() => setLoadPlantImage(true)} onLoadEnd={() => setLoadPlantImage(false)} style={{ width: 150, height: 150 }} />
                 <View>
-                  <TouchableOpacity style={buttonStyle.button}
-                    onPress={() => navigation.navigate('ShowItemItinerary',
+                  <Pressable style={buttonStyle.button}
+                    onPressOut={() => navigation.navigate('ShowItemItinerary',
                       {
                         info: { position: { _long: selectedPlantLong, _lat: selectedPlantLat }, name: selectedPlantName },
                         userposition: { long: userPositionLong, lat: userPositionLat },
                         id: route.params?.id
                       })}>
                     <Text style={buttonStyle.buttonText}>Iniciar Ruta</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                   <AudioButton
                     audioURL={selectedPlantAudio}
                     navigation={navigation}
                     plantButton={false}
                   />
-                  <TouchableOpacity style={buttonStyle.buttonMin}>
-                    <Text style={buttonStyle.buttonTextMin} onPress={() => backToPosition()}>Volver a ver Ubicación</Text>
-                  </TouchableOpacity>
+                  <Pressable style={buttonStyle.buttonMin} onPressOut={() => backToPosition()}>
+                    <Text style={buttonStyle.buttonTextMin}>Volver a ver Ubicación</Text>
+                  </Pressable>
                 </View>
               </View>
             </View>}
@@ -396,7 +395,7 @@ const textStyle = StyleSheet.create({
   baseText: {
     color: "black",
     fontSize: 20,
-    marginTop: 10
+    marginTop: 7
   },
   baseTextMinimized: {
     color: "white",
@@ -404,11 +403,14 @@ const textStyle = StyleSheet.create({
     marginTop: 10
   },
   titulo: {
-    fontSize: 15
+    color: "gray",
+    fontSize: 15,
+    marginBottom: 10
   },
   sci_name: {
     fontStyle: 'italic',
-    fontSize: 13,
+    color: "gray",
+    fontSize: 14,
     marginBottom: 10
   },
   sci_name_minimized: {
@@ -421,7 +423,8 @@ const textStyle = StyleSheet.create({
     color: "black",
     fontSize: 12,
     marginTop: 10,
-    padding: 20
+    padding: 20,
+    height: 300
   },
   viewTextStyle: {
     flex: 1,
@@ -467,6 +470,7 @@ const textStyle = StyleSheet.create({
     alignItems: 'center'
   },
   switchText: {
+    color: "gray",
     fontSize: 16,
     marginStart: 15,
     marginEnd: 10
@@ -481,6 +485,9 @@ const textStyle = StyleSheet.create({
     backgroundColor: "#419E08",
     width: 400,
     height: 100
+  },
+  scrollView : {
+    height: 40
   }
 });
 

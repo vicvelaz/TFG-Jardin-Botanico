@@ -171,7 +171,7 @@ export const List = ({ route, navigation }: Props) => {
                 onKeyPress={(event) => updateSearch( undefined )}
                 /> */}
 
-                <Text style={styles.title}>Puntos de Interés</Text>
+                {state.type === "places" && <Text style={styles.title}>Puntos de Interés</Text>}
                 <FlatList
                     style={styles.list}
                     data={items}
@@ -186,8 +186,8 @@ export const List = ({ route, navigation }: Props) => {
                     keyExtractor={({ id }: Data) => id.toString()}
                     numColumns={2}
                 />
-                <Text style={styles.title}>Otros Servicios</Text>
-                <FlatList
+                {state.type === "places" && <Text style={styles.title}>Otros Servicios</Text>}
+                {state.type === "places" && <FlatList
                     style={styles.list}
                     data={otherServices}
                     renderItem={({ item }) => (
@@ -200,7 +200,7 @@ export const List = ({ route, navigation }: Props) => {
                     )}
                     keyExtractor={({ id }: Data) => id.toString()}
                     numColumns={2}
-                />
+                />}
             </ImageBackground>
         </SafeAreaView>
     );

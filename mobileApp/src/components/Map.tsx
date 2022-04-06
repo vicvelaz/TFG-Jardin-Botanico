@@ -1,8 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity, Switch } from 'react-native';
-import MapboxGL, {Logger} from '@react-native-mapbox-gl/maps';
+import MapboxGL, { Logger } from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
-import { booleanPointInPolygon, point, polygon } from '@turf/turf';
+import { booleanPointInPolygon, Feature, point, Polygon, polygon, Properties } from '@turf/turf';
 import { db } from '../firebase/firebase-config';
 import SwipeUpDown, { SwipeUpDownProps } from 'react-native-swipe-up-down';
 import { AudioButton } from '../components/AudioButton';
@@ -29,54 +29,10 @@ const Map = ({ route, navigation }: Props) => {
   const zoomMinimo: number = 17;
   const centerLng: number = -3.690750;
   const centerLat: number = 40.411147;
-  const perimetro = polygon([[
-    [-3.6925971508026127, 40.41231565042066],
-    [-3.6919802427291875, 40.40973422067125],
-    [-3.6890941858291626, 40.40976689761599],
-    [-3.68891716003418, 40.409893520626945],
-    [-3.6890029907226562, 40.41200114608072],
-    [-3.6904352903366084, 40.41233607272957],
-    [-3.6904406547546387, 40.41256888661311],
-    [-3.690462112426758, 40.41262198440359],
-    [-3.691293597221374, 40.41258930884518],
-    [-3.691293597221374, 40.41247085981296],
-    [-3.6925971508026127, 40.41231565042066]
-  ]]);
-  const terrazaCuadros = polygon([[
-    [-3.6924737691879277, 40.412262552388476],
-    [-3.6918890476226807, 40.40973830529021],
-    [-3.690934181213379, 40.40981591300332],
-    [-3.6915135383605957, 40.412393255161554],
-    [-3.6924737691879277, 40.412262552388476]
-  ]]);
-  const terrazaEscuelas = polygon([[
-    [-3.6908376216888428, 40.409852674520415],
-    [-3.6904406547546387, 40.40996704355622],
-    [-3.690054416656494, 40.41021211940711],
-    [-3.690510392189026, 40.412180863026386],
-    [-3.6913901567459106, 40.41241367744691],
-    [-3.6908376216888428, 40.409852674520415]
-  ]]);
-  const planoFlor = polygon([[
-    [-3.690043687820434, 40.41020395022645],
-    [-3.6894160509109497, 40.410571562373974],
-    [-3.6897593736648564, 40.4120256529652],
-    [-3.690505027770996, 40.41218494749685],
-    [-3.690043687820434, 40.41020395022645]
-  ]]);
 
-  const terrazaBonsais = polygon([[
-    [-3.689311444759369, 40.41193375210237],
-    [-3.6890673637390137, 40.41086973519647],
-    [-3.688962757587433, 40.41084727016682],
-    [-3.689040541648865, 40.411966427979095],
-    [-3.6892604827880855, 40.411988892635144],
-    [-3.689311444759369, 40.41193375210237]
-  ]]);
-
-  //terrazas
-  const terracelist = [terrazaCuadros, terrazaEscuelas, planoFlor, terrazaBonsais];
-  const terraces = ["Terraza de los Cuadros", "Terraza de las Escuelas", "Plano de la Flor", "Terraza de los Bonsáis"];
+  const [perimetro, setPerimetro] = React.useState<any>();
+  const [terraces, setTerraces] = React.useState<any>([]);
+  const [zones, setZones] = React.useState<any>([]);
 
   const swipeUpDownRef = React.useRef();
 
@@ -85,13 +41,14 @@ const Map = ({ route, navigation }: Props) => {
   const [styleURL, setStyleURL] = React.useState<string>("mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm");
   const [isEnabled, setEnabled] = React.useState<boolean>(false);
   const [camera, setCamera] = React.useState<MapboxGL.Camera>();
+  const [markers, setMarkers] = React.useState<MapboxGL.PointAnnotation[]>();
   const [plants, setPlants] = React.useState<any>([]);
 
   //estados del mapa y del user
   const [userPositionLat, setUserPositionLat] = React.useState<number>(40.412386);
   const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.691977);
   const [alertShown, setAlertShown] = React.useState<boolean>();
-  const [actualPlace, setActualPlace] = React.useState<string>();
+  const [actualPlace, setActualPlace] = React.useState<string>("Cargando..");
   const [showItemMarkers, setShowItemMarkers] = React.useState<boolean>(false);
   const [showPosition, setShowPosition] = React.useState<boolean>(true);
 
@@ -111,14 +68,34 @@ const Map = ({ route, navigation }: Props) => {
     requestPermissions();
     checkUserPosition();
     obtenerPlantas();
+    obtenerZonas();
     disableLogger();
   }, []);
+
+  //consulta de zonas a firebase
+  const obtenerZonas = async () => {
+
+    const data = await db.collection('zones').get();
+    const arrayData: any[] = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+    const arrayPolygon = arrayData.map((e: any) =>
+    ({ id: e.id, name: e.name, type: e.type, coordinates: polygon([e.coordinates.map((c: any) => ([c.longitude, c.latitude]))]) }
+    ));
+
+    const arrayZones = arrayPolygon.filter((e: any) => e.type === "zone");
+    const arrayTerraces = arrayPolygon.filter((e: any) => e.type === "terrace");
+    const arrayPerimetro = arrayPolygon.filter((e: any) => e.type === "perimeter");
+
+    setZones(arrayZones);
+    setTerraces(arrayTerraces);
+    setPerimetro(arrayPerimetro[0]);
+  }
 
   //metodo para deshabilitar el logger del mapa con warnings de la API de mapbox
   const disableLogger = () => {
     Logger.setLogCallback(log => {
       const { message } = log;
-    
+
       // expected warnings - see https://github.com/mapbox/mapbox-gl-native/issues/15341#issuecomment-522889062
       if (
         message.match('Request failed due to a permanent error: Canceled') ||
@@ -157,14 +134,22 @@ const Map = ({ route, navigation }: Props) => {
         setUserPositionLat(position.coords.latitude);
         setUserPositionLong(position.coords.longitude);
         const userCoords = point([position.coords.longitude, position.coords.latitude]);
-        if (!booleanPointInPolygon(userCoords, perimetro) && !alertShown) {
+
+        if (perimetro !== undefined && !booleanPointInPolygon(userCoords, perimetro.coordinates)) {
           setActualPlace("Fuera del Jardín");
-          Alert.alert("Estás fuera del Jardín Botánico", "Por favor, camina hacia el jardín para poder utilizar el mapa",
-            [{ text: "OK", onPress: () => setAlertShown(false) }]);
-          setAlertShown(true);
+          
         } else {
-          const i = terracelist.findIndex(t => booleanPointInPolygon(userCoords, t));
-          setActualPlace(terraces[i]);
+          if (zones !== undefined && zones.length !== 0 && terraces !== undefined && terraces.length !== 0) {
+            const i = zones.findIndex((t: any) => booleanPointInPolygon(userCoords, t.coordinates));
+            if (i === -1) {
+              const l = terraces.findIndex((t: any) => booleanPointInPolygon(userCoords, t.coordinates));
+              if (l !== -1) {
+                setActualPlace(terraces[l].name);
+              }
+            } else {
+              setActualPlace(zones[i].name);
+            }
+          }
         }
       },
       (error) => {
@@ -203,33 +188,62 @@ const Map = ({ route, navigation }: Props) => {
   //volver de la informacion de la planta en swipeup a informacion de ubicacion del usuario
   const backToPosition = () => {
     setShowPosition(true);
-    camera?.flyTo([userPositionLong,userPositionLat]);
+    camera?.flyTo([userPositionLong, userPositionLat]);
   }
 
-  const updateAccessibilitySwitch = (value: boolean) => {
+  const updateAccessibilitySwitch = async (value: boolean) => {
     setEnabled(previousState => !previousState);
-    value ? setStyleURL("mapbox://styles/ramxnchv/cl1kwik9i00c615qs8phvcjcp") : setStyleURL("mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm");
+  }
+
+  const loadMap = () => {
+    return <MapboxGL.MapView ref={c => c !== null && setMap(c)} onPress={() => backToPosition()} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
+      <MapboxGL.Camera ref={c => c !== null && setCamera(c)} zoomLevel={16.15} centerCoordinate={[centerLng, centerLat]} />
+      <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()} />
+      {plants.map((e: Data, i: number) => (
+        <MapboxGL.PointAnnotation ref={c => c !== null && markers?.push(c)} key={e.id} id={e.id} onSelected={() => showPlantInfo(e)} anchor={{ x: 0.5, y: 0.5 }} title={e.name} coordinate={[e.positionLong, e.positionLat]}>
+          <View>
+            <Image
+              source={require("../img/red_marker.png")}
+              style={{ width: 30, height: 47 }}
+              onLoad={() => markers && markers[i].refresh()}
+            />
+          </View>
+        </MapboxGL.PointAnnotation>
+      ))}
+    </MapboxGL.MapView>
+  }
+
+  const loadAccesibleMap = () => {
+    return <MapboxGL.MapView ref={c => c !== null && setMap(c)} onPress={() => backToPosition()} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl1kwik9i00c615qs8phvcjcp"}>
+      <MapboxGL.Camera ref={c => c !== null && setCamera(c)} zoomLevel={16.15} centerCoordinate={[centerLng, centerLat]} />
+      <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()} />
+      {plants.map((e: Data, i: number) => (
+        <MapboxGL.PointAnnotation ref={c => c !== null && markers?.push(c)} key={e.id} id={e.id} onSelected={() => showPlantInfo(e)} anchor={{ x: 0.5, y: 0.5 }} coordinate={[e.positionLong, e.positionLat]}>
+          <View>
+            <Image
+              source={require("../img/red_marker.png")}
+              style={{ width: 30, height: 45 }}
+              onLoad={() => markers && markers[i].refresh()}
+            />
+          </View>
+        </MapboxGL.PointAnnotation>
+      ))}
+    </MapboxGL.MapView>
   }
 
   return (
     <View style={mapStyle.page}>
       <View style={mapStyle.container}>
-        <MapboxGL.MapView ref={c => c !== null && setMap(c)} onPress={() => backToPosition()} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={styleURL}>
-          <MapboxGL.Camera ref={c => c !== null && setCamera(c)} zoomLevel={16.15} centerCoordinate={[centerLng, centerLat]} />
-          <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()} />
-          {showItemMarkers && plants.map((e: Data) => (
-            <MapboxGL.PointAnnotation key={e.id} id={e.id} onSelected={() => showPlantInfo(e)} anchor={{ x: 0.5, y: 0.5 }} coordinate={[e.positionLong, e.positionLat]}></MapboxGL.PointAnnotation>
-          ))}
-        </MapboxGL.MapView>
+        {isEnabled ? loadAccesibleMap() : loadMap()}
       </View>
       {showPosition ?
         (<SwipeUpDown
-	        itemMini={(show : SwipeUpDownProps) => 
+          itemMini={(show: SwipeUpDownProps) =>
             <View style={[textStyle.miniInfoView]}>
               <Text style={textStyle.baseText}>{actualPlace}</Text>
               <Text style={textStyle.titulo}>UBICACIÓN ACTUAL</Text>
             </View>}
-	        itemFull={(hide : SwipeUpDownProps) =>
+          itemFull={(hide: SwipeUpDownProps) =>
             <View style={textStyle.maxInfoView}>
               <View style={textStyle.ubicacionInfo}>
                 <Text style={swipeUpMinimized ? textStyle.baseText : textStyle.baseTextMinimized}>{actualPlace}</Text>
@@ -248,13 +262,13 @@ const Map = ({ route, navigation }: Props) => {
               </View>
             </View>
           }
-	        onShowMini={() => setSwipeUpMinimized(true)}
-	        onShowFull={() => setSwipeUpMinimized(false)}
-	        animation="spring"
-	        disableSwipeIcon={false}
-	        extraMarginTop={200}
+          onShowMini={() => setSwipeUpMinimized(true)}
+          onShowFull={() => setSwipeUpMinimized(false)}
+          animation="spring"
+          disableSwipeIcon={false}
+          extraMarginTop={200}
           swipeHeight={40}
-	        style={swipeUpMinimized ? {backgroundColor: '#419E08', height: 80}:{backgroundColor: '#fff', height: 80}} // style for swipe
+          style={swipeUpMinimized ? { backgroundColor: '#419E08', height: 80 } : { backgroundColor: '#fff', height: 80 }} // style for swipe
           iconColor={"black"}
           iconSize={30}
         />)
@@ -282,12 +296,14 @@ const Map = ({ route, navigation }: Props) => {
                 )}
                 <Image source={{ uri: selectedPlantImage }} onLoadStart={() => setLoadPlantImage(true)} onLoadEnd={() => setLoadPlantImage(false)} style={{ width: 150, height: 150 }} />
                 <View>
-                  <TouchableOpacity style={buttonStyle.button} 
-                      onPress={() => navigation.navigate('ShowItemItinerary',
-                      { info: {position: {_long: selectedPlantLong, _lat: selectedPlantLat}, name: selectedPlantName}, 
-                        userposition: {long: userPositionLong, lat: userPositionLat}, 
-                        id:route.params?.id })}>
-                      <Text style={buttonStyle.buttonText}>Iniciar Ruta</Text>
+                  <TouchableOpacity style={buttonStyle.button}
+                    onPress={() => navigation.navigate('ShowItemItinerary',
+                      {
+                        info: { position: { _long: selectedPlantLong, _lat: selectedPlantLat }, name: selectedPlantName },
+                        userposition: { long: userPositionLong, lat: userPositionLat },
+                        id: route.params?.id
+                      })}>
+                    <Text style={buttonStyle.buttonText}>Iniciar Ruta</Text>
                   </TouchableOpacity>
                   <AudioButton
                     audioURL={selectedPlantAudio}
@@ -463,6 +479,20 @@ const textStyle = StyleSheet.create({
     width: 400,
     height: 100
   }
+});
+
+const annotationStyles = StyleSheet.create({
+  annotationContainer: {
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 30 / 2,
+    borderWidth: StyleSheet.hairlineWidth,
+    height: 30,
+    justifyContent: 'center',
+    overflow: 'hidden',
+    width: 30,
+  },
 });
 
 export default Map

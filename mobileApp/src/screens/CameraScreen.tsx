@@ -69,19 +69,30 @@ export const CameraScreen = ({ route, navigation }: Props) => {
                 const d = res.data;
                 const arrayImages: JSX.Element[] = [];
                 if (d.is_plant) {
-
-                    navigation.setOptions({ title: "Identificador de Plantas: " + d.suggestions[0].plant_details.common_names[0] });
-                    setScientificName(d.suggestions[0].plant_name);
-                    setDescription(d.suggestions[0].plant_details.wiki_description.value)
-
-                    d.suggestions[0].similar_images.forEach((element: any) => {
-                        arrayImages.push(
-                            <View >
-                                <Image style={styles.image} source={{ uri: element.url }} />
-                            </View>
-                        )
-                    });
-
+                    if(d.suggestions !== null && d.suggestions !== undefined){
+                        if(d.suggestions[0].plant_details.common_names !== null && d.suggestions[0].plant_details.common_names !== undefined){
+                            navigation.setOptions({ title: "Identificador de Plantas: " + d.suggestions[0].plant_details.common_names[0] });
+                        }
+                        if(d.suggestions[0].plant_name !== null && d.suggestions[0].plant_name !== undefined){
+                            setScientificName(d.suggestions[0].plant_name);
+                        }
+                        if(d.suggestions[0].plant_details.wiki_description !== null && d.suggestions[0].plant_details.wiki_description !== undefined){
+                            console.log(d.suggestions[0].plant_details.wiki_description)
+                            console.log(d.suggestions[0].plant_details.wiki_description.value)
+                            setDescription(d.suggestions[0].plant_details.wiki_description.value)
+                        }else{
+                            setDescription("No hay descripción de la planta")
+                        }
+                        if(d.suggestions[0].similar_images !== null && d.suggestions[0].similar_images !== undefined){
+                            d.suggestions[0].similar_images.forEach((element: any) => {
+                                arrayImages.push(
+                                   <View >
+                                       <Image style={styles.image} source={{ uri: element.url }} />
+                                   </View>
+                               )
+                               });
+                        }
+                    }
                 } else {
 
                     arrayImages.push(

@@ -40,7 +40,6 @@ const Map = ({ route, navigation }: Props) => {
 
   //mapa y listas
   const [map, setMap] = React.useState<MapboxGL.MapView>();
-  const [styleURL, setStyleURL] = React.useState<string>("mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm");
   const [isEnabled, setEnabled] = React.useState<boolean>(false);
   const [camera, setCamera] = React.useState<MapboxGL.Camera>();
   const [markers, setMarkers] = React.useState<MapboxGL.PointAnnotation[]>();
@@ -268,7 +267,7 @@ const Map = ({ route, navigation }: Props) => {
           onShowFull={() => setSwipeUpMinimized(false)}
           animation="spring"
           disableSwipeIcon={false}
-          extraMarginTop={200}
+          extraMarginTop={450}
           swipeHeight={40}
           style={swipeUpMinimized ? { backgroundColor: '#419E08', height: 80 } : { backgroundColor: '#fff', height: 80 }} // style for swipe
           iconColor={"black"}

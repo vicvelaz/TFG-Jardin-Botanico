@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Alert, Text, PermissionsAndroid } from 'react-native';
+import { StyleSheet, View, Alert, Text, PermissionsAndroid, Dimensions } from 'react-native';
 import MapboxGL , {Logger} from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
 import { booleanPointInPolygon, point, polygon } from '@turf/turf';
@@ -74,12 +74,16 @@ export const ShowItemPosition = ({ route, navigation }: Props) => {
     );
 }
 
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
 const textStyle = StyleSheet.create({
     baseText: {
       color: "black",
       fontSize: 20
     },
     titulo: {
+      color: "gray",
       fontSize: 15
     },
     viewTextStyle: {
@@ -101,8 +105,8 @@ const textStyle = StyleSheet.create({
       backgroundColor: '#F5FCFF'
     },
     container: {
-      height: 600,
-      width: 400,
+      height: windowHeight-150,
+      width: windowWidth,
       backgroundColor: 'tomato'
     },
     map: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Ref } from 'react';
 import { StyleSheet, View, Alert, PermissionsAndroid, Text, Image, ActivityIndicator, TouchableOpacity, Switch, Dimensions, Pressable, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import MapboxGL, { Logger } from '@react-native-mapbox-gl/maps';
 import Geolocation from 'react-native-geolocation-service';
@@ -36,7 +36,8 @@ const Map = ({ route, navigation }: Props) => {
   const [terraces, setTerraces] = React.useState<any>([]);
   const [zones, setZones] = React.useState<any>([]);
 
-  const swipeUpDownRef = React.useRef();
+  const swipeUpDownPositionRef = React.useRef<any>();
+  const swipeUpDownPlantRef = React.useRef<any>();
 
   //mapa y listas
   const [map, setMap] = React.useState<MapboxGL.MapView>();
@@ -184,11 +185,14 @@ const Map = ({ route, navigation }: Props) => {
     setSelectedPlantAudio(e.audio);
     setSelectedPlantLat(e.positionLat);
     setSelectedPlantLong(e.positionLong);
+    swipeUpDownPositionRef.current?.showMini();
+    swipeUpDownPlantRef.current?.showFull();
   }
 
   //volver de la informacion de la planta en swipeup a informacion de ubicacion del usuario
   const backToPosition = () => {
     setShowPosition(true);
+    swipeUpDownPositionRef.current?.showFull();
     camera?.flyTo([userPositionLong, userPositionLat]);
   }
 
@@ -197,7 +201,7 @@ const Map = ({ route, navigation }: Props) => {
   }
 
   const loadMap = () => {
-    return <MapboxGL.MapView ref={c => c !== null && setMap(c)} onPress={() => backToPosition()} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
+    return <MapboxGL.MapView ref={c => c !== null && setMap(c)} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl006l6ye000614mufkp230xm"}>
       <MapboxGL.Camera ref={c => c !== null && setCamera(c)} zoomLevel={16.15} centerCoordinate={[centerLng, centerLat]} />
       <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()} />
       {plants.map((e: Data, i: number) => (
@@ -215,7 +219,7 @@ const Map = ({ route, navigation }: Props) => {
   }
 
   const loadAccesibleMap = () => {
-    return <MapboxGL.MapView ref={c => c !== null && setMap(c)} onPress={() => backToPosition()} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl1kwik9i00c615qs8phvcjcp"}>
+    return <MapboxGL.MapView ref={c => c !== null && setMap(c)} onRegionDidChange={() => updateZoom()} style={mapStyle.map} styleURL={"mapbox://styles/ramxnchv/cl1kwik9i00c615qs8phvcjcp"}>
       <MapboxGL.Camera ref={c => c !== null && setCamera(c)} zoomLevel={16.15} centerCoordinate={[centerLng, centerLat]} />
       <MapboxGL.UserLocation androidRenderMode='compass' renderMode={'native'} showsUserHeadingIndicator={true} onUpdate={() => checkUserPosition()} />
       {plants.map((e: Data, i: number) => (
@@ -268,10 +272,11 @@ const Map = ({ route, navigation }: Props) => {
           animation="spring"
           disableSwipeIcon={false}
           extraMarginTop={450}
-          swipeHeight={40}
+          swipeHeight={30}
           style={swipeUpMinimized ? { backgroundColor: '#419E08', height: 80 } : { backgroundColor: '#fff', height: 80 }} // style for swipe
           iconColor={"black"}
           iconSize={30}
+          ref={swipeUpDownPositionRef}
         />)
         :
         (<SwipeUpDown
@@ -288,7 +293,9 @@ const Map = ({ route, navigation }: Props) => {
               </View>
               <View style={textStyle.descripcion}>
                 <ScrollView style={textStyle.scrollView}>
-                  <Text style={textStyle.infoText}>{selectedPlantDescription}</Text>
+                  <TouchableWithoutFeedback>
+                    <Text style={textStyle.infoText}>{selectedPlantDescription}</Text>
+                  </TouchableWithoutFeedback>
                 </ScrollView>
               </View>
               <View style={textStyle.imageButtonsView}>
@@ -326,6 +333,7 @@ const Map = ({ route, navigation }: Props) => {
           style={swipeUpMinimized ? { backgroundColor: '#419E08', height: 80 } : { backgroundColor: '#fff', height: 80 }} // style for swipe
           iconColor={"black"}
           iconSize={30}
+          ref={swipeUpDownPlantRef}
         />)}
     </View>
   );

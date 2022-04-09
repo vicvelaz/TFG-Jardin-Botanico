@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, ImageBackground, Image, Dimensions, Modal,PermissionsAndroid } from 'react-native'
+import { Text, View, StyleSheet, TouchableOpacity, ImageBackground, Image, Dimensions, Modal,PermissionsAndroid, ActivityIndicator } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack';
 import Carousel from 'react-native-snap-carousel';
 import { ScrollView } from 'react-native-gesture-handler';
 import { db } from '../firebase/firebase-config';
 import { AudioButton } from '../components/AudioButton';
 import Geolocation from 'react-native-geolocation-service';
+import { center } from '@turf/turf';
 
 interface Props extends StackScreenProps<any, 'PlantDetails'> { };
 
@@ -112,7 +113,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
     return (
         <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.container}>
             {state.isLoading
-                ? <Text style={{ color: 'white', fontSize: 50, textAlign: 'center' }}>Cargando....</Text>
+                ? <ActivityIndicator size={100} color="white" style={{flex:1,alignSelf:"center", justifyContent:"center"}}/>
                 : <View>
                     {
                         (state.data.scientific_name != '' && state.data.scientific_name != undefined ) &&

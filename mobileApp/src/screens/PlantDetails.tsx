@@ -19,6 +19,7 @@ interface Data {
     name?: string,
     scientific_name?: string,
     position?: any
+    otherServices?:boolean,
 }
 
 interface PropState {
@@ -49,6 +50,8 @@ export const PlantDetails = ({ route, navigation }: Props) => {
 
             const info: any = data.data();
             const arrayImages: JSX.Element[] = [];
+
+            console.log(info);
 
             if (info.media == undefined || info.media == '') {
                 arrayImages.push(
@@ -133,20 +136,26 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                         }
                     </View>
                     <View style={[styles.block, (state.data.scientific_name != '' && state.data.scientific_name != undefined ) ? { height: windowHeight - 405 } : { height: windowHeight - 350 }]}>
+                      
+                      {!state.data.otherServices &&
                         <View style={styles.description}>
                             <ScrollView >
                                 <Text style={styles.descriptionText}>{state.data.description}</Text>
                             </ScrollView>
                         </View>
 
-                        <View style={styles.rowButtons}>
+                      } 
+
+                        <View style={[!state.data.otherServices &&  styles.rowButtons]}>
+                        {!state.data.otherServices &&
                             <AudioButton
                                 audioURL={state.data.audio}
                                 navigation={navigation}
                                 plantButton={true}
                             />
+                        }
                             <TouchableOpacity
-                                style={styles.smallButton}
+                            style={[state.data.otherServices? styles.button : styles.smallButton]}
                                 onPress={() => navigation.navigate('ShowItemPosition',{ info: state.data, id:route.params?.id })}
                             >
                                 <Text style={styles.buttonText}>Mostrar ubicación</Text>

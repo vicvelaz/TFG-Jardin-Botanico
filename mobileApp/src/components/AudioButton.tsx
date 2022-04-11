@@ -70,7 +70,7 @@ export const AudioButton = ({ audioURL,navigation,plantButton}: Props) => {
                 disabled={true}
                 style={plantButton ? { ...styles.button, backgroundColor: 'grey' }:{ ...stylesButtonMap.button, backgroundColor: 'grey' }}
             >
-                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Play audio</Text>
+                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Audio no disponible</Text>
 
             </TouchableOpacity>
         )
@@ -86,21 +86,21 @@ export const AudioButton = ({ audioURL,navigation,plantButton}: Props) => {
                     onPress={() => { audioState == 'playing' ? executeAction('pause') : executeAction('play') }}
                 >
                     <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>
-                        {audioState == 'playing' ? 'Pause' : 'Resume'}
+                        {audioState == 'playing' ? 'Parar' : 'Continuar'}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={plantButton ? styles.smallButton : stylesButtonMap.smallButton}
                     onPress={() => executeAction('stop')}
                 >
-                    <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Stop</Text>
+                    <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Detener</Text>
                 </TouchableOpacity>
             </View>
             : <TouchableOpacity
                 style={plantButton ? styles.button : stylesButtonMap.button}
                 onPress={() => executeAction('play')}
             >
-                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Play audio</Text>
+                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Iniciar audio</Text>
             </TouchableOpacity>
 
     )
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: 'white',
         borderWidth: 2,
-        width: '45%'
+        width: '45%',
     },
     button: {
         backgroundColor: '#419E08',
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
         width: '48%'
     },
     buttonText: {
-        fontSize: 17,
+        fontSize: 15,
         alignSelf: 'center',
         fontWeight: 'bold',
         color: 'white',

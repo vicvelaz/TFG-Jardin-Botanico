@@ -20,31 +20,11 @@ export const startLoginEmailPassword = (email, password) => {
             .catch( e => {
                 console.log(e);
                 dispatch( finishLoading() );
-                Swal.fire('Error', e.message, 'error');
+                Swal.fire('Error', 'Email o contraseña invalidas ', 'error');
             })
 
         
         
-    }
-}
-
-export const startRegisterWithEmailPasswordName = ( email, password, name ) => {
-    return ( dispatch ) => {
-
-        firebase.auth().createUserWithEmailAndPassword( email, password )
-            .then( async({ user }) => {
-
-                await user.updateProfile({ displayName: name });
-
-                dispatch(
-                    login( user.uid, user.displayName )
-                );
-            })
-            .catch( e => {
-                console.log(e);
-                Swal.fire('Error', e.message, 'error');
-            })
-
     }
 }
 

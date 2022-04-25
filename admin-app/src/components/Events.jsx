@@ -8,21 +8,12 @@ import 'bootstrap'
 import { MDBDataTableV5 } from 'mdbreact';
 
 const Events = () => {
-
-    //listado de eventos
-    // const [eventos, setEventos] = React.useState([]);
-    // const [items, setList] = React.useState([]);
-
     //estados de control
     const [loading, setLoading] = React.useState(false);
     const [edit, setEdit] = React.useState(false);
     const [error, setError] = React.useState(null);
     const [editFechaIni, setEditFechaIni] = React.useState(false);
     const [editFechaFin, setEditFechaFin] = React.useState(false);
-    // const [numPaginas, setNumPaginas] = React.useState(1);
-    // const [pagActual, setPagActual] = React.useState(1);
-    // const [itemActual, setItemActual] = React.useState(0);
-    // const [paginas, setPaginas] = React.useState([]);
 
     //estados para inputs
     const [busqueda, setBusqueda] = React.useState("");
@@ -77,9 +68,9 @@ const Events = () => {
 
         try {
             const data = await db.collection('events').get();
-            // console.log(arrayData);
+          
             const arrayData = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            // setList(arrayData);
+         
             const tableRow = [];
             arrayData.forEach(element => {
                 tableRow.push({
@@ -88,7 +79,7 @@ const Events = () => {
                     description: element.description.length > 200 ? `${element.description.substring(0, 200)}...` : element.description,
                     start_date: moment.unix(element.start_date.seconds).format('DD/MM/YYYY'),
                     end_date: moment.unix(element.end_date.seconds).format('DD/MM/YYYY'),
-                    options: <div className="d-flex"><button className="btn btn-info" onClick={() => loadModalModificarEvento(element.id)} data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarEvento(element.id)}>Eliminar</button></div>,
+                    options: <div className="d-flex"><button className="btn btn-light" onClick={() => loadModalModificarEvento(element.id)} data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarEvento(element.id)}>Eliminar</button></div>,
                 })
             })
 
@@ -186,7 +177,7 @@ const Events = () => {
             }
 
             setLoading(true);
-            console.log(id);
+
             await db.collection('events').doc(id).update({
                 name: name,
                 description: description,
@@ -219,7 +210,6 @@ const Events = () => {
             window.$('#nuevoeventomodal').modal('toggle');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
-            document.getElementById("busc").value = "";
             setBusqueda("");
 
         } catch (error) {
@@ -233,17 +223,14 @@ const Events = () => {
         setEdit(true);
         const data = db.collection('events').doc(id).get().then(e => {
 
-            // console.log(e.data())
-            const eventoInfo = e.data()
-            // const eventoInfo = datatable.rows.find(item => item.id === id);
+            const eventoInfo = e.data();
+            
             document.getElementById("name").value = eventoInfo.name;
             document.getElementById("description").value = eventoInfo.description;
 
-            // const fecha_inicio = eventoInfo.start_date.split("/");
             const initDate = new Date(eventoInfo.start_date * 1000);
             document.getElementById("startevent").value = `${initDate.getFullYear()}-${('0' + (initDate.getMonth() + 1)).slice(-2)}-${('0' + initDate.getDate()).slice(-2)}`;
 
-            // const fecha_fin = eventoInfo.end_date.split("/");
             const endDate = new Date(eventoInfo.end_date * 1000);
             document.getElementById("endevent").value = `${endDate.getFullYear()}-${('0' + (endDate.getMonth() + 1)).slice(-2)}-${('0' + endDate.getDate()).slice(-2)}`;
 
@@ -256,9 +243,6 @@ const Events = () => {
             setImage(eventoInfo.image);
         }
         );
-        // const info= data.data();
-        // const arrayData = data.docs(doc => ({ id: doc.id, ...doc.data() }));
-        // console.log(data);
 
     }
 
@@ -348,69 +332,22 @@ const Events = () => {
                             </div>
                         </div>
                     </div>
-                    {/* <div className=" ms-auto me-5">
-                        <input type="text" id="busc" className="form-control form-control-md text-dark" placeholder="Buscar" onChange={e => buscarEvento(e)} onKeyDown={e => buscarEvento(e)}></input>
-                    </div> */}
                 </div>
 
                 <MDBDataTableV5
                     hover
-                    entriesOptions={[5, 20, 25]}
+                    entriesOptions={[5, 10, 20]}
                     entries={5}
                     pagesAmount={4}
                     data={datatable}
                     paging
-                    // searchTop
                     theadColor='elegant-color'
                     theadTextWhite
                     tbodyColor='rgba-grey-strong'
-                    searchingLabel=''
                     searchBottom={true}
                     className="table-container mt-2"
 
                 />
-                {/* <div className="mt-4 table-container rounded">
-                    <table className="table table-striped table-hover">
-                        <thead className="table-dark">
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th>Inicio</th>
-                                <th>Fin</th>
-                                <th>Opciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {
-                                eventos.map(e => (
-                                    <tr key={e.id}>
-                                        <td>{e.name}</td>
-                                        <td>{e.description.length>200 ?`${e.description.substring(0,200)}...`:e.description}</td>
-                                        <td>{moment.unix(e.start_date.seconds).format('DD/MM/YY')}</td>
-                                        <td>{moment.unix(e.end_date.seconds).format('DD/MM/YY')}</td>
-                                        <td><div className="d-flex"><button className="btn btn-success" onClick={() => loadModalModificarEvento(e.id)} data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarEvento(e.id)}>Eliminar</button></div></td>
-                                    </tr>
-                                ))
-                            }
-                        </tbody>
-                    </table>
-                </div> */}
-                {/* <nav className="mt-3" aria-label="Page navigation example">
-                    <ul className="pagination justify-content-center">
-                        <li className={pagActual === 1 ? "page-item disabled" : "page-item"} onClick={() => paginaAnterior()}>
-                            <a className={pagActual === 1 ? "page-link disabled-button" : "page-link clickable"}>Anterior</a>
-                        </li>
-                        {paginas.map((e) =>
-                            <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}> 
-                                <a className="page-link clickable">{e}</a> 
-                            </li>
-                        )}
-                        
-                        <li className={pagActual === numPaginas ? "page-item disabled" : "page-item"} onClick={() => siguientePagina()}>
-                            <a className={pagActual === numPaginas ? "page-link disabled-button" : "page-link clickable"}>Siguiente</a>
-                        </li>
-                    </ul>
-                </nav> */}
             </div>
         </div>
     )

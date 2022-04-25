@@ -4,17 +4,10 @@ import $ from "jquery";
 import "bootstrap";
 import "moment/locale/es";
 import SortableSelect from "./SelectItineraryItems";
+import { MDBDataTableV5 } from 'mdbreact';
 
 const Itineraries = () => {
-  let opciones = [
-    // { value: 'Planta 1', label: 'Planta 1' },
-    // { value: 'Planta 2', label: 'Planta 2' },
-    // { value: 'Planta 3', label: 'Planta 3' }
-  ];
-
-  //listado de Itinerarios
-  const [itinerarios, setItinerarios] = React.useState([]);
-  const [list,setList] = React.useState([]);
+ 
 
   //listado de plantas y lugares
   const [plantasLugares, setPlantas_Lugares] = React.useState([
@@ -24,16 +17,36 @@ const Itineraries = () => {
     // }
   ]);
 
+  const [datatable, setDatatable] = React.useState(
+    {
+        columns: [
+            {
+                label: 'Nombre',
+                field: 'name',
+                sort: 'asc',
+                width: 300
+            },
+            {
+                label: 'Descripción',
+                field: 'description',
+                sort: 'asc',
+                width: 270
+            },
+            {
+                label: 'Opciones',
+                field: 'options',
+                sort: 'asc',
+                width: 150
+            }
+        ],
+        rows: []
+    }
+);
+
   //estados de control
-  const [loading, setLoading] = React.useState(false);
   const [edit, setEdit] = React.useState(false);
-  const [numPaginas, setNumPaginas] = React.useState(1);
-  const [pagActual, setPagActual] = React.useState(1);
-  const [itemActual, setItemActual] = React.useState(0);
-  const [paginas, setPaginas] = React.useState([]);
 
   //estados para inputs
-  const [busqueda, setBusqueda] = React.useState("");
   const [id, setID] = React.useState("");
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
@@ -44,12 +57,18 @@ const Itineraries = () => {
     try {
       const data = await db.collection("itinerary").get();
       const arrayData = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setList(arrayData);
-      setItinerarios(arrayData.slice(0, 5));
-      setNumPaginas(arrayData.length % 5 === 0 ? (arrayData.length / 5) : (Math.trunc(arrayData.length / 5)) + 1);
-      setItemActual(itemActual + 5);
-      let pag = Array.from({length: numPaginas}, (_, index) => index + 1);
-      setPaginas(pag);
+      const tableRow = [];
+      arrayData.forEach(element => {
+          tableRow.push({
+              id: element.id,
+              name: element.name,
+              description: element.description.length > 200 ? `${element.description.substring(0, 200)}...` : element.description,
+              options: <div className="d-flex"><button className="btn btn-light" onClick={() => loadModalModificarItinerario(element.id)} data-bs-toggle="modal" data-bs-target="#nuevoitinerariomodal">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarItinerario(element.id)}>Eliminar</button></div>,
+          })
+      })
+
+
+      setDatatable({ ...datatable, rows: tableRow })
     } catch (error) {
       console.log(error);
     }
@@ -83,15 +102,21 @@ const Itineraries = () => {
 
   const loadModalModificarItinerario = (id) => {
     setEdit(true);
-    const itinerarioInfo = list.find((item) => item.id === id);
-    prepararParadas(itinerarioInfo);
-    document.getElementById("name").value = itinerarioInfo.name;
-    document.getElementById("description").value = itinerarioInfo.description;
-    setID(itinerarioInfo.id);
-    setName(itinerarioInfo.name);
-    setDescription(itinerarioInfo.description);
-    document.getElementById("editsortableselect").click()
-    setImage(itinerarioInfo.image);
+    obtenerItinerarios();
+    db.collection('itinerary').doc(id).get().then(e => {
+      const itinerarioInfo = e.data();
+      console.log(itinerarioInfo);
+      document.getElementById("name").value = itinerarioInfo.name;
+      document.getElementById("description").value = itinerarioInfo.description;
+      prepararParadas(itinerarioInfo);
+
+      setID(id);
+      setName(itinerarioInfo.name);
+      setDescription(itinerarioInfo.description);
+      document.getElementById("editsortableselect").click()
+      setImage(itinerarioInfo.image);
+    });
+
   };
 
   const prepararParadas = (itinerarioInfo) => {
@@ -100,8 +125,9 @@ const Itineraries = () => {
     itinerarioInfo.paradas.forEach((parada) => {
       let auxParada = plantasLugares.find(
         (element) => element.value === parada.id
-      );
-
+        );
+        console.log(auxParada);
+        
       auxPuntos.push({ value: auxParada.value, label: auxParada.label });
       puntos.push(auxParada);
     });
@@ -124,7 +150,6 @@ const Itineraries = () => {
     e.preventDefault();
     
     try {
-      setLoading(true);
 
       let paradas = [];
       puntos.forEach((element) => {
@@ -147,7 +172,6 @@ const Itineraries = () => {
 
       obtenerItinerarios();
 
-      setLoading(false);
       setEdit(false);
       setName("");
       setDescription("");
@@ -159,8 +183,6 @@ const Itineraries = () => {
       window.$("#nuevoitinerariomodal").modal("toggle");
       $("body").removeClass("modal-open");
       $(".modal-backdrop").remove();
-      document.getElementById("busc").value = "";
-      setBusqueda("");
     } catch (error) {
       console.log(error);
     }
@@ -182,7 +204,6 @@ const Itineraries = () => {
         image: "",
       };
 
-      setLoading(true);
       const ev = await db.collection("itinerary").add(nuevoItinerario);
 
       if (image !== undefined) {
@@ -197,7 +218,6 @@ const Itineraries = () => {
 
       obtenerItinerarios();
 
-      setLoading(false);
       setName("");
       setDescription("");
       setPuntos([]);
@@ -224,42 +244,6 @@ const Itineraries = () => {
     }
   };
 
-  const buscarItinerario = (e) => {
-    setBusqueda(e.target.value);
-
-    if (busqueda === "") {
-      obtenerItinerarios();
-    } else {
-      setItinerarios(list.filter((ev) => ev.name.includes(busqueda)));
-    }
-  };
-
-  const siguientePagina = () => {
-    if(pagActual !== numPaginas){
-        let ia = itemActual + 5;
-        setItemActual(ia);
-        setItinerarios(list.slice(itemActual, ia));
-        setPagActual(pagActual + 1);
-    }
-}
-
-const paginaAnterior = () => {
-    if(pagActual !== 1){
-        let ia = itemActual - 5;
-        const itt = ia - 5;
-        setItemActual(ia);
-        setItinerarios(list.slice(itt, ia));
-        setPagActual(pagActual - 1);
-    } 
-}
-
-const irAPagina = (pag) => {
-    const it = pag * 5;
-    const itt = it - 5;
-    setItemActual(it);
-    setItinerarios(list.slice(itt,it));
-    setPagActual(pag);
-}
 
   return (
     <div className="background">
@@ -361,71 +345,21 @@ const irAPagina = (pag) => {
               </div>
             </div>
           </div>
-          <div className=" ms-auto me-5">
-            <input
-              type="text"
-              id="busc"
-              className="form-control form-control-md text-dark"
-              placeholder="Buscar"
-              onKeyUp={(e) => buscarItinerario(e)}
-            // onChange={(e) => buscarItinerario(e)}
-            // onKeyDown={(e) => buscarItinerario(e)}
-            ></input>
-          </div>
-        </div>
-        <div className="mt-4 table-container rounded">
-          <table className="table table-striped table-hover">
-            <thead className="table-dark">
-              <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Opciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {itinerarios.map((e) => (
-                <tr key={e.id}>
-                  <td>{e.name}</td>
-                  <td>{e.description.length>200 ?`${e.description.substring(0,200)}...`:e.description}</td>
-                  <td>
-                    <div className="d-flex">
-                      <button
-                        className="btn btn-success"
-                        onClick={() => loadModalModificarItinerario(e.id)}
-                        data-bs-toggle="modal"
-                        data-bs-target="#nuevoitinerariomodal"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="btn btn-danger ms-3"
-                        onClick={() => eliminarItinerario(e.id)}
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <nav className="mt-3" aria-label="Page navigation example">
-          <ul className="pagination justify-content-center">
-            <li className={pagActual === 1 ? "page-item disabled" : "page-item"} onClick={() => paginaAnterior()}>
-              <a className={pagActual === 1 ? "page-link disabled-button" : "page-link clickable"}>Anterior</a>
-            </li>
-            {paginas.map((e) =>
-              <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}>
-                <a className="page-link clickable">{e}</a>
-              </li>
-            )}
-            <li className={pagActual === numPaginas ? "page-item disabled" : "page-item"} onClick={() => siguientePagina()}>
-              <a className={pagActual === numPaginas ? "page-link disabled-button" : "page-link clickable"}>Siguiente</a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+        </div> 
+        <MDBDataTableV5
+                    hover
+                    entriesOptions={[5, 10, 20]}
+                    entries={5}
+                    pagesAmount={4}
+                    data={datatable}
+                    paging
+                    theadColor='elegant-color'
+                    theadTextWhite
+                    tbodyColor='rgba-grey-strong'
+                    searchBottom={true}
+                    className="table-container mt-2"
+                />
+      </div> 
     </div>
   );
 };

@@ -3,10 +3,6 @@
   margin: 0px;
 }
 
-.App {
-  text-align: center;
-}
-
 
 .background{
     margin-top: 56px;
@@ -19,7 +15,7 @@
     z-index: -1;
 }
 
-.contenedor{
+.table-container{
   background-color: rgb(255, 255, 255,0.5);
 }
 
@@ -32,7 +28,7 @@ table{
   border-color: #000000!important;
 }
 
-.texto{
+.text{
   min-height: 90px!important;
 }
 
@@ -47,7 +43,7 @@ table{
   color: black;
 }
 
-.deshabilitado{
+.disabled-button{
   background-color: rgb(172, 172, 168)!important;
   color: black!important;
 }
@@ -70,80 +66,7 @@ table{
   font-size:0;
 }
 
-
-/* Estilos login */
-
-
-.auth__main {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  background: url("https://firebasestorage.googleapis.com/v0/b/realjardinbotanicoapp.appspot.com/o/background-dark.jpg?alt=media&token=b43496b1-59e5-442d-9891-534415ee857b") top center no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
-
-}
-
-.auth__box-container {
-  background-color: white;
-  box-shadow: 0px 3px rgb(0, 95, 0);
-  border-radius: 2px;
-  padding: 20px;
-  width: 250px;
-}
-
-
-.auth__title {
-  color: green;
-  margin-bottom: 20px;
-}
-
-.auth__input {
-  color:rgb(0, 95, 0);
-  border: 0px;
-  border-bottom: 1px solid #d8d8d8;
-  font-size: 16px;
-  margin-bottom: 10px;
-  height: 20px;
-  width: 100%;
-
-  transition: border-bottom .3s ease;
-
-}
-
-.auth__input:focus{
-  border-bottom: 1px solid green;
-  outline: none;
-}
-
-
-.auth__social-networks {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  width: 100%;
-}
-
-
-.auth__alert-error {
-  background-color: red;
-  border-radius: 5px;
-  color: white;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
-  padding: 5px
-}
-
-
 .btn-logout {
-  /* background-color: transparent; */
   border: none;
   color: white;
   cursor: pointer;
@@ -158,3 +81,55 @@ table{
 .btn-logout:focus{
   outline: none;
 }
+
+
+
+/* Estilos login */
+
+
+.main-auth {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: url("https://firebasestorage.googleapis.com/v0/b/realjardinbotanicoapp.appspot.com/o/background-dark.jpg?alt=media&token=b43496b1-59e5-442d-9891-534415ee857b") top center no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+
+}
+
+.box-container-auth {
+  background-color: white;
+  box-shadow: 0px 3px rgb(0, 95, 0);
+  border-radius: 2px;
+  padding: 20px;
+  width: 250px;
+}
+
+
+.title-auth {
+  color: green;
+  margin-bottom: 20px;
+}
+
+.input-auth {
+  color:rgb(0, 95, 0);
+  border: 0px;
+  border-bottom: 1px solid #d8d8d8;
+  font-size: 16px;
+  margin-bottom: 10px;
+  height: 20px;
+  width: 100%;
+
+  transition: border-bottom .3s ease;
+
+}
+
+.input-auth:focus{
+  border-bottom: 1px solid green;
+  outline: none;
+}
+
+

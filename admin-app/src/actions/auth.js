@@ -30,9 +30,6 @@ export const startLoginEmailPassword = (email, password) => {
 
 
 
-
-
-
 export const login = (uid, displayName) => ({
     type: types.login,
     payload: {

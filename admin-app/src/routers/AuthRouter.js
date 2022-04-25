@@ -5,8 +5,8 @@ import { LoginScreen } from '../components/auth/LoginScreen';
 
 export const AuthRouter = () => {
     return (
-        <div className="auth__main">
-            <div className="auth__box-container">
+        <div className="main-auth">
+            <div className="box-container-auth">
                 <Switch>
                     <Route 
                         exact

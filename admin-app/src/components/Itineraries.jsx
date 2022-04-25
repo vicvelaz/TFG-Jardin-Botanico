@@ -311,7 +311,7 @@ const irAPagina = (pag) => {
                     </div>
                     <div className="form-floating mt-3">
                       <textarea
-                        className="form-control texto"
+                        className="form-control text"
                         id="description"
                         name="description"
                         placeholder="Descripción"
@@ -373,7 +373,7 @@ const irAPagina = (pag) => {
             ></input>
           </div>
         </div>
-        <div className="mt-4 contenedor rounded">
+        <div className="mt-4 table-container rounded">
           <table className="table table-striped table-hover">
             <thead className="table-dark">
               <tr>
@@ -413,7 +413,7 @@ const irAPagina = (pag) => {
         <nav className="mt-3" aria-label="Page navigation example">
           <ul className="pagination justify-content-center">
             <li className={pagActual === 1 ? "page-item disabled" : "page-item"} onClick={() => paginaAnterior()}>
-              <a className={pagActual === 1 ? "page-link deshabilitado" : "page-link clickable"}>Anterior</a>
+              <a className={pagActual === 1 ? "page-link disabled-button" : "page-link clickable"}>Anterior</a>
             </li>
             {paginas.map((e) =>
               <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}>
@@ -421,7 +421,7 @@ const irAPagina = (pag) => {
               </li>
             )}
             <li className={pagActual === numPaginas ? "page-item disabled" : "page-item"} onClick={() => siguientePagina()}>
-              <a className={pagActual === numPaginas ? "page-link deshabilitado" : "page-link clickable"}>Siguiente</a>
+              <a className={pagActual === numPaginas ? "page-link disabled-button" : "page-link clickable"}>Siguiente</a>
             </li>
           </ul>
         </nav>

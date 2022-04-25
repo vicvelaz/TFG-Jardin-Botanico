@@ -462,7 +462,7 @@ const Plants = () => {
                                                 <label className='form-check-label' for="otherservices" >Otros servicios </label>
                                             </div>
                                             <div className="form-floating mt-3">
-                                                <textarea className="form-control texto" id="description" name="description" placeholder="Descripción" maxLength="2000" onChange={e => setDescription(e.target.value.replace(/"/g,"'"))} disabled={type === "place" && otherServices} required></textarea>
+                                                <textarea className="form-control text" id="description" name="description" placeholder="Descripción" maxLength="2000" onChange={e => setDescription(e.target.value.replace(/"/g,"'"))} disabled={type === "place" && otherServices} required></textarea>
                                                 <label htmlFor="description">Descripción</label>
                                             </div>
 
@@ -526,7 +526,7 @@ const Plants = () => {
                 </div>
             </div>
             <div className="container d-flex flex-column">
-                <div className="mt-4 contenedor rounded">
+                <div className="mt-4 table-container rounded">
                     <table className="table table-striped table-hover">
                         <thead className="table-dark">
                             <tr>
@@ -559,7 +559,7 @@ const Plants = () => {
                 <nav className="mt-3" aria-label="Page navigation example">
                     <ul className="pagination justify-content-center">
                         <li className={pagActual === 1 ? "page-item disabled" : "page-item"} onClick={() => paginaAnterior()}>
-                            <a className={pagActual === 1 ? "page-link deshabilitado" : "page-link clickable"}>Anterior</a>
+                            <a className={pagActual === 1 ? "page-link disabled-button" : "page-link clickable"}>Anterior</a>
                         </li>
                         {paginas.map((e) =>
                             <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}>
@@ -568,7 +568,7 @@ const Plants = () => {
                         )}
 
                         <li className={pagActual === numPaginas ? "page-item disabled" : "page-item"} onClick={() => siguientePagina()}>
-                            <a className={pagActual === numPaginas ? "page-link deshabilitado" : "page-link clickable"}>Siguiente</a>
+                            <a className={pagActual === numPaginas ? "page-link disabled-button" : "page-link clickable"}>Siguiente</a>
                         </li>
                     </ul>
                 </nav>

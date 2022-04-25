@@ -232,7 +232,7 @@ const textStyle = StyleSheet.create({
     height: 500,
     width: 400,
   },
-  textoParada: {
+  textParada: {
     color: "black",
     fontSize: 12,
     marginTop: 10

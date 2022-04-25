@@ -25,7 +25,7 @@ export const LoginScreen = () => {
 
     return (
         <>
-            <h3 className="auth__title">Login</h3>
+            <h3 className="title-auth">Inicio de sesión</h3>
 
             <form onSubmit={ handleLogin }>
 
@@ -33,7 +33,7 @@ export const LoginScreen = () => {
                     type="text"
                     placeholder="Email"
                     name="email"
-                    className="auth__input"
+                    className="input-auth"
                     autoComplete="off"
                     value={ email }
                     onChange={ handleInputChange }
@@ -41,9 +41,9 @@ export const LoginScreen = () => {
 
                 <input 
                     type="password"
-                    placeholder="Password"
+                    placeholder="Contraseña"
                     name="password"
-                    className="auth__input"
+                    className="input-auth"
                     value={ password }
                     onChange={ handleInputChange }
                 />
@@ -51,10 +51,10 @@ export const LoginScreen = () => {
 
                 <button
                     type="submit"
-                    className="btn btn-primary"
+                    className="btn btn-primary mt-2"
                     disabled={ loading }
                 >
-                    Login
+                    Iniciar sesión
                 </button>
 
             

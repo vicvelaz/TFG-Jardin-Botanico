@@ -280,7 +280,7 @@ const Events = () => {
                                             <label htmlFor="name">Nombre</label>
                                         </div>
                                         <div className="form-floating mt-3">
-                                            <textarea className="form-control texto" id="description" name="description" placeholder="Descripción"  onChange={e => setDescription(e.target.value.replace(/"/g,"'"))} required></textarea>
+                                            <textarea className="form-control text" id="description" name="description" placeholder="Descripción"  onChange={e => setDescription(e.target.value.replace(/"/g,"'"))} required></textarea>
                                             <label htmlFor="description">Descripción</label>
                                         </div>
                                         <div className="d-flex mt-4">
@@ -316,7 +316,7 @@ const Events = () => {
                         <input type="text" id="busc" className="form-control form-control-md text-dark" placeholder="Buscar" onChange={e => buscarEvento(e)} onKeyDown={e => buscarEvento(e)}></input>
                     </div>
                 </div>
-                <div className="mt-4 contenedor rounded">
+                <div className="mt-4 table-container rounded">
                     <table className="table table-striped table-hover">
                         <thead className="table-dark">
                             <tr>
@@ -345,7 +345,7 @@ const Events = () => {
                 <nav className="mt-3" aria-label="Page navigation example">
                     <ul className="pagination justify-content-center">
                         <li className={pagActual === 1 ? "page-item disabled" : "page-item"} onClick={() => paginaAnterior()}>
-                            <a className={pagActual === 1 ? "page-link deshabilitado" : "page-link clickable"}>Anterior</a>
+                            <a className={pagActual === 1 ? "page-link disabled-button" : "page-link clickable"}>Anterior</a>
                         </li>
                         {paginas.map((e) =>
                             <li className={pagActual === e ? "page-item active" : "page-item"} key={e} onClick={() => irAPagina(e)}> 
@@ -354,7 +354,7 @@ const Events = () => {
                         )}
                         
                         <li className={pagActual === numPaginas ? "page-item disabled" : "page-item"} onClick={() => siguientePagina()}>
-                            <a className={pagActual === numPaginas ? "page-link deshabilitado" : "page-link clickable"}>Siguiente</a>
+                            <a className={pagActual === numPaginas ? "page-link disabled-button" : "page-link clickable"}>Siguiente</a>
                         </li>
                     </ul>
                 </nav>

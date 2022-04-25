@@ -34,7 +34,7 @@ const Header = () => {
                         </ul>
                     </div>
                     <button
-                        className="btn btn-logout"
+                        className="btn"
                         onClick={hanleLogout}
                     >
                         Logout

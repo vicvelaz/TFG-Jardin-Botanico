@@ -16,7 +16,9 @@
 }
 
 .table-container{
-  background-color: rgb(255, 255, 255,0.5);
+  /* background-color: rgb(255, 255, 255,0.5);
+  border-radius: 5px;
+  padding: 5px; */
 }
 
 table{
@@ -66,21 +68,6 @@ table{
   font-size:0;
 }
 
-.btn-logout {
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-size: 12px;
-  padding: 7px 10px 7px 10px;
-
-  transition: color .3s ease;
-  transition: background-color .3s ease;
-  
-}
-
-.btn-logout:focus{
-  outline: none;
-}
 
 
 

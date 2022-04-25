@@ -1,64 +1,120 @@
 import React from 'react'
-import {db,storage} from '../firebase/firebase-config'
+import { db, storage } from '../firebase/firebase-config'
 
 import moment from 'moment'
 import 'moment/locale/es'
 import $ from 'jquery'
 import 'bootstrap'
+import { MDBDataTableV5 } from 'mdbreact';
 
 const Events = () => {
 
     //listado de eventos
-    const [eventos,setEventos] = React.useState([]);
-    const [items, setList] = React.useState([]);
+    // const [eventos, setEventos] = React.useState([]);
+    // const [items, setList] = React.useState([]);
 
     //estados de control
-    const [loading,setLoading] = React.useState(false);
-    const [edit,setEdit] = React.useState(false);
-    const [error,setError] = React.useState(null);
-    const [editFechaIni,setEditFechaIni] = React.useState(false);
-    const [editFechaFin,setEditFechaFin] = React.useState(false);
-    const [numPaginas, setNumPaginas] = React.useState(1);
-    const [pagActual, setPagActual] = React.useState(1);
-    const [itemActual, setItemActual] = React.useState(0);
-    const [paginas, setPaginas] = React.useState([]);
+    const [loading, setLoading] = React.useState(false);
+    const [edit, setEdit] = React.useState(false);
+    const [error, setError] = React.useState(null);
+    const [editFechaIni, setEditFechaIni] = React.useState(false);
+    const [editFechaFin, setEditFechaFin] = React.useState(false);
+    // const [numPaginas, setNumPaginas] = React.useState(1);
+    // const [pagActual, setPagActual] = React.useState(1);
+    // const [itemActual, setItemActual] = React.useState(0);
+    // const [paginas, setPaginas] = React.useState([]);
 
     //estados para inputs
-    const [busqueda,setBusqueda] = React.useState(""); 
-    const [id,setID] = React.useState("");
+    const [busqueda, setBusqueda] = React.useState("");
+    const [id, setID] = React.useState("");
     const [name, setName] = React.useState("");
     const [description, setDescription] = React.useState("");
     const [startDate, setStartDate] = React.useState("");
     const [endDate, setEndDate] = React.useState("");
     const [image, setImage] = React.useState(null);
-    
+
+    const [datatable, setDatatable] = React.useState(
+        {
+            columns: [
+                {
+                    label: 'Nombre',
+                    field: 'name',
+                    sort: 'asc',
+                    width: 300
+                },
+                {
+                    label: 'Descripción',
+                    field: 'description',
+                    sort: 'asc',
+                    width: 270
+                },
+                {
+                    label: 'Inicio',
+                    field: 'start_date',
+                    sort: 'asc',
+                    width: 200,
+                },
+                {
+                    label: 'Fin',
+                    field: 'end_date',
+                    sort: 'asc',
+                    width: 100
+                },
+                {
+                    label: 'Opciones',
+                    field: 'options',
+                    sort: 'asc',
+                    width: 150
+                }
+            ],
+            rows: []
+        }
+    );
+
+
 
     const obtenerEventos = async () => {
 
-        try{
+        try {
             const data = await db.collection('events').get();
-            const arrayData = data.docs.map(doc => ({id: doc.id, ...doc.data()}));
-            setList(arrayData);
-            setNumPaginas(arrayData.length % 5 === 0 ? (arrayData.length / 5) : (Math.trunc(arrayData.length / 5)) + 1);
-            setEventos(arrayData.slice(0, 5));
-            setItemActual(itemActual + 5);
-            let pag = Array.from({length: numPaginas}, (_, index) => index + 1);
-            setPaginas(pag);
+            // console.log(arrayData);
+            const arrayData = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            // setList(arrayData);
+            const tableRow = [];
+            arrayData.forEach(element => {
+                tableRow.push({
+                    id: element.id,
+                    name: element.name,
+                    description: element.description.length > 200 ? `${element.description.substring(0, 200)}...` : element.description,
+                    start_date: moment.unix(element.start_date.seconds).format('DD/MM/YYYY'),
+                    end_date: moment.unix(element.end_date.seconds).format('DD/MM/YYYY'),
+                    options: <div className="d-flex"><button className="btn btn-info" onClick={() => loadModalModificarEvento(element.id)} data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarEvento(element.id)}>Eliminar</button></div>,
+                })
+            })
 
-        } catch(error){
+
+            setDatatable({ ...datatable, rows: tableRow })
+
+
+
+
+
+        } catch (error) {
             console.log(error);
         }
 
     }
 
-    React.useEffect(()=>{obtenerEventos()},[]);
+    React.useEffect(() => {
+        obtenerEventos()
+    }, []);
 
     //Funciones asincronas => Consulta a Firebase
 
-    const nuevoEvento = async(e) => {
+    const nuevoEvento = async (e) => {
         e.preventDefault();
 
-        if(new Date(startDate) > new Date(endDate)){
+        if (new Date(startDate) > new Date(endDate)) {
             setError("La fecha de inicio no puede ser posterior a la de fin")
             return
         }
@@ -75,13 +131,13 @@ const Events = () => {
             setLoading(true);
             const ev = await db.collection('events').add(nuevoEvento);
 
-            if(image !== undefined){
+            if (image !== undefined) {
                 const imagenRef = storage.ref().child("/images/events").child(ev.id);
                 await imagenRef.put(image)
                 const imagenURL = await imagenRef.getDownloadURL()
-                await db.collection('events').doc(ev.id).update({image: imagenURL});
+                await db.collection('events').doc(ev.id).update({ image: imagenURL });
             }
-            
+
             obtenerEventos();
 
             setLoading(false);
@@ -98,14 +154,13 @@ const Events = () => {
             window.$('#nuevoeventomodal').modal('toggle');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
-            
+
         } catch (error) {
             console.log(error);
         }
     }
 
-    const eliminarEvento = async (id) =>
-    {
+    const eliminarEvento = async (id) => {
         try {
             await db.collection('events').doc(id).delete();
             const imagenRef = storage.ref().child("/images/events").child(id);
@@ -117,20 +172,21 @@ const Events = () => {
         }
     }
 
-    const modificarEvento = async(e) => {
+    const modificarEvento = async (e) => {
         e.preventDefault();
-        
-        try {
-            const fecha_ini = editFechaIni ? new Date (startDate) : new Date (startDate.seconds*1000);
-            const fecha_fin = editFechaFin ? new Date (endDate) : new Date (endDate.seconds*1000);
 
-            if(new Date(fecha_ini) > new Date(fecha_fin)){
+
+        try {
+            const fecha_ini = editFechaIni ? new Date(startDate) : new Date(startDate.seconds * 1000);
+            const fecha_fin = editFechaFin ? new Date(endDate) : new Date(endDate.seconds * 1000);
+
+            if (new Date(fecha_ini) > new Date(fecha_fin)) {
                 setError("La fecha de inicio no puede ser posterior a la de fin")
                 return
             }
 
             setLoading(true);
-
+            console.log(id);
             await db.collection('events').doc(id).update({
                 name: name,
                 description: description,
@@ -139,11 +195,11 @@ const Events = () => {
                 image: ''
             });
 
-            if(image !== undefined){
+            if (image !== undefined) {
                 const imagenRef = storage.ref().child("/images/events").child(id);
                 await imagenRef.put(image)
                 const imagenURL = await imagenRef.getDownloadURL()
-                await db.collection('events').doc(id).update({image: imagenURL});
+                await db.collection('events').doc(id).update({ image: imagenURL });
             }
 
             obtenerEventos();
@@ -158,38 +214,51 @@ const Events = () => {
             setEditFechaIni(false);
             setEditFechaFin(false);
             setError(null);
-            
+
             document.getElementById("formularioeventos").reset();
             window.$('#nuevoeventomodal').modal('toggle');
             $('body').removeClass('modal-open');
             $('.modal-backdrop').remove();
             document.getElementById("busc").value = "";
             setBusqueda("");
-            
+
         } catch (error) {
             console.log(error);
-        } 
+        }
     }
 
     //Funciones auxiliares => Formateo y Frontend
 
     const loadModalModificarEvento = (id) => {
         setEdit(true);
-        const eventoInfo = eventos.find(item => item.id === id);
+        const data = db.collection('events').doc(id).get().then(e => {
 
-        document.getElementById("name").value = eventoInfo.name;
-        document.getElementById("description").value = eventoInfo.description;
-        const fecha_inicio = new Date (eventoInfo.start_date.seconds*1000);
-        document.getElementById("startevent").value = `${fecha_inicio.getFullYear()}-${('0' + (fecha_inicio.getMonth()+1)).slice(-2)}-${('0' + fecha_inicio.getDate()).slice(-2)}`;
-        const fecha_fin = new Date (eventoInfo.end_date.seconds*1000);
-        document.getElementById("endevent").value = `${fecha_fin.getFullYear()}-${('0' + (fecha_fin.getMonth()+1)).slice(-2)}-${('0' + fecha_fin.getDate()).slice(-2)}`;
-        
-        setID(eventoInfo.id);
-        setName(eventoInfo.name);
-        setDescription(eventoInfo.description);
-        setStartDate(eventoInfo.start_date);
-        setEndDate(eventoInfo.end_date);
-        setImage(eventoInfo.image);
+            // console.log(e.data())
+            const eventoInfo = e.data()
+            // const eventoInfo = datatable.rows.find(item => item.id === id);
+            document.getElementById("name").value = eventoInfo.name;
+            document.getElementById("description").value = eventoInfo.description;
+
+            // const fecha_inicio = eventoInfo.start_date.split("/");
+            const initDate = new Date(eventoInfo.start_date * 1000);
+            document.getElementById("startevent").value = `${initDate.getFullYear()}-${('0' + (initDate.getMonth() + 1)).slice(-2)}-${('0' + initDate.getDate()).slice(-2)}`;
+
+            // const fecha_fin = eventoInfo.end_date.split("/");
+            const endDate = new Date(eventoInfo.end_date * 1000);
+            document.getElementById("endevent").value = `${endDate.getFullYear()}-${('0' + (endDate.getMonth() + 1)).slice(-2)}-${('0' + endDate.getDate()).slice(-2)}`;
+
+
+            setID(id);
+            setName(eventoInfo.name);
+            setDescription(eventoInfo.description);
+            setStartDate(eventoInfo.start_date);
+            setEndDate(eventoInfo.end_date);
+            setImage(eventoInfo.image);
+        }
+        );
+        // const info= data.data();
+        // const arrayData = data.docs(doc => ({ id: doc.id, ...doc.data() }));
+        // console.log(data);
 
     }
 
@@ -203,11 +272,11 @@ const Events = () => {
         setEndDate('');
         setImage('');
         setError(null);
-            
+
         document.getElementById("formularioeventos").reset();
     }
 
-    const modificarFechaIni= (e) => {
+    const modificarFechaIni = (e) => {
         setStartDate(e.target.value);
         setEditFechaIni(true);
     }
@@ -217,41 +286,8 @@ const Events = () => {
         setEditFechaFin(true);
     }
 
-    const buscarEvento = (e) => {
-        setBusqueda(e.target.value);
-        if(busqueda === ""){
-            obtenerEventos();
-        }else{
-            setEventos(items.filter(ev => ev.name.includes(busqueda)));
-        }
-    }
 
-    const siguientePagina = () => {
-        if(pagActual !== numPaginas){
-            let ia = itemActual + 5;
-            setItemActual(ia);
-            setEventos(items.slice(itemActual, ia));
-            setPagActual(pagActual + 1);
-        }
-    }
 
-    const paginaAnterior = () => {
-        if(pagActual !== 1){
-            let ia = itemActual - 5;
-            const itt = ia - 5;
-            setItemActual(ia);
-            setEventos(items.slice(itt, ia));
-            setPagActual(pagActual - 1);
-        } 
-    }
-
-    const irAPagina = (pag) => {
-        const it = pag * 5;
-        const itt = it - 5;
-        setItemActual(it);
-        setEventos(items.slice(itt,it));
-        setPagActual(pag);
-    }
 
     return (
         <div className="background">
@@ -265,7 +301,7 @@ const Events = () => {
                         <div className="modal-dialog modal-dialog-centered modal-lg">
                             <div className="modal-content">
                                 <div className="modal-header">
-                                    <h4 className="modal-title">{edit ? 'Editar Evento':'Nuevo Evento'}</h4>
+                                    <h4 className="modal-title">{edit ? 'Editar Evento' : 'Nuevo Evento'}</h4>
                                     <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={() => cancelarEdit()}></button>
                                 </div>
                                 <form id="formularioeventos" onSubmit={e => edit ? modificarEvento(e) : nuevoEvento(e)}>
@@ -276,11 +312,11 @@ const Events = () => {
                                             </div>
                                         )}
                                         <div className="form-floating mt-3">
-                                            <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value.replace(/"/g,"'"))} required></input>
+                                            <input type="text" className="form-control" id="name" placeholder="Nombre" name="name" maxLength="50" onChange={e => setName(e.target.value.replace(/"/g, "'"))} required></input>
                                             <label htmlFor="name">Nombre</label>
                                         </div>
                                         <div className="form-floating mt-3">
-                                            <textarea className="form-control text" id="description" name="description" placeholder="Descripción"  onChange={e => setDescription(e.target.value.replace(/"/g,"'"))} required></textarea>
+                                            <textarea className="form-control text" id="description" name="description" placeholder="Descripción" onChange={e => setDescription(e.target.value.replace(/"/g, "'"))} required></textarea>
                                             <label htmlFor="description">Descripción</label>
                                         </div>
                                         <div className="d-flex mt-4">
@@ -300,11 +336,11 @@ const Events = () => {
                                     </div>
                                     <div className="modal-footer">
                                         {loading ? (
-                                            <button type="submit" className="btn btn-success" value={edit ? 'Editar':'Añadir'}>
+                                            <button type="submit" className="btn btn-success" value={edit ? 'Editar' : 'Añadir'}>
                                                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                                                 Cargando...
                                             </button>
-                                        ):(<input type="submit" className="btn btn-success" value={edit ? 'Editar':'Añadir'}></input>)}
+                                        ) : (<input type="submit" className="btn btn-success" value={edit ? 'Editar' : 'Añadir'}></input>)}
 
                                         <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={() => cancelarEdit()}>Cancelar</button>
                                     </div>
@@ -312,11 +348,28 @@ const Events = () => {
                             </div>
                         </div>
                     </div>
-                    <div className=" ms-auto me-5">
+                    {/* <div className=" ms-auto me-5">
                         <input type="text" id="busc" className="form-control form-control-md text-dark" placeholder="Buscar" onChange={e => buscarEvento(e)} onKeyDown={e => buscarEvento(e)}></input>
-                    </div>
+                    </div> */}
                 </div>
-                <div className="mt-4 table-container rounded">
+
+                <MDBDataTableV5
+                    hover
+                    entriesOptions={[5, 20, 25]}
+                    entries={5}
+                    pagesAmount={4}
+                    data={datatable}
+                    paging
+                    // searchTop
+                    theadColor='elegant-color'
+                    theadTextWhite
+                    tbodyColor='rgba-grey-strong'
+                    searchingLabel=''
+                    searchBottom={true}
+                    className="table-container mt-2"
+
+                />
+                {/* <div className="mt-4 table-container rounded">
                     <table className="table table-striped table-hover">
                         <thead className="table-dark">
                             <tr>
@@ -341,8 +394,8 @@ const Events = () => {
                             }
                         </tbody>
                     </table>
-                </div>
-                <nav className="mt-3" aria-label="Page navigation example">
+                </div> */}
+                {/* <nav className="mt-3" aria-label="Page navigation example">
                     <ul className="pagination justify-content-center">
                         <li className={pagActual === 1 ? "page-item disabled" : "page-item"} onClick={() => paginaAnterior()}>
                             <a className={pagActual === 1 ? "page-link disabled-button" : "page-link clickable"}>Anterior</a>
@@ -357,7 +410,7 @@ const Events = () => {
                             <a className={pagActual === numPaginas ? "page-link disabled-button" : "page-link clickable"}>Siguiente</a>
                         </li>
                     </ul>
-                </nav>
+                </nav> */}
             </div>
         </div>
     )

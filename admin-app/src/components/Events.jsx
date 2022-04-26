@@ -76,7 +76,7 @@ const Events = () => {
                 tableRow.push({
                     id: element.id,
                     name: element.name,
-                    description: element.description.length > 200 ? `${element.description.substring(0, 200)}...` : element.description,
+                    description: element.description.length > 160 ? `${element.description.substring(0, 160)}...` : element.description,
                     start_date: moment.unix(element.start_date.seconds).format('DD/MM/YYYY'),
                     end_date: moment.unix(element.end_date.seconds).format('DD/MM/YYYY'),
                     options: <div className="d-flex"><button className="btn btn-light" onClick={() => loadModalModificarEvento(element.id)} data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarEvento(element.id)}>Eliminar</button></div>,
@@ -221,7 +221,7 @@ const Events = () => {
 
     const loadModalModificarEvento = (id) => {
         setEdit(true);
-        const data = db.collection('events').doc(id).get().then(e => {
+        db.collection('events').doc(id).get().then(e => {
 
             const eventoInfo = e.data();
             
@@ -280,7 +280,7 @@ const Events = () => {
             </div>
             <div className="container d-flex flex-column">
                 <div className="d-flex mt-5">
-                    <button className="btn btn-success ms-5" data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Nuevo Evento</button>
+                    <button className="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevoeventomodal">Nuevo Evento</button>
                     <div className="modal fade text-dark" id="nuevoeventomodal">
                         <div className="modal-dialog modal-dialog-centered modal-lg">
                             <div className="modal-content">
@@ -345,8 +345,7 @@ const Events = () => {
                     theadTextWhite
                     tbodyColor='rgba-grey-strong'
                     searchBottom={true}
-                    className="table-container mt-2"
-
+                    className="mt-2"
                 />
             </div>
         </div>

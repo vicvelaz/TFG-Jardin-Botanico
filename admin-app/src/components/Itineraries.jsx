@@ -62,9 +62,10 @@ const Itineraries = () => {
           tableRow.push({
               id: element.id,
               name: element.name,
-              description: element.description.length > 200 ? `${element.description.substring(0, 200)}...` : element.description,
+              description: element.description.length > 240 ? `${element.description.substring(0, 240)}...` : element.description,
               options: <div className="d-flex"><button className="btn btn-light" onClick={() => loadModalModificarItinerario(element.id)} data-bs-toggle="modal" data-bs-target="#nuevoitinerariomodal">Editar</button><button className="btn btn-danger ms-3" onClick={() => eliminarItinerario(element.id)}>Eliminar</button></div>,
           })
+        
       })
 
 
@@ -253,7 +254,7 @@ const Itineraries = () => {
       <div className="container d-flex flex-column">
         <div className="d-flex mt-5">
           <button
-            className="btn btn-success ms-5"
+            className="btn btn-success"
             data-bs-toggle="modal"
             data-bs-target="#nuevoitinerariomodal"
           >
@@ -357,7 +358,7 @@ const Itineraries = () => {
                     theadTextWhite
                     tbodyColor='rgba-grey-strong'
                     searchBottom={true}
-                    className="table-container mt-2"
+                    className="mt-2"
                 />
       </div> 
     </div>

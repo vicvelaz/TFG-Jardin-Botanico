@@ -133,14 +133,14 @@ const Map = ({ route, navigation }: Props) => {
       for(const element of arrayData){
           let trad = await traducir([element.name,element.description]);
           arrayPlants.push({
-            id: element.id, name: trad[0], scientific_name: element.type === 'plant' ? element.scientific_name : element.otherServices ? 'Otros Servicios' : 'Punto de Interés', description: element.type === 'place' && element.otherServices ? "No hay descripción" : trad[1],
+            id: element.id, name: trad[0], scientific_name: element.type === 'plant' ? element.scientific_name : element.otherServices ? "Other Services" : "Point of Interest", description: element.type === 'place' && element.otherServices ? "No description found" : trad[1],
             positionLat: element.position._lat, positionLong: element.position._long, audio: element.audio, image: element.media[0]
           });
       }
     }else{
       arrayData.forEach((element: any) => {
         arrayPlants.push({
-          id: element.id, name: element.name, scientific_name: element.scientific_name, description: element.description,
+          id: element.id, name: element.name, scientific_name: element.type === 'plant' ? element.scientific_name : element.otherServices ? 'Otros Servicios' : 'Punto de Interés', description: element.type === 'place' && element.otherServices ? "No hay descripción" : element.description,
           positionLat: element.position._lat, positionLong: element.position._long, audio: element.audio, image: element.media[0]
         });
       });

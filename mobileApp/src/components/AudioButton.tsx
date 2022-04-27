@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { AppState, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Sound from 'react-native-sound';
 import { StackNavigationProp } from '@react-navigation/stack';
+import * as RNLocalize from "react-native-localize";
+import traducir from "../traducir"
 
 
 interface Props {
@@ -15,8 +17,10 @@ export const AudioButton = ({ audioURL,navigation,plantButton}: Props) => {
 
     const [audioState, setAudioState] = useState<string>('off');//Puede estar playing, pause, off
     const [control_Online, setControl_Online] = useState<Sound>();
+    const [staticText, setStaticText] = useState<string[]>(['Audio no disponible', 'Parar', 'Continuar', 'Detener', 'Iniciar Audio']);
 
     useEffect(() => {
+        getLanguage();
         if (audioURL != '') {
             Sound.setCategory('Playback', true);
             setControl_Online(new Sound(audioURL, '', (error) => {
@@ -25,6 +29,15 @@ export const AudioButton = ({ audioURL,navigation,plantButton}: Props) => {
         }
         
     }, [])
+
+    const getLanguage = async () => {
+        if (RNLocalize.getLocales()[0].languageCode != 'es') {
+            const trad = await traducir(['Audio no disponible', 'Parar', 'Continuar', 'Detener', 'Iniciar Audio'])
+            setStaticText(trad);
+        } else {
+            setStaticText(['Audio no disponible', 'Parar', 'Continuar', 'Detener', 'Iniciar Audio'])
+        }
+    }
 
     // Cierra el audio si pulsamos el botón de atras
     const _handleNavigationFocusChange = () => {
@@ -70,7 +83,7 @@ export const AudioButton = ({ audioURL,navigation,plantButton}: Props) => {
                 disabled={true}
                 style={plantButton ? { ...styles.button, backgroundColor: 'grey' }:{ ...stylesButtonMap.button, backgroundColor: 'grey' }}
             >
-                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Audio no disponible</Text>
+                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>{staticText[0]}</Text>
 
             </TouchableOpacity>
         )
@@ -86,21 +99,21 @@ export const AudioButton = ({ audioURL,navigation,plantButton}: Props) => {
                     onPress={() => { audioState == 'playing' ? executeAction('pause') : executeAction('play') }}
                 >
                     <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>
-                        {audioState == 'playing' ? 'Parar' : 'Continuar'}
+                        {audioState == 'playing' ? staticText[1] : staticText[2]}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={plantButton ? styles.smallButton : stylesButtonMap.smallButton}
                     onPress={() => executeAction('stop')}
                 >
-                    <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Detener</Text>
+                    <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>{staticText[3]}</Text>
                 </TouchableOpacity>
             </View>
             : <TouchableOpacity
                 style={plantButton ? styles.button : stylesButtonMap.button}
                 onPress={() => executeAction('play')}
             >
-                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>Iniciar audio</Text>
+                <Text style={plantButton ? styles.buttonText : stylesButtonMap.buttonText}>{staticText[4]}</Text>
             </TouchableOpacity>
 
     )

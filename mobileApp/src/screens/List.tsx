@@ -3,10 +3,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Dimensions, FlatList, Image, ImageBackground, LogBox, SafeAreaView, StyleSheet, Text, TextInput } from 'react-native';
 import { db } from '../firebase/firebase-config';
 import { SearchBar } from 'react-native-elements';
+import * as RNLocalize from "react-native-localize";
+import traducir from "../traducir"
 
 import { Item } from '../components/Item';
 
-import traducir from "../traducir"
 
 
 
@@ -38,6 +39,7 @@ export const List = ({ route, navigation }: Props) => {
     const [items, setItems] = useState<any>([]);
     const [otherServices, setOtherServices] = useState<any>([])
     const [isPlaces, setIsPlaces] = useState<boolean>(false)
+    const [staticText, setStaticText] = useState<string[]>(['Puntos de Interés', 'Otros Servicios', 'Busca aquí...']);
 
     const updateSearch: any = (text: any) => {
 
@@ -65,9 +67,17 @@ export const List = ({ route, navigation }: Props) => {
             const data = await db.collection('plants').where('type', '==', 'plant').orderBy('name').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const arrayPlants: Data[] = [];
-            arrayData.forEach((element: any) => {
-                arrayPlants.push({ id: element.id, name: element.name, image: element.media[0] });
-            });
+            if (RNLocalize.getLocales()[0].languageCode != 'es') {
+                for(const element of arrayData){
+                    let trad = await traducir([element.name]);
+                    arrayPlants.push({ id: element.id, name: trad[0], image: element.media[0] });
+                }
+            }else{
+                arrayData.forEach((element: any) => {
+                    arrayPlants.push({ id: element.id, name: element.name, image: element.media[0] });
+                });
+            }
+            
             setItems(arrayPlants);
             setstate({
                 isLoading: false,
@@ -91,12 +101,23 @@ export const List = ({ route, navigation }: Props) => {
             const os = arrayData.filter((place: any) => place.otherServices !== undefined && place.otherServices);
             const pl = arrayData.filter((place: any) => place.otherServices === undefined || !place.otherServices);
 
-            pl.forEach((element: any) => {
-                arrayPlaces.push({ id: element.id, name: element.name, image: element.media[0] });
-            });
-            os.forEach((element: any) => {
-                arrayOtherServices.push({ id: element.id, name: element.name, image: element.media[0] });
-            });
+            if (RNLocalize.getLocales()[0].languageCode != 'es') {
+                for(const element of pl){
+                    let trad = await traducir([element.name]);
+                    arrayPlaces.push({ id: element.id, name: trad[0], image: element.media[0] });
+                }
+                for(const element of os){
+                    let trad = await traducir([element.name]);
+                    arrayOtherServices.push({ id: element.id, name: trad[0], image: element.media[0] });
+                }
+            }else{
+                pl.forEach((element: any) => {
+                    arrayPlaces.push({ id: element.id, name: element.name, image: element.media[0] });
+                });
+                os.forEach((element: any) => {
+                    arrayOtherServices.push({ id: element.id, name: element.name, image: element.media[0] });
+                });
+            }
 
             setItems(arrayPlaces);
             setOtherServices(arrayOtherServices);
@@ -116,9 +137,17 @@ export const List = ({ route, navigation }: Props) => {
             const data = await db.collection('itinerary').orderBy('name', 'desc').get();
             const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             const arrayItineraries: Data[] = [];
-            arrayData.forEach((element: any) => {
-                arrayItineraries.push({ id: element.id, name: element.name, image: element.media[0] });
-            });
+            if (RNLocalize.getLocales()[0].languageCode != 'es') {
+                for(const element of arrayData){
+                    let trad = await traducir([element.name]);
+                    arrayItineraries.push({ id: element.id, name: trad[0], image: element.media[0] });
+                }
+            }else{
+                arrayData.forEach((element: any) => {
+                    arrayItineraries.push({ id: element.id, name: element.name, image: element.media[0] });
+                });
+            }
+            
             setItems(arrayItineraries);
             setstate({
                 isLoading: false,
@@ -146,16 +175,26 @@ export const List = ({ route, navigation }: Props) => {
         }
     }
 
+    const getLanguage = async () => {
+        if (RNLocalize.getLocales()[0].languageCode != 'es') {
+            const trad = await traducir(['Puntos de Interés', 'Otros Servicios','Busca aquí...'])
+            setStaticText(trad);
+        } else {
+            setStaticText(['Puntos de Interés', 'Otros Servicios','Busca aquí...'])
+        }
+    }
+
     useEffect(() => {
         // navigation.setOptions({ title: route.params?.title });
         getItems();
+        getLanguage();
     }, [route.params?.title])
 
     return (
         <SafeAreaView style={styles.container}>
             <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.container}>
                 <SearchBar
-                    placeholder="Escribe aquí..."
+                    placeholder={RNLocalize.getLocales()[0].languageCode != 'es' ? staticText[2] : "Escribe aquí..."}
                     accessibilityRole="search"
                     platform='android'
                     onChangeText={updateSearch}
@@ -172,7 +211,7 @@ export const List = ({ route, navigation }: Props) => {
                 onKeyPress={(event) => updateSearch( undefined )}
                 /> */}
 
-                {isPlaces && <Text style={styles.title}>Puntos de Interés</Text>}
+                {isPlaces && <Text style={styles.title}>{staticText[0]}</Text>}
                 <FlatList
                     style={styles.list}
                     data={items}
@@ -187,7 +226,7 @@ export const List = ({ route, navigation }: Props) => {
                     keyExtractor={({ id }: Data) => id.toString()}
                     numColumns={2}
                 />
-                {isPlaces && <Text style={styles.title}>Otros Servicios</Text>}
+                {isPlaces && <Text style={styles.title}>{staticText[1]}</Text>}
                 {isPlaces && <FlatList
                     style={styles.list}
                     data={otherServices}

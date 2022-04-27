@@ -89,7 +89,7 @@ export const MainMenu = ({ navigation }: Props) => {
     return (
         <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.backgroundImage}>
             <View style={styles.container}>
-                <Text style={styles.mainTitle}>Real Jardín Botánico App</Text>
+                <Image source={require('../img/logo.png')} style={styles.logo}></Image>
                 <View style={styles.events}>
                     {/*EVENTOS*/}
                     <Text style={styles.eventsTitle}>{staticText[0]}</Text>
@@ -167,6 +167,12 @@ const styles = StyleSheet.create({
 
     backgroundImage: {
         flex: 1,
+    },
+    logo: {
+        width: 354,
+        height: 91,
+        alignSelf: 'center',
+        marginTop: 30,
     },
     container: {
         flex: 1,

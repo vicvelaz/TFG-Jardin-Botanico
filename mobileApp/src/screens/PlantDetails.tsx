@@ -6,7 +6,8 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { db } from '../firebase/firebase-config';
 import { AudioButton } from '../components/AudioButton';
 import Geolocation from 'react-native-geolocation-service';
-import { center } from '@turf/turf';
+import * as RNLocalize from "react-native-localize";
+import traducir from "../traducir"
 
 interface Props extends StackScreenProps<any, 'PlantDetails'> { };
 
@@ -44,6 +45,8 @@ export const PlantDetails = ({ route, navigation }: Props) => {
     const [userPositionLat, setUserPositionLat] = React.useState<number>(40.411147);
     const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.690750);
 
+    const [staticText, setStaticText] = useState<string[]>(['Mostrar ubicación', 'Iniciar ruta']);
+
 
     const getDetails = async () => {
         try {
@@ -51,9 +54,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
 
             const info: any = data.data();
             const arrayImages: JSX.Element[] = [];
-
-            console.log(info);
-
+            
             if (info.media == undefined || info.media == '') {
                 arrayImages.push(
                     <View >
@@ -69,6 +70,11 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                         </View>
                     )
                 });
+            }
+
+            if (RNLocalize.getLocales()[0].languageCode != 'es') {
+                const trad = await traducir([info.description]);
+                info.description = trad[0];
             }
 
             setImage(arrayImages);
@@ -88,7 +94,17 @@ export const PlantDetails = ({ route, navigation }: Props) => {
         requestPermissions();
         checkUserPosition();
         getDetails();
+        getLanguage();
     }, [])
+
+    const getLanguage = async () => {
+        if (RNLocalize.getLocales()[0].languageCode != 'es') {
+            const trad = await traducir(['Mostrar ubicación', 'Iniciar ruta'])
+            setStaticText(trad);
+        } else {
+            setStaticText(['Mostrar ubicación', 'Iniciar ruta'])
+        }
+    }
 
     async function requestPermissions() {
         await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
@@ -159,7 +175,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                             style={[state.data.otherServices? styles.button : styles.smallButton]}
                                 onPress={() => navigation.navigate('ShowItemPosition',{ info: state.data, id:route.params?.id })}
                             >
-                                <Text style={styles.buttonText}>Mostrar ubicación</Text>
+                                <Text style={styles.buttonText}>{staticText[0]}</Text>
                             </TouchableOpacity>
 
                         </View>
@@ -168,7 +184,7 @@ export const PlantDetails = ({ route, navigation }: Props) => {
                             style={styles.button}
                             onPress={() => navigation.navigate('ShowItemItinerary',{ info: state.data, userposition: {long: userPositionLong, lat: userPositionLat}, id:route.params?.id })}
                         >
-                            <Text style={styles.buttonText}>Iniciar ruta</Text>
+                            <Text style={styles.buttonText}>{staticText[1]}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>}

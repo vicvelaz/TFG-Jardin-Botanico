@@ -7,6 +7,8 @@ import { db } from '../firebase/firebase-config';
 import SwipeUpDown, { SwipeUpDownProps } from 'react-native-swipe-up-down';
 import { AudioButton } from '../components/AudioButton';
 import { StackScreenProps } from '@react-navigation/stack';
+import * as RNLocalize from "react-native-localize";
+import traducir from "../traducir"
 
 MapboxGL.setAccessToken('pk.eyJ1IjoicmFteG5jaHYiLCJhIjoiY2t6c2IybzZrNXB2aDMwbzFnbmFsOXptNSJ9.CQqoytOo3yM-pGaCRIGgjw');
 interface Props extends StackScreenProps<any, 'MapScreen'> { };
@@ -26,6 +28,8 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const Map = ({ route, navigation }: Props) => {
+
+  const [staticText, setStaticText] = React.useState<string[]>(['Iniciar ruta', 'Volver atrás', 'Mostrar caminos accesibles', 'UBICACIÓN ACTUAL']);
 
   //constantes del jardin con coordenadas fijas
   const zoomMinimo: number = 17;
@@ -67,12 +71,22 @@ const Map = ({ route, navigation }: Props) => {
 
   //useEffect al cargar el componente
   React.useEffect(() => {
+    getLanguage();
     requestPermissions();
     checkUserPosition();
     obtenerPlantas();
     obtenerZonas();
     disableLogger();
   }, []);
+
+  const getLanguage = async () => {
+    if (RNLocalize.getLocales()[0].languageCode != 'es') {
+        const trad = await traducir(['Iniciar ruta', 'Volver atrás', 'Mostrar caminos accesibles','UBICACIÓN ACTUAL'])
+        setStaticText(trad);
+    } else {
+        setStaticText(['Iniciar ruta', 'Volver atrás', 'Mostrar caminos accesibles','UBICACIÓN ACTUAL'])
+    }
+}
 
   //consulta de zonas a firebase
   const obtenerZonas = async () => {
@@ -112,15 +126,26 @@ const Map = ({ route, navigation }: Props) => {
 
   //consulta de plantas a firebase
   const obtenerPlantas = async () => {
-    const data = await db.collection('plants').where('type', '==', 'plant').get();
+    const data = await db.collection('plants').get();
     const arrayData: any = data.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     const arrayPlants: Data[] = [];
-    arrayData.forEach((element: any) => {
-      arrayPlants.push({
-        id: element.id, name: element.name, scientific_name: element.scientific_name, description: element.description,
-        positionLat: element.position._lat, positionLong: element.position._long, audio: element.audio, image: element.media[0]
+    if (RNLocalize.getLocales()[0].languageCode != 'es') {
+      for(const element of arrayData){
+          let trad = await traducir([element.name,element.description]);
+          arrayPlants.push({
+            id: element.id, name: trad[0], scientific_name: element.type === 'plant' ? element.scientific_name : element.otherServices ? 'Otros Servicios' : 'Punto de Interés', description: element.type === 'place' && element.otherServices ? "No hay descripción" : trad[1],
+            positionLat: element.position._lat, positionLong: element.position._long, audio: element.audio, image: element.media[0]
+          });
+      }
+    }else{
+      arrayData.forEach((element: any) => {
+        arrayPlants.push({
+          id: element.id, name: element.name, scientific_name: element.scientific_name, description: element.description,
+          positionLat: element.position._lat, positionLong: element.position._long, audio: element.audio, image: element.media[0]
+        });
       });
-    });
+    }
+    
     setPlants(arrayPlants);
   }
 
@@ -246,17 +271,17 @@ const Map = ({ route, navigation }: Props) => {
           itemMini={(show: SwipeUpDownProps) =>
             <View style={[textStyle.miniInfoView]}>
               <Text style={textStyle.baseText}>{actualPlace}</Text>
-              <Text style={textStyle.titulo}>UBICACIÓN ACTUAL</Text>
+              <Text style={textStyle.titulo}>{staticText[3]}</Text>
             </View>}
           itemFull={(hide: SwipeUpDownProps) =>
             <View style={textStyle.maxInfoView}>
               <View style={textStyle.ubicacionInfo}>
                 <Text style={swipeUpMinimized ? textStyle.baseText : textStyle.baseTextMinimized}>{actualPlace}</Text>
-                <Text style={swipeUpMinimized ? textStyle.sci_name : textStyle.sci_name_minimized}>UBICACIÓN ACTUAL</Text>
+                <Text style={swipeUpMinimized ? textStyle.sci_name : textStyle.sci_name_minimized}>{staticText[3]}</Text>
               </View>
               <View style={textStyle.switchView}>
                 <Image source={require('../img/wheelchair.png')} style={textStyle.switchImg}></Image>
-                <Text style={textStyle.switchText}>Mostrar caminos accesibles</Text>
+                <Text style={textStyle.switchText}>{staticText[2]}</Text>
                 <Switch
                   trackColor={{ false: "#9c9c9c", true: "#9c9c9c" }}
                   thumbColor="#003d88"
@@ -311,7 +336,7 @@ const Map = ({ route, navigation }: Props) => {
                         userposition: { long: userPositionLong, lat: userPositionLat },
                         id: route.params?.id
                       })}>
-                    <Text style={buttonStyle.buttonText}>Iniciar Ruta</Text>
+                    <Text style={buttonStyle.buttonText}>{staticText[0]}</Text>
                   </Pressable>
                   <AudioButton
                     audioURL={selectedPlantAudio}
@@ -319,7 +344,7 @@ const Map = ({ route, navigation }: Props) => {
                     plantButton={false}
                   />
                   <Pressable style={buttonStyle.buttonMin} onPressOut={() => backToPosition()}>
-                    <Text style={buttonStyle.buttonTextMin}>Volver a ver Ubicación</Text>
+                    <Text style={buttonStyle.buttonTextMin}>{staticText[1]}</Text>
                   </Pressable>
                 </View>
               </View>

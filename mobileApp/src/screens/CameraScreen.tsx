@@ -5,6 +5,8 @@ import { ImageBackground, PermissionsAndroid, ScrollView, StyleSheet, TouchableO
 import { Text } from "react-native-elements";
 import { ImagePickerResponse, launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Carousel from "react-native-snap-carousel";
+import * as RNLocalize from "react-native-localize";
+import traducir from "../traducir"
 
 interface Props extends StackScreenProps<any, 'CameraScreen'> { };
 
@@ -16,16 +18,28 @@ export const CameraScreen = ({ route, navigation }: Props) => {
     const [isLoading, setLoading] = useState<boolean>(true);
     const [image, setImage] = useState<JSX.Element[]>([]);
     const [index, setIndex] = useState(0);
+    const [isPlant, setIsPlant] = useState<boolean>(true);
 
     const [name, setName] = useState<string>();
     const [scientificName, setScientificName] = useState<string>();
     const [description, setDescription] = useState<string>();
+    const [staticText, setStaticText] = useState<string[]>(['Identificador de Plantas: ','No hay descripción de la planta','Planta no identificada','No se pudo identificar la planta. Intenta hacer otra fotografía con la mayor claridad posible.','Identificando...','Estamos identificando la planta...', 'Reabrir cámara']);
 
     React.useEffect(() => {
+        getLanguage();
         navigation.setOptions({ title: "Identificador de Plantas" });
         requestPermissions();
         abrirCamara();
     }, []);
+
+    const getLanguage = async () => {
+        if (RNLocalize.getLocales()[0].languageCode != 'es') {
+            const trad = await traducir(['Identificador de Plantas: ','No hay descripción de la planta','Planta no identificada','No se pudo identificar la planta. Intenta hacer otra fotografía con la mayor claridad posible.','Identificando...','Estamos identificando la planta...', 'Reabrir cámara'])
+            setStaticText(trad);
+        } else {
+            setStaticText(['Identificador de Plantas: ','No hay descripción de la planta','Planta no identificada','No se pudo identificar la planta. Intenta hacer otra fotografía con la mayor claridad posible.','Identificando...','Estamos identificando la planta...', 'Reabrir cámara'])
+        }
+    }
 
     async function requestPermissions() {
         await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
@@ -50,7 +64,7 @@ export const CameraScreen = ({ route, navigation }: Props) => {
             images: [base64photo],
             /* modifiers docs: https://github.com/flowerchecker/Plant-id-API/wiki/Modifiers */
             modifiers: ["crops_fast", "similar_images", "health_all", "disease_similar_images"],
-            plant_language: "es",
+            plant_language: RNLocalize.getLocales()[0].languageCode != 'es' ? "en" : "es",
             /* plant details docs: https://github.com/flowerchecker/Plant-id-API/wiki/Plant-details */
             plant_details: ["common_names",
                 "url",
@@ -69,9 +83,10 @@ export const CameraScreen = ({ route, navigation }: Props) => {
                 const d = res.data;
                 const arrayImages: JSX.Element[] = [];
                 if (d.is_plant) {
+                    setIsPlant(true);
                     if(d.suggestions !== null && d.suggestions !== undefined){
                         if(d.suggestions[0].plant_details.common_names !== null && d.suggestions[0].plant_details.common_names !== undefined){
-                            navigation.setOptions({ title: "Identificador de Plantas: " + d.suggestions[0].plant_details.common_names[0] });
+                            navigation.setOptions({ title: staticText[0] + d.suggestions[0].plant_details.common_names[0] });
                         }
                         if(d.suggestions[0].plant_name !== null && d.suggestions[0].plant_name !== undefined){
                             setScientificName(d.suggestions[0].plant_name);
@@ -81,7 +96,7 @@ export const CameraScreen = ({ route, navigation }: Props) => {
                             console.log(d.suggestions[0].plant_details.wiki_description.value)
                             setDescription(d.suggestions[0].plant_details.wiki_description.value)
                         }else{
-                            setDescription("No hay descripción de la planta")
+                            setDescription('No hay descripción de la planta')
                         }
                         if(d.suggestions[0].similar_images !== null && d.suggestions[0].similar_images !== undefined){
                             d.suggestions[0].similar_images.forEach((element: any) => {
@@ -94,14 +109,12 @@ export const CameraScreen = ({ route, navigation }: Props) => {
                         }
                     }
                 } else {
-
+                    setIsPlant(false)
                     arrayImages.push(
                         <View >
                             <Image style={styles.image} source={require('../img/image-not-found.jpg')} />
                         </View>
                     );
-                    setScientificName("Planta no identificada");
-                    setDescription("No se pudo identificar la planta. Intenta hacer otra fotografía con la mayor claridad posible.");
                 }
 
                 setImage(arrayImages);
@@ -118,7 +131,8 @@ export const CameraScreen = ({ route, navigation }: Props) => {
         <ImageBackground source={require('../img/background-dark.jpg')} resizeMode="cover" style={styles.container}>
             <View>
                     {
-                        isLoading ? <Text style={styles.scientific_name}>Identificando...</Text> : <Text style={styles.scientific_name}>{scientificName}</Text>
+                        isLoading ? <Text style={styles.scientific_name}>{staticText[4]}</Text> : <Text style={styles.scientific_name}>
+                            {isPlant ? scientificName : staticText[2]}</Text>
                     }
                     {isLoading ? 
                     <View style={styles.carousel}>
@@ -145,10 +159,15 @@ export const CameraScreen = ({ route, navigation }: Props) => {
                     <View style={[styles.block, (scientificName != '' && scientificName != undefined) ? { height: windowHeight - 405 } : { height: windowHeight - 350 }]}>
                         <View style={styles.description}>
                             <ScrollView >
-                                {isLoading ? <Text style={styles.descriptionText}>Estamos identificando la planta...</Text> : <Text style={styles.descriptionText}>{description}</Text> }
+                                {isLoading ? <Text style={styles.descriptionText}>{staticText[5]}</Text> : <Text style={styles.descriptionText}>
+                                    {isPlant ? description : staticText[3]}</Text> }
                             </ScrollView>
                         </View>
+                        <TouchableOpacity style={styles.button} onPress={() => abrirCamara()}>
+                            <Text style={styles.buttonText}>{staticText[6]}</Text>
+                        </TouchableOpacity>
                     </View>
+                    
                 </View>
         </ImageBackground>
     )

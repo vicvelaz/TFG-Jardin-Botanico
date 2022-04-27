@@ -6,6 +6,8 @@ import Carousel from 'react-native-snap-carousel';
 import { ScrollView } from 'react-native-gesture-handler';
 import { db } from '../firebase/firebase-config';
 import Geolocation from 'react-native-geolocation-service';
+import * as RNLocalize from "react-native-localize";
+import traducir from "../traducir"
 
 interface Props extends StackScreenProps<any, 'ItineraryDetails'> { };
 
@@ -38,6 +40,7 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
     const [index, setIndex] = useState(0);
     const [userPositionLat, setUserPositionLat] = React.useState<number>(40.411147);
     const [userPositionLong, setUserPositionLong] = React.useState<number>(-3.690750);
+    const [staticText, setStaticText] = useState<string[]>(['Iniciar itinerario']);
 
     const getDetails = async () => {
         try {
@@ -54,7 +57,17 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                         arrayStops.push({id: id,... i});
                     }, Promise.resolve())
 
-                    setStops(arrayStops);
+                    if (RNLocalize.getLocales()[0].languageCode != 'es') {
+                        const translatedStops: any[] = [];
+                        for(const element of arrayStops){
+                            let trad = await traducir([element.name]);
+                            translatedStops.push({ id: element.id, name: trad[0], image: element.media[0] });
+                        }
+                        setStops(translatedStops);
+                        
+                    }else{
+                        setStops(arrayStops);
+                    }
 
                     const arrayImagesURL: any[] = [];
                     arrayImagesURL.push(info.media[0]);
@@ -70,6 +83,11 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                             </View>
                         )
                     });
+
+                    if (RNLocalize.getLocales()[0].languageCode != 'es') {
+                        const trad = await traducir([info.description]);
+                        info.description = trad[0];
+                    }
                     setImages(arrayImages);
                     setstate({
                         isLoading: false,
@@ -85,12 +103,22 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
         }
     }
 
+    const getLanguage = async () => {
+        if (RNLocalize.getLocales()[0].languageCode != 'es') {
+            const trad = await traducir(['Iniciar itinerario'])
+            setStaticText(trad);
+        } else {
+            setStaticText(['Iniciar itinerario'])
+        }
+    }
+
   
     useEffect(() => {
         navigation.setOptions({ title: route.params?.title })
         requestPermissions();
         checkUserPosition();
         getDetails();
+        getLanguage();
     }, [])
 
     async function requestPermissions() {
@@ -173,7 +201,7 @@ export const ItineraryDetails = ({ route, navigation }: Props) => {
                             { info: state.data, userposition: {long: userPositionLong, lat: userPositionLat},
                              stops: stops, id:route.params?.id })}
                         >
-                            <Text style={styles.buttonText}>Iniciar itinerario</Text>
+                            <Text style={styles.buttonText}>{staticText[0]}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

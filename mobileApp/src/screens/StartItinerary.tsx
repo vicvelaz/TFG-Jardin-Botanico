@@ -55,7 +55,7 @@ export const StartItinerary = ({ route, navigation }: Props) => {
           origin={[route.params?.userposition.long, route.params?.userposition.lat]}
           destination={[route.params?.stops[route.params?.stops.length - 1].position._long, route.params?.stops[route.params?.stops.length - 1].position._lat]}
           waypoints={route.params?.stops.filter(filterLast).map((s: any) => [s.position._long, s.position._lat])}
-          shouldSimulateRoute={true/*false*/}
+          shouldSimulateRoute={false}
           onLocationChange={(event) => {
 
           }}

@@ -26,7 +26,7 @@ Para realizar la instalación del proyecto, serán necesarios realizar los sigui
 
 * Clonar el repositorio en nuestro equipo.
 * Realizar el siguiente comando desde las carpetas admin-app y mobileApp: ``` npm install ```
-* Después, dentro de la ruta /mobileApp copiar el contenido del directorio modulosBackUp dentro de node_modules, sobreescribiendo así el contenido de las dos librerías.
+* Después, dentro de la ruta /mobileApp, copiar el contenido del directorio modulosBackUp dentro de node_modules, sobreescribiendo así el contenido de las dos librerías incluidas.
 * A continuación, se deberá lanzar los siguientes comandos dentro de su respectiva carpeta para lanzar la aplicación correspondiente:
   *  admin-app ``` npm start ```
   *  mobileApp ``` npx react-native run-android ```

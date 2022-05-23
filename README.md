@@ -9,12 +9,19 @@ Gracias a este trabajo, los usuarios disponen de una forma sencilla de acceso a 
 Para la implementación de este trabajo de fin de grado se ha desarrollado un sistema compuesto por una aplicación para dispositivos Android que hace uso de la información añadida en la base de datos mediante una aplicación web que funciona como gestor de contenidos.
 
 
-### Pre-requisitos 📋
+## Pre-requisitos 📋
 
 
 
-### Instalación 🔧
+## Instalación 🔧
 
+Para realizar la instalación del proyecto, serán necesarios realizar los siguientes pasos:
+
+* Clonar el repositorio en nuestro equipo.
+* Realizar el siguiente comando desde las carpetas admin-app y mobileApp: ``` npm install ```
+* A continuación, se deberá lanzar los siguientes comandos dentro de su respectiva carpeta para lanzar la aplicación correspondiente:
+  *  admin-app ``` npm start ```
+  *  mobileApp ``` npx react-native run-android ```
 
 
 ## Construido con 🛠️
@@ -36,3 +43,8 @@ En este proyecto se utiliza React como base de la aplicación web de gestión de
 * [Plant.id](https://plant.id/) es un servicio de identificación de plantas basado en machine learning. Consiste en realizar una fotografía, enviarla a su servidor y obtener posteriormente una respuesta con varias opciones posibles ordenadas por un valor de probabilidad. En la funcionalidad de reconocimiento de plantas de la aplicación móvil se hace uso de la API que ofrece esta empresa.
 
 * [Axios](https://axios-http.com/docs/intro) es una librería Javascript que puede ejecutarse en el navegador y permite hacer cualquier operación HTTP, siendo común su uso para el consumo de API REST que devuelvan datos JSON por la simplicidad que ofrece a la hora de hacer peticiones. Esta librería se utiliza para hacer consultas a algunas APIs como Google Translate en la aplicación móvil.
+
+## Autores
+[Ramón Rosa Pérez](https://github.com/Ramxnchv)
+
+[Víctor Velázquez Cabrera](https://github.com/vicvelaz)

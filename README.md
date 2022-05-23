@@ -13,11 +13,11 @@ Para la implementación de este trabajo de fin de grado se ha desarrollado un si
 
 Para poder instalar y ejecutar las aplicaciones necesitaremos realizar las siguientes acciones
 
-* Descargar e instalar [java](https://www.oracle.com/es/java/technologies/javase/jdk11-archive-downloads.html). 
-* Descargar e instalar [git](https://git-scm.com/). 
-* Descargar e instalar [node](https://nodejs.org/es/download/).
+* Descargar e instalar [Java](https://www.oracle.com/es/java/technologies/javase/jdk11-archive-downloads.html). 
+* Descargar e instalar [Git](https://git-scm.com/). 
+* Descargar e instalar [Node](https://nodejs.org/es/download/).
 * Descargar e instalar un entorno de desarrollo como por ejemplo [Visual Studio Code](https://code.visualstudio.com/download).
-* Para poder emular la aplicación móvil, será necesario tener conectado un dispositivo android con el modo depuración activado o en su defecto utilizar el emulador que proporciona el entorno de desarrollo [Android Studio](https://nodejs.org/es/download/).
+* Para poder emular la aplicación móvil, será necesario tener conectado un dispositivo android con el modo depuración activado o en su defecto utilizar el emulador que proporciona el entorno de desarrollo [Android Studio](https://nodejs.org/es/download/). Para poder utilizar los comandos asociados a react-native debe instalar [React Native CLI](https://reactnative.dev/docs/environment-setup) siguiendo los pasos del tutorial del enlace.
 
 
 ## Instalación 🔧
@@ -26,6 +26,7 @@ Para realizar la instalación del proyecto, serán necesarios realizar los sigui
 
 * Clonar el repositorio en nuestro equipo.
 * Realizar el siguiente comando desde las carpetas admin-app y mobileApp: ``` npm install ```
+* Después, dentro de la ruta /mobileApp copiar el contenido del directorio modulosBackUp dentro de node_modules, sobreescribiendo así el contenido de las dos librerías.
 * A continuación, se deberá lanzar los siguientes comandos dentro de su respectiva carpeta para lanzar la aplicación correspondiente:
   *  admin-app ``` npm start ```
   *  mobileApp ``` npx react-native run-android ```

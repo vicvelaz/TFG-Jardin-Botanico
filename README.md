@@ -11,6 +11,13 @@ Para la implementación de este trabajo de fin de grado se ha desarrollado un si
 
 ## Pre-requisitos 📋
 
+Para poder instalar y ejecutar las aplicaciones necesitaremos realizar las siguientes acciones
+
+* Descargar e instalar [java](https://www.oracle.com/es/java/technologies/javase/jdk11-archive-downloads.html). 
+* Descargar e instalar [git](https://git-scm.com/). 
+* Descargar e instalar [node](https://nodejs.org/es/download/).
+* Descargar e instalar un entorno de desarrollo como por ejemplo [Visual Studio Code](https://code.visualstudio.com/download).
+* Para poder emular la aplicación móvil, será necesario tener conectado un dispositivo android con el modo depuración activado o en su defecto utilizar el emulador que proporciona el entorno de desarrollo [Android Studio](https://nodejs.org/es/download/).
 
 
 ## Instalación 🔧

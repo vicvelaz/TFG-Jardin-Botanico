@@ -17,7 +17,8 @@ Para poder instalar y ejecutar las aplicaciones necesitaremos realizar las sigui
 * Descargar e instalar [Git](https://git-scm.com/). 
 * Descargar e instalar [Node](https://nodejs.org/es/download/).
 * Descargar e instalar un entorno de desarrollo como por ejemplo [Visual Studio Code](https://code.visualstudio.com/download).
-* Para poder emular la aplicación móvil, será necesario tener conectado un dispositivo android con el modo depuración activado o en su defecto utilizar el emulador que proporciona el entorno de desarrollo [Android Studio](https://nodejs.org/es/download/). Para poder utilizar los comandos asociados a react-native debe instalar [React Native CLI](https://reactnative.dev/docs/environment-setup) siguiendo los pasos del tutorial del enlace.
+* Para poder emular la aplicación móvil, será necesario tener conectado un dispositivo android con el modo depuración activado o en su defecto utilizar el emulador que proporciona el entorno de desarrollo [Android Studio](https://nodejs.org/es/download/). 
+* Para poder utilizar los comandos asociados a react-native debe instalar [React Native CLI](https://reactnative.dev/docs/environment-setup) siguiendo los pasos del tutorial del enlace.
 
 
 ## Instalación 🔧

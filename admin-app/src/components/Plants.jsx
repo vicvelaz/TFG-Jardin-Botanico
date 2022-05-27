@@ -255,7 +255,6 @@ const Plants = () => {
 
             if (images !== null && images !== "") {
                 const arr = Array.from(images);
-                console.log(arr.length);
                 if (arr.length !== 0) {
                     await db.collection('plants').doc(id).update({ media: firebase.firestore.FieldValue.delete() });
                     arr.map(async (i, index) => {
@@ -270,10 +269,13 @@ const Plants = () => {
             }
 
             if (audio !== "" && audio !== null) {
-                const audioRef = storage.ref().child("/audio/plants").child(it.id);
+                const audioRef = storage.ref().child("/audio/plants").child(id);
+                console.log(3);
                 await audioRef.put(audio);
+                console.log(4);
                 const audioURL = await audioRef.getDownloadURL();
-                await db.collection('plants').doc(it.id).update({ audio: audioURL });
+                console.log(5);
+                await db.collection('plants').doc(id).update({ audio: audioURL });
             }
 
             obtenerPlantas();

@@ -258,8 +258,6 @@ const Plants = () => {
                 if (arr.length !== 0) {
                     await db.collection('plants').doc(id).update({ media: firebase.firestore.FieldValue.delete() });
                     arr.map(async (i, index) => {
-                        console.log('i', i);
-                        console.log('id',id);
                         const imagenRef = storage.ref().child(`/images/plants/${id}`).child(`${index}-${Date.now()}`);
                         await imagenRef.put(i);
                         const imagenURL = await imagenRef.getDownloadURL();
@@ -270,11 +268,8 @@ const Plants = () => {
 
             if (audio !== "" && audio !== null) {
                 const audioRef = storage.ref().child("/audio/plants").child(id);
-                console.log(3);
                 await audioRef.put(audio);
-                console.log(4);
                 const audioURL = await audioRef.getDownloadURL();
-                console.log(5);
                 await db.collection('plants').doc(id).update({ audio: audioURL });
             }
 

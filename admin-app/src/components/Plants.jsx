@@ -255,10 +255,12 @@ const Plants = () => {
 
             if (images !== null && images !== "") {
                 const arr = Array.from(images);
+                console.log(arr.length);
                 if (arr.length !== 0) {
+                    await db.collection('plants').doc(id).update({ media: firebase.firestore.FieldValue.delete() });
                     arr.map(async (i, index) => {
-                        console.log('i' + i);
-                        console.log('id' + id);
+                        console.log('i', i);
+                        console.log('id',id);
                         const imagenRef = storage.ref().child(`/images/plants/${id}`).child(`${index}-${Date.now()}`);
                         await imagenRef.put(i);
                         const imagenURL = await imagenRef.getDownloadURL();
@@ -268,7 +270,6 @@ const Plants = () => {
             }
 
             if (audio !== "" && audio !== null) {
-                console.log("hay audio nuevo")
                 const audioRef = storage.ref().child("/audio/plants").child(it.id);
                 await audioRef.put(audio);
                 const audioURL = await audioRef.getDownloadURL();

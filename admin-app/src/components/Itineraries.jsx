@@ -77,6 +77,7 @@ const Itineraries = () => {
 
   React.useEffect(() => {
     obtenerItinerarios();
+    obtenerPlantasLugares();
   }, []);
 
   const obtenerPlantasLugares = async () => {
@@ -93,9 +94,6 @@ const Itineraries = () => {
     }
   };
 
-  React.useEffect(() => {
-    obtenerPlantasLugares();
-  }, []);
 
   const actualizarPuntos = (p) => {
     setPuntos(p);
@@ -114,26 +112,39 @@ const Itineraries = () => {
       setID(id);
       setName(itinerarioInfo.name);
       setDescription(itinerarioInfo.description);
-      document.getElementById("editsortableselect").click()
+      
       setImage(itinerarioInfo.image);
     });
 
   };
 
-  const prepararParadas = (itinerarioInfo) => {
+  const prepararParadas = async (itinerarioInfo) => {
 
     let auxPuntos = [];
-    itinerarioInfo.paradas.forEach((parada) => {
-      let auxParada = plantasLugares.find(
-        (element) => element.value === parada.id
-        );
-        console.log(auxParada);
-        
-      auxPuntos.push({ value: auxParada.value, label: auxParada.label });
-      puntos.push(auxParada);
-    });
-
-    setPuntos(auxPuntos);
+    try {
+      const data = await db.collection("plants").get();
+      const arrayData = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      let infoSelect = [];
+      arrayData.forEach((element) => {
+        infoSelect.push({ value: element.id, label: element.name });
+      });
+      setPlantas_Lugares(infoSelect);
+      console.log(infoSelect)
+      itinerarioInfo.paradas.forEach((parada) => {
+        let auxParada = infoSelect.find(
+          (element) => element.value === parada.id
+          );
+          console.log(parada)
+          console.log(auxParada);
+          
+        auxPuntos.push({ value: auxParada.value, label: auxParada.label });
+        puntos.push(auxParada);
+      });
+      setPuntos(auxPuntos);
+      document.getElementById("editsortableselect").click()
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const cancelarEdit = () => {

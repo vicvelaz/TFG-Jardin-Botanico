@@ -85,6 +85,7 @@ import com.facebook.react.uimanager.events.RCTEventEmitter
 import com.mapbox.navigation.core.arrival.ArrivalController
 import com.mapbox.navigation.core.arrival.AutoArrivalController
 import com.mapbox.navigation.core.trip.session.LegIndexUpdatedCallback
+import com.mapbox.navigation.ui.maps.route.RouteLayerConstants
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLineColorResources
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLineResources
 
@@ -594,14 +595,17 @@ class MapboxNavigationView(private val context: ThemedReactContext, private val 
 
         val mapboxRouteLineOptions = MapboxRouteLineOptions.Builder(context)
                 .styleInactiveRouteLegsIndependently(true)
-            .withRouteLineBelowLayerId("road-label")
+            .withRouteLineBelowLayerId("road-pedestrian")
             .build()
 
         routeLineApi = MapboxRouteLineApi(mapboxRouteLineOptions)
         routeLineView = MapboxRouteLineView(mapboxRouteLineOptions)
 
         // initialize maneuver arrow view to draw arrows on the map
-        val routeArrowOptions = RouteArrowOptions.Builder(context).build()
+        val routeArrowOptions = RouteArrowOptions.Builder(context)
+                .withAboveLayerId(RouteLayerConstants.TOP_LEVEL_ROUTE_LINE_LAYER_ID)
+                .build()
+
         routeArrowView = MapboxRouteArrowView(routeArrowOptions)
 
         setCameraPositionToOrigin()

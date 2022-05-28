@@ -1,5 +1,5 @@
 import React from "react";
-import { db, storage } from "../firebase/firebase-config";
+import { db, storage, firebase } from "../firebase/firebase-config";
 import $ from "jquery";
 import "bootstrap";
 import "moment/locale/es";
@@ -104,7 +104,6 @@ const Itineraries = () => {
     obtenerItinerarios();
     db.collection('itinerary').doc(id).get().then(e => {
       const itinerarioInfo = e.data();
-      console.log(itinerarioInfo);
       document.getElementById("name").value = itinerarioInfo.name;
       document.getElementById("description").value = itinerarioInfo.description;
       prepararParadas(itinerarioInfo);
@@ -112,8 +111,7 @@ const Itineraries = () => {
       setID(id);
       setName(itinerarioInfo.name);
       setDescription(itinerarioInfo.description);
-      
-      setImage(itinerarioInfo.image);
+
     });
 
   };
@@ -129,13 +127,10 @@ const Itineraries = () => {
         infoSelect.push({ value: element.id, label: element.name });
       });
       setPlantas_Lugares(infoSelect);
-      console.log(infoSelect)
       itinerarioInfo.paradas.forEach((parada) => {
         let auxParada = infoSelect.find(
           (element) => element.value === parada.id
           );
-          console.log(parada)
-          console.log(auxParada);
           
         auxPuntos.push({ value: auxParada.value, label: auxParada.label });
         puntos.push(auxParada);
@@ -172,15 +167,20 @@ const Itineraries = () => {
         name: name,
         description: description,
         paradas: paradas,
-        image: "",
       });
 
-      if (image !== undefined) {
-        const imagenRef = storage.ref().child("/images/itinerary").child(id);
-        await imagenRef.put(image);
-        const imagenURL = await imagenRef.getDownloadURL();
-        await db.collection("itinerary").doc(id).update({ image: imagenURL });
-      }
+      if (image !== null && image !== "") {
+        const arr = Array.from(image);
+        if (arr.length !== 0) {
+            await db.collection('itinerary').doc(id).update({ media: firebase.firestore.FieldValue.delete() });
+            arr.map(async (i, index) => {
+                const imagenRef = storage.ref().child(`/images/itinerary/${id}`).child(`${index}-${Date.now()}`);
+                await imagenRef.put(i);
+                const imagenURL = await imagenRef.getDownloadURL();
+                await db.collection('itinerary').doc(id).update({ media: firebase.firestore.FieldValue.arrayUnion(imagenURL) });
+            })
+        }
+    }
 
       obtenerItinerarios();
 
@@ -213,20 +213,32 @@ const Itineraries = () => {
         name: name,
         description: description,
         paradas: paradas,
-        image: "",
       };
 
       const ev = await db.collection("itinerary").add(nuevoItinerario);
 
-      if (image !== undefined) {
-        const imagenRef = storage.ref().child("/images/itinerary").child(ev.id);
-        await imagenRef.put(image);
-        const imagenURL = await imagenRef.getDownloadURL();
-        await db
-          .collection("itinerary")
-          .doc(ev.id)
-          .update({ image: imagenURL });
-      }
+      // if (image !== undefined) {
+      //   const imagenRef = storage.ref().child("/images/itinerary").child(ev.id);
+      //   await imagenRef.put(image);
+      //   const imagenURL = await imagenRef.getDownloadURL();
+      //   await db.collection('itinerary').doc(ev.id).update({ media: firebase.firestore.FieldValue.arrayUnion(imagenURL) });
+      //   // await db
+      //   //   .collection("itinerary")
+      //   //   .doc(ev.id)
+      //   //   .update({ image: imagenURL });
+      // }
+
+      if (image !== null) {
+        const arr = Array.from(image);
+        if (arr.length !== 0) {
+            arr.map(async (i, index) => {
+                const imagenRef = storage.ref().child(`/images/itinerary/${ev.id}`).child(`${index}-${Date.now()}`);
+                await imagenRef.put(i);
+                const imagenURL = await imagenRef.getDownloadURL();
+                await db.collection('itinerary').doc(ev.id).update({ media: firebase.firestore.FieldValue.arrayUnion(imagenURL) });
+            })
+        }
+    }
 
       obtenerItinerarios();
 
@@ -247,13 +259,21 @@ const Itineraries = () => {
 
   const eliminarItinerario = async (id) => {
     try {
-      await db.collection("itinerary").doc(id).delete();
-      const imagenRef = storage.ref().child("/images/itinerary").child(id);
-      await imagenRef.delete();
+      await db.collection('itinerary').doc(id).delete();
+      const imagenRef = storage.ref().child(`/images/itinerary/${id}`);
+      imagenRef.listAll().then((listResults) => {
+          if (listResults.items.length !== 0) {
+              const promises = listResults.items.map((item) => {
+                  return item.delete();
+              });
+              Promise.all(promises);
+          }
+      });
       obtenerItinerarios();
-    } catch (error) {
-      console.log(error);
-    }
+
+  } catch (error) {
+    obtenerItinerarios();
+  }
   };
 
 
@@ -336,6 +356,7 @@ const Itineraries = () => {
                       accept="image/*"
                       id="formFile"
                       required={!edit}
+                      onChange={e => setImage(e.target.files)}
                     ></input>
                   </div>
                   <div className="modal-footer">

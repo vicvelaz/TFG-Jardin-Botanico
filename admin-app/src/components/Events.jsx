@@ -228,10 +228,10 @@ const Events = () => {
             document.getElementById("name").value = eventoInfo.name;
             document.getElementById("description").value = eventoInfo.description;
 
-            const initDate = new Date(eventoInfo.start_date * 1000);
+            const initDate = new Date(eventoInfo.start_date.seconds * 1000);
             document.getElementById("startevent").value = `${initDate.getFullYear()}-${('0' + (initDate.getMonth() + 1)).slice(-2)}-${('0' + initDate.getDate()).slice(-2)}`;
 
-            const endDate = new Date(eventoInfo.end_date * 1000);
+            const endDate = new Date(eventoInfo.end_date.seconds * 1000);
             document.getElementById("endevent").value = `${endDate.getFullYear()}-${('0' + (endDate.getMonth() + 1)).slice(-2)}-${('0' + endDate.getDate()).slice(-2)}`;
 
 
